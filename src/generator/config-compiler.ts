@@ -53,10 +53,7 @@ export class ConfigCompiler {
 		this.possibleJsonPaths = this.SchemaExtactionService.extractPossiblePaths(
 			this.jsonSchemas
 		);
-		// writeFileSync(
-		// 	"./validPaths.json",
-		// 	JSON.stringify(this.possibleJsonPaths, null, 2)
-		// );
+
 		const errors = this.buildData["x-errorcodes"];
 		this.errorDefinitions = errors.code;
 	};
@@ -137,6 +134,15 @@ export class ConfigCompiler {
 			`index.ts`,
 			l0,
 			"typescript"
+		);
+	};
+
+	generateValidPaths = async () => {
+		if (!this.possibleJsonPaths)
+			throw new Error("Possible paths not initialized");
+		writeFileSync(
+			"./validPaths.json",
+			JSON.stringify(this.possibleJsonPaths, null, 2)
 		);
 	};
 }
