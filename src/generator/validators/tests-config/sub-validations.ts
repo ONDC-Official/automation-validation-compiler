@@ -163,7 +163,6 @@ export class VariableValidator extends TestObjectValidator {
 			}
 			this.validateKey(key);
 			const value = this.targetObject[key];
-			console.log(value);
 			if (!isValidVariableValueType(value)) {
 				throw new Error(
 					`Variable: ${key} should be a string or array of primitives at path ${this.validationPath}`

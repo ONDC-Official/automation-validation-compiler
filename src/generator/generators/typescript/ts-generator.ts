@@ -196,7 +196,6 @@ export class TypescriptGenerator extends CodeGenerator {
 	};
 
 	private generateErrorFile(errors: ErrorDefinition[]): string {
-		console.log(errors);
 		const allCodes = errors.map((error) => error.code);
 		if (allCodes.length !== new Set(allCodes).size) {
 			throw new Error("Duplicate error codes found");

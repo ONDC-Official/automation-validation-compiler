@@ -140,9 +140,10 @@ export class ConfigCompiler {
 	generateValidPaths = async () => {
 		if (!this.possibleJsonPaths)
 			throw new Error("Possible paths not initialized");
-		writeFileSync(
-			"./validPaths.json",
-			JSON.stringify(this.possibleJsonPaths, null, 2)
-		);
+		// writeFileSync(
+		// 	"./validPaths.json",
+		// 	JSON.stringify(this.possibleJsonPaths, null, 2)
+		// );
+		return this.possibleJsonPaths;
 	};
 }
