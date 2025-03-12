@@ -37,10 +37,7 @@ export class SchemaExtactionService {
 						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
 						(_, match) => `['${match}']`
 					)
-					.replace(
-						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
-						(_, match) => `['${match}']`
-					)
+					.replace(/\.(@[\w-\/]+)/g, (_, match) => `['@${match.substring(1)}']`)
 			);
 		}
 		return paths;
