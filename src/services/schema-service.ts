@@ -32,7 +32,15 @@ export class SchemaExtactionService {
 		const paths: Record<string, string[]> = {};
 		for (const [key, schema] of Object.entries(schemas)) {
 			paths[key] = getAllJsonPaths(schema).map((p) =>
-				p.replace(/\.([\w-]+\/[\w-]+)(?![\w\]])/g, (_, match) => `['${match}']`)
+				p
+					.replace(
+						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
+						(_, match) => `['${match}']`
+					)
+					.replace(
+						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
+						(_, match) => `['${match}']`
+					)
 			);
 		}
 		return paths;
