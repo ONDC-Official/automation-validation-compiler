@@ -18,10 +18,6 @@ export class SchemaExtactionService {
 			const existingSchema =
 				paths[`/${targetApi}`].post.requestBody.content["application/json"]
 					.schema;
-			// output["response"] =
-			// 	paths[`/${targetApi}`].post.responses.default.content[
-			// 		"application/json"
-			// 	].schema;
 			const filtteredSchema = removeRequiredAndEnum(
 				existingSchema,
 				removeEnums,
@@ -35,7 +31,9 @@ export class SchemaExtactionService {
 	extractPossiblePaths = (schemas: Record<string, JSONSchema7>) => {
 		const paths: Record<string, string[]> = {};
 		for (const [key, schema] of Object.entries(schemas)) {
-			paths[key] = getAllJsonPaths(schema);
+			paths[key] = getAllJsonPaths(schema).map((p) =>
+				p.replace(/\.([\w-]+\/[\w-]+)(?![\w\]])/g, (_, match) => `['${match}']`)
+			);
 		}
 		return paths;
 	};

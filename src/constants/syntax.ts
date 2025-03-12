@@ -5,6 +5,7 @@ export enum TestObjectSyntax {
 	Continue = "_CONTINUE_",
 	ErrorCode = "_ERROR_CODE_",
 	SuccessCode = "_SUCCESS_CODE_",
+	Description = "_DESCRIPTION_",
 }
 
 export const ExternalDataSyntax = "_EXTERNAL";

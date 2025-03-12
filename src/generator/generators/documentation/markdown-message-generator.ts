@@ -7,6 +7,7 @@ import {
 	addTabToMarkdown,
 	ConvertArrayToStringsInTestObject,
 } from "../../../utils/general-utils/string-utils.js";
+import { TestObjectSyntax } from "../../../constants/syntax.js";
 
 export function markdownMessageGenerator(
 	returnInput: string,
@@ -15,7 +16,9 @@ export function markdownMessageGenerator(
 	skipInput?: string[]
 ) {
 	const ast = buildAstFromInput(returnInput);
-	const returnTemplate = CompileToMarkdown(ast, startingPointer, 0, false);
+	const returnTemplate = variableValues[TestObjectSyntax.Description]
+		? variableValues[TestObjectSyntax.Description]
+		: CompileToMarkdown(ast, startingPointer, 0, false);
 
 	let finalReturn = Mustache.render(
 		returnTemplate,

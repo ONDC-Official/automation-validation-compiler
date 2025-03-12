@@ -1,7 +1,7 @@
 import { JSONSchema7 } from "json-schema";
 import { BUILD_TYPE } from "../types/build.js";
 import { loadAndDereferenceYaml } from "../utils/config-utils/yaml.js";
-import { SchemaExtactionService } from "../services/schema-service.js";
+import { SchemaExtactionService as SchemaExtractionService } from "../services/schema-service.js";
 import { ErrorDefinition } from "../types/error-codes.js";
 import { ValidationConfig } from "../types/config-types.js";
 import logger from "../utils/logger.js";
@@ -15,16 +15,19 @@ import Mustache from "mustache";
 
 import { fileURLToPath } from "url";
 import path from "path";
+import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVariables.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 type CodeGeneratorConfig = {
-	removeRequiredfromSchema: boolean;
-	removeEnumsfromSchema: boolean;
+	removeRequiredFromSchema: boolean;
+	removeEnumsFromSchema: boolean;
+	duplicateVariablesInChildren: boolean;
 };
 
 const defaultConfig: CodeGeneratorConfig = {
-	removeRequiredfromSchema: true,
-	removeEnumsfromSchema: true,
+	removeRequiredFromSchema: true,
+	removeEnumsFromSchema: true,
+	duplicateVariablesInChildren: true,
 };
 
 export class ConfigCompiler {
@@ -32,11 +35,12 @@ export class ConfigCompiler {
 	jsonSchemas: Record<string, JSONSchema7> | undefined;
 	possibleJsonPaths: Record<string, string[]> | undefined;
 	errorDefinitions: ErrorDefinition[] | undefined;
+	generatorConfig: CodeGeneratorConfig | undefined;
 	language: SupportedLanguages;
-	private SchemaExtactionService: SchemaExtactionService;
+	private SchemaExtractionService: SchemaExtractionService;
 	constructor(language: SupportedLanguages) {
 		this.language = language;
-		this.SchemaExtactionService = new SchemaExtactionService();
+		this.SchemaExtractionService = new SchemaExtractionService();
 	}
 	// 1. extract build, create schemas , extract possible paths , extract errorcodes
 	initialize = async (
@@ -44,13 +48,14 @@ export class ConfigCompiler {
 		generatorConfig: Partial<CodeGeneratorConfig> = {}
 	) => {
 		const finalConfig = { ...defaultConfig, ...generatorConfig };
+		this.generatorConfig = finalConfig;
 		this.buildData = await loadAndDereferenceYaml<BUILD_TYPE>(buildYaml);
-		this.jsonSchemas = await this.SchemaExtactionService.extractSchemas(
+		this.jsonSchemas = await this.SchemaExtractionService.extractSchemas(
 			this.buildData,
-			finalConfig.removeRequiredfromSchema,
-			finalConfig.removeEnumsfromSchema
+			finalConfig.removeRequiredFromSchema,
+			finalConfig.removeEnumsFromSchema
 		);
-		this.possibleJsonPaths = this.SchemaExtactionService.extractPossiblePaths(
+		this.possibleJsonPaths = this.SchemaExtractionService.extractPossiblePaths(
 			this.jsonSchemas
 		);
 
@@ -83,6 +88,11 @@ export class ConfigCompiler {
 		valConfig: ValidationConfig,
 		codeName: string = "L1-Validations"
 	) => {
+		if (this.generatorConfig?.duplicateVariablesInChildren) {
+			console.log("Duplicating variables");
+			valConfig = duplicateVariablesInChildren(valConfig);
+		}
+
 		await this.performValidations(valConfig);
 		// Generate code based on the language
 		switch (this.language) {
