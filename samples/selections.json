@@ -181,7 +181,7 @@
 		]
 	},
 	"_SESSION_DATA_": {
-		"search": {
+	"search": {
 			"transaction_id": null,
 			"message_id": null,
 			"last_action": null,
@@ -211,6 +211,6 @@
 			"error_code": null,
 			"error_message": null,
 			"quote": null
-		}
+		}	
 	}
 }
