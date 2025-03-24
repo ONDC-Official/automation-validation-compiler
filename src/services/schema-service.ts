@@ -18,10 +18,10 @@ export class SchemaExtactionService {
 			const existingSchema =
 				paths[`/${targetApi}`].post.requestBody.content["application/json"]
 					.schema;
-			output["response"] =
-				paths[`/${targetApi}`].post.responses.default.content[
-					"application/json"
-				].schema;
+			// output["response"] =
+			// 	paths[`/${targetApi}`].post.responses.default.content[
+			// 		"application/json"
+			// 	].schema;
 			const filtteredSchema = removeRequiredAndEnum(
 				existingSchema,
 				removeEnums,
