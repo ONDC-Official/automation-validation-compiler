@@ -60,53 +60,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_CONTEXT_CODE_2(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.context.location.city.code",
-                );
-                const enumList = ["std:080"];
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate =
-                    validations.arePresent(attr) &&
-                    validations.allIn(attr, enumList);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_CONTEXT_CODE_2**: all of the following sub conditions must be met:
-
-  - **condition REQUIRED_CONTEXT_CODE_2.1**: $.context.location.city.code must be present in the payload
-  - **condition REQUIRED_CONTEXT_CODE_2.2**: every element of $.context.location.city.code must be in ["std:080"]
-
-	> Note: **Condition REQUIRED_CONTEXT_CODE_2** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_CONTEXT_DOMAIN_3(
             input: validationInput,
         ): validationOutput {
@@ -567,47 +520,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_MESSAGE_ID_14(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.id",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_ID_14**: $.message.order.id must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_ID_14** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_MESSAGE_STATUS_15(
             input: validationInput,
         ): validationOutput {
@@ -942,129 +854,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_MESSAGE_CATEGORY_IDS_23(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.items[*].category_ids[*]",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_CATEGORY_IDS_23**: $.message.order.items[*].category_ids[*] must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_CATEGORY_IDS_23** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_LABEL_24(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.items[*].time.label",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_LABEL_24**: $.message.order.items[*].time.label must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_LABEL_24** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_DURATION_25(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.items[*].time.duration",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_DURATION_25**: $.message.order.items[*].time.duration must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_DURATION_25** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_MESSAGE_ID_26(
             input: validationInput,
         ): validationOutput {
@@ -1178,88 +967,6 @@ export default function on_cancel(input: validationInput): validationOutput {
                             description: `- **condition REQUIRED_MESSAGE_URL_28**: $.message.order.provider.descriptor.images[*].url must be present in the payload
 
 	> Note: **Condition REQUIRED_MESSAGE_URL_28** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_START_29(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.provider.time.range.start",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_START_29**: $.message.order.provider.time.range.start must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_START_29** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_END_30(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.provider.time.range.end",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_END_30**: $.message.order.provider.time.range.end must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_END_30** can be skipped if the following conditions are met:
 	>
 	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
                         },
@@ -1623,7 +1330,7 @@ export default function on_cancel(input: validationInput): validationOutput {
                     "$.message.order.quote.breakup[*].title",
                 );
                 const enumList = [
-                    "BASE_PRICE",
+                    "BASE_FARE",
                     "REFUND",
                     "CANCELLATION_CHARGES",
                     "OFFER",
@@ -1650,7 +1357,7 @@ export default function on_cancel(input: validationInput): validationOutput {
                             description: `- **condition REQUIRED_MESSAGE_TITLE_39**: all of the following sub conditions must be met:
 
   - **condition REQUIRED_MESSAGE_TITLE_39.1**: $.message.order.quote.breakup[*].title must be present in the payload
-  - **condition REQUIRED_MESSAGE_TITLE_39.2**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_PRICE", "REFUND", "CANCELLATION_CHARGES", "OFFER", "TOLL"]
+  - **condition REQUIRED_MESSAGE_TITLE_39.2**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_FARE", "REFUND", "CANCELLATION_CHARGES", "OFFER", "TOLL"]
 
 	> Note: **Condition REQUIRED_MESSAGE_TITLE_39** can be skipped if the following conditions are met:
 	>
@@ -1931,170 +1638,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_MESSAGE_URL_46(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.cancellation_terms[*].external_ref.url",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_URL_46**: $.message.order.cancellation_terms[*].external_ref.url must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_URL_46** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_MIMETYPE_47(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.cancellation_terms[*].external_ref.mimetype",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_MIMETYPE_47**: $.message.order.cancellation_terms[*].external_ref.mimetype must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_MIMETYPE_47** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_CANCELLED_BY_48(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.cancellation.cancelled_by",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_CANCELLED_BY_48**: $.message.order.cancellation.cancelled_by must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_CANCELLED_BY_48** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_TIME_49(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.cancellation.time",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.order.fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_TIME_49**: $.message.order.cancellation.time must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_TIME_49** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.order.fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function VALID_ENUM_MESSAGE_TYPE_1(
             input: validationInput,
         ): validationOutput {
@@ -2219,7 +1762,12 @@ export default function on_cancel(input: validationInput): validationOutput {
                     testObj,
                     "$.list[*].descriptor.code",
                 );
-                const validValues = ["ROUTE_ID", "ROUTE_DIRECTION"];
+                const validValues = [
+                    "ROUTE_ID",
+                    "ROUTE_DIRECTION",
+                    "OPERATIONAL_START_TIME",
+                    "OPERATIONAL_END_TIME",
+                ];
 
                 const validate = validations.allIn(subTags, validValues);
 
@@ -2228,7 +1776,7 @@ export default function on_cancel(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition validate_tag_0_ROUTE_INFO**: every element of $.message.order.fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')].list[*].descriptor.code must be in ["ROUTE_ID", "ROUTE_DIRECTION"]`,
+                            description: `- **condition validate_tag_0_ROUTE_INFO**: every element of $.message.order.fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')].list[*].descriptor.code must be in ["ROUTE_ID", "ROUTE_DIRECTION", "OPERATIONAL_START_TIME", "OPERATIONAL_END_TIME"]`,
                         },
                     ];
                 }
@@ -2488,7 +2036,6 @@ export default function on_cancel(input: validationInput): validationOutput {
 
         const testFunctions: testFunctionArray = [
             REQUIRED_CONTEXT_CODE_1,
-            REQUIRED_CONTEXT_CODE_2,
             REQUIRED_CONTEXT_DOMAIN_3,
             REQUIRED_CONTEXT_TIMESTAMP_4,
             REQUIRED_CONTEXT_BAP_ID_5,
@@ -2500,7 +2047,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             REQUIRED_CONTEXT_TTL_11,
             REQUIRED_CONTEXT_BPP_ID_12,
             REQUIRED_CONTEXT_BPP_URI_13,
-            REQUIRED_MESSAGE_ID_14,
             REQUIRED_MESSAGE_STATUS_15,
             REQUIRED_MESSAGE_ID_16,
             REQUIRED_MESSAGE_NAME_17,
@@ -2509,14 +2055,9 @@ export default function on_cancel(input: validationInput): validationOutput {
             REQUIRED_MESSAGE_VALUE_20,
             REQUIRED_MESSAGE_COUNT_21,
             REQUIRED_MESSAGE_FULFILLMENT_IDS_22,
-            REQUIRED_MESSAGE_CATEGORY_IDS_23,
-            REQUIRED_MESSAGE_LABEL_24,
-            REQUIRED_MESSAGE_DURATION_25,
             REQUIRED_MESSAGE_ID_26,
             REQUIRED_MESSAGE_NAME_27,
             REQUIRED_MESSAGE_URL_28,
-            REQUIRED_MESSAGE_START_29,
-            REQUIRED_MESSAGE_END_30,
             REQUIRED_MESSAGE_ID_31,
             REQUIRED_MESSAGE_TYPE_32,
             REQUIRED_MESSAGE_ID_33,
@@ -2532,10 +2073,6 @@ export default function on_cancel(input: validationInput): validationOutput {
             REQUIRED_MESSAGE_TYPE_43,
             REQUIRED_MESSAGE_BANK_CODE_44,
             REQUIRED_MESSAGE_BANK_ACCOUNT_NUMBER_45,
-            REQUIRED_MESSAGE_URL_46,
-            REQUIRED_MESSAGE_MIMETYPE_47,
-            REQUIRED_MESSAGE_CANCELLED_BY_48,
-            REQUIRED_MESSAGE_TIME_49,
             VALID_ENUM_MESSAGE_TYPE_1,
             VALID_ENUM_MESSAGE_STATUS_2,
             validate_tag_0,

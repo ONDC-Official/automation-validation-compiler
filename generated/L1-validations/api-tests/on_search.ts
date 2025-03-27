@@ -60,53 +60,6 @@ export default function on_search(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_CONTEXT_CODE_2(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.context.location.city.code",
-                );
-                const enumList = ["std:080"];
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].fulfillments[*].vehicle.category",
-                );
-                const useCode = ["METRO"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate =
-                    validations.arePresent(attr) &&
-                    validations.allIn(attr, enumList);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_CONTEXT_CODE_2**: all of the following sub conditions must be met:
-
-  - **condition REQUIRED_CONTEXT_CODE_2.1**: $.context.location.city.code must be present in the payload
-  - **condition REQUIRED_CONTEXT_CODE_2.2**: every element of $.context.location.city.code must be in ["std:080"]
-
-	> Note: **Condition REQUIRED_CONTEXT_CODE_2** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.catalog.providers[*].fulfillments[*].vehicle.category must **not** be in ["METRO"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_CONTEXT_DOMAIN_3(
             input: validationInput,
         ): validationOutput {
@@ -1642,176 +1595,6 @@ export default function on_search(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_MESSAGE_ID_40(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].categories[*].id",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_ID_40**: $.message.catalog.providers[*].categories[*].id must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_ID_40** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.catalog.providers[*].fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_CODE_41(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].categories[*].descriptor.code",
-                );
-                const enumList = ["TICKET", "PASS"];
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate =
-                    validations.arePresent(attr) &&
-                    validations.allIn(attr, enumList);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_CODE_41**: all of the following sub conditions must be met:
-
-  - **condition REQUIRED_MESSAGE_CODE_41.1**: $.message.catalog.providers[*].categories[*].descriptor.code must be present in the payload
-  - **condition REQUIRED_MESSAGE_CODE_41.2**: every element of $.message.catalog.providers[*].categories[*].descriptor.code must be in ["TICKET", "PASS"]
-
-	> Note: **Condition REQUIRED_MESSAGE_CODE_41** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.catalog.providers[*].fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_START_42(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].time.range.start",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_START_42**: $.message.catalog.providers[*].time.range.start must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_START_42** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.catalog.providers[*].fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_END_43(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].time.range.end",
-                );
-                const useCasePath = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.catalog.providers[*].fulfillments[*].vehicle.category",
-                );
-                const useCode = ["BUS"];
-
-                const skipCheck = !validations.allIn(useCasePath, useCode);
-                if (skipCheck) continue;
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_END_43**: $.message.catalog.providers[*].time.range.end must be present in the payload
-
-	> Note: **Condition REQUIRED_MESSAGE_END_43** can be skipped if the following conditions are met:
-	>
-	> - **condition B**: every element of $.message.catalog.providers[*].fulfillments[*].vehicle.category must **not** be in ["BUS"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_MESSAGE_NAME_44(
             input: validationInput,
         ): validationOutput {
@@ -2438,39 +2221,6 @@ export default function on_search(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function validate_tag_1_ROUTE_INFO(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(
-                input.payload,
-                "$.message.catalog.providers[*].fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')]",
-            );
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const subTags = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.list[*].descriptor.code",
-                );
-                const validValues = ["ROUTE_ID", "ROUTE_DIRECTION"];
-
-                const validate = validations.allIn(subTags, validValues);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition validate_tag_1_ROUTE_INFO**: every element of $.message.catalog.providers[*].fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')].list[*].descriptor.code must be in ["ROUTE_ID", "ROUTE_DIRECTION"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function validate_tag_1_TICKET_INFO(
             input: validationInput,
         ): validationOutput {
@@ -2722,7 +2472,6 @@ export default function on_search(input: validationInput): validationOutput {
 
         const testFunctions: testFunctionArray = [
             REQUIRED_CONTEXT_CODE_1,
-            REQUIRED_CONTEXT_CODE_2,
             REQUIRED_CONTEXT_DOMAIN_3,
             REQUIRED_CONTEXT_TIMESTAMP_4,
             REQUIRED_CONTEXT_BAP_ID_5,
@@ -2760,10 +2509,6 @@ export default function on_search(input: validationInput): validationOutput {
             REQUIRED_CONTEXT_BPP_URI_37,
             REQUIRED_MESSAGE_NAME_38,
             REQUIRED_MESSAGE_ID_39,
-            REQUIRED_MESSAGE_ID_40,
-            REQUIRED_MESSAGE_CODE_41,
-            REQUIRED_MESSAGE_START_42,
-            REQUIRED_MESSAGE_END_43,
             REQUIRED_MESSAGE_NAME_44,
             REQUIRED_MESSAGE_ID_45,
             REQUIRED_MESSAGE_TYPE_46,
@@ -2780,7 +2525,6 @@ export default function on_search(input: validationInput): validationOutput {
             validate_tag_0,
             validate_tag_0_FARE_POLICY,
             validate_tag_1,
-            validate_tag_1_ROUTE_INFO,
             validate_tag_1_TICKET_INFO,
             validate_tag_1_TRIP_DETAILS,
             validate_tag_2,

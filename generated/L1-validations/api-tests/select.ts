@@ -48,41 +48,6 @@ export default function select(input: validationInput): validationOutput {
             }
             return [{ valid: valid, code: 200 }, ...subResults];
         }
-        function REQUIRED_CONTEXT_CODE_2(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.context.location.city.code",
-                );
-                const enumList = ["std:080"];
-
-                const validate =
-                    validations.arePresent(attr) &&
-                    validations.allIn(attr, enumList);
-
-                if (!validate) {
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_CONTEXT_CODE_2**: all of the following sub conditions must be met:
-
-  - **condition REQUIRED_CONTEXT_CODE_2.1**: $.context.location.city.code must be present in the payload
-  - **condition REQUIRED_CONTEXT_CODE_2.2**: every element of $.context.location.city.code must be in ["std:080"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
         function REQUIRED_CONTEXT_DOMAIN_3(
             input: validationInput,
         ): validationOutput {
@@ -1238,7 +1203,7 @@ export default function select(input: validationInput): validationOutput {
             for (const testObj of scope) {
                 testObj._EXTERNAL = input.externalData;
                 const enumList = [
-                    "BASE_PRICE",
+                    "BASE_FARE",
                     "REFUND",
                     "CANCELLATION_CHARGES",
                     "OFFER",
@@ -1259,7 +1224,7 @@ export default function select(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition VALID_ENUM_MESSAGE_TITLE_8**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_PRICE", "REFUND", "CANCELLATION_CHARGES", "OFFER", "TOLL"]
+                            description: `- **condition VALID_ENUM_MESSAGE_TITLE_8**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_FARE", "REFUND", "CANCELLATION_CHARGES", "OFFER", "TOLL"]
 
 	> Note: **Condition VALID_ENUM_MESSAGE_TITLE_8** can be skipped if the following conditions are met:
 	>
@@ -1322,7 +1287,12 @@ export default function select(input: validationInput): validationOutput {
                     testObj,
                     "$.list[*].descriptor.code",
                 );
-                const validValues = ["ROUTE_ID", "ROUTE_DIRECTION"];
+                const validValues = [
+                    "ROUTE_ID",
+                    "ROUTE_DIRECTION",
+                    "OPERATIONAL_START_TIME",
+                    "OPERATIONAL_END_TIME",
+                ];
 
                 const validate = validations.allIn(subTags, validValues);
 
@@ -1331,7 +1301,7 @@ export default function select(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition validate_tag_0_ROUTE_INFO**: every element of $.message.order.fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')].list[*].descriptor.code must be in ["ROUTE_ID", "ROUTE_DIRECTION"]`,
+                            description: `- **condition validate_tag_0_ROUTE_INFO**: every element of $.message.order.fulfillments[*].tags[?(@.descriptor.code=='ROUTE_INFO')].list[*].descriptor.code must be in ["ROUTE_ID", "ROUTE_DIRECTION", "OPERATIONAL_START_TIME", "OPERATIONAL_END_TIME"]`,
                         },
                     ];
                 }
@@ -1409,7 +1379,6 @@ export default function select(input: validationInput): validationOutput {
 
         const testFunctions: testFunctionArray = [
             REQUIRED_CONTEXT_CODE_1,
-            REQUIRED_CONTEXT_CODE_2,
             REQUIRED_CONTEXT_DOMAIN_3,
             REQUIRED_CONTEXT_TIMESTAMP_4,
             REQUIRED_CONTEXT_BAP_ID_5,

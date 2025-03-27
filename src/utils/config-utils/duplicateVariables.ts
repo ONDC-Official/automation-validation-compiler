@@ -52,6 +52,6 @@ function duplicateVariables(
 	} else {
 		// console.log("adding variables", parentVariables, test);
 		Object.assign(test, parentVariables);
-		console.log(test);
+		// console.log(test);
 	}
 }
