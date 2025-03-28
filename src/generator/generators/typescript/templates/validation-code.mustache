@@ -30,6 +30,7 @@ if(invalidResults.length > 0) {
 const validate = {{{returnStatement}}}
 
 if(!validate){
+    delete testObj._EXTERNAL;
     return [{
         valid: false,
         code: {{errorCode}},

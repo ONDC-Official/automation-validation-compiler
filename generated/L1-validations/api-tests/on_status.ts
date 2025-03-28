@@ -40,6 +40,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -87,6 +88,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -131,6 +133,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -172,6 +175,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -213,6 +217,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -254,6 +259,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -295,6 +301,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -339,6 +346,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -383,6 +391,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -421,6 +430,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -462,6 +472,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -503,6 +514,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -544,6 +556,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -585,6 +598,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -626,6 +640,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -670,6 +685,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -714,6 +730,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -755,6 +772,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -796,6 +814,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -837,6 +856,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -878,6 +898,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -919,6 +940,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -960,6 +982,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1001,6 +1024,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1042,6 +1066,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1086,6 +1111,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1130,6 +1156,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1171,6 +1198,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1212,6 +1240,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1253,6 +1282,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1294,6 +1324,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1335,6 +1366,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1376,6 +1408,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1426,6 +1459,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1470,6 +1504,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1511,6 +1546,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1552,6 +1588,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1593,6 +1630,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1637,6 +1675,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1684,6 +1723,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1735,6 +1775,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1779,6 +1820,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1820,6 +1862,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1861,6 +1904,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1902,6 +1946,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1943,6 +1988,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -1984,6 +2030,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2025,6 +2072,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2066,6 +2114,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2107,6 +2156,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2148,6 +2198,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2189,6 +2240,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2230,6 +2282,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2271,6 +2324,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2309,6 +2363,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2350,6 +2405,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2391,6 +2447,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2432,6 +2489,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2473,6 +2531,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2514,6 +2573,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2555,6 +2615,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2596,6 +2657,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2637,6 +2699,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2678,6 +2741,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2719,6 +2783,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2760,6 +2825,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2801,6 +2867,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2842,6 +2909,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2883,6 +2951,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2924,6 +2993,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -2965,6 +3035,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3006,6 +3077,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3047,6 +3119,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3088,6 +3161,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3132,6 +3206,7 @@ export default function on_status(input: validationInput): validationOutput {
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3176,6 +3251,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3217,6 +3293,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3258,6 +3335,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3299,6 +3377,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3340,6 +3419,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3381,6 +3461,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3422,6 +3503,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3463,6 +3545,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3504,6 +3587,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3545,6 +3629,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3586,6 +3671,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3627,6 +3713,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3668,6 +3755,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3709,6 +3797,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3750,6 +3839,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3791,6 +3881,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3832,6 +3923,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3873,6 +3965,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.arePresent(attr);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3910,6 +4003,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(enumPath, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3947,6 +4041,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(enumPath, enumList);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -3982,6 +4077,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(tagPath, validTags);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4024,6 +4120,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4057,6 +4154,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4090,6 +4188,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4121,6 +4220,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(tagPath, validTags);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4158,6 +4258,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4189,6 +4290,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(tagPath, validTags);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4230,6 +4332,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
@@ -4272,6 +4375,7 @@ export default function on_status(input: validationInput): validationOutput {
                 const validate = validations.allIn(subTags, validValues);
 
                 if (!validate) {
+                    delete testObj._EXTERNAL;
                     return [
                         {
                             valid: false,
