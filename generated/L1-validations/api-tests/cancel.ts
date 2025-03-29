@@ -61,7 +61,7 @@ export default function cancel(input: validationInput): validationOutput {
                     testObj,
                     "$.context.domain",
                 );
-                const enumList = ["ONDC:TRV11"];
+                const enumList = ["ONDC:TRV10"];
 
                 const validate =
                     validations.arePresent(attr) &&
@@ -76,7 +76,7 @@ export default function cancel(input: validationInput): validationOutput {
                             description: `- **condition REQUIRED_CONTEXT_DOMAIN_3**: all of the following sub conditions must be met:
 
   - **condition REQUIRED_CONTEXT_DOMAIN_3.1**: $.context.domain must be present in the payload
-  - **condition REQUIRED_CONTEXT_DOMAIN_3.2**: every element of $.context.domain must be in ["ONDC:TRV11"]`,
+  - **condition REQUIRED_CONTEXT_DOMAIN_3.2**: every element of $.context.domain must be in ["ONDC:TRV10"]`,
                         },
                     ];
                 }
@@ -430,8 +430,22 @@ export default function cancel(input: validationInput): validationOutput {
                     testObj,
                     "$.message.cancellation_reason_id",
                 );
+                const enumList = [
+                    "000",
+                    "001",
+                    "002",
+                    "003",
+                    "004",
+                    "005",
+                    "011",
+                    "012",
+                    "013",
+                    "014",
+                ];
 
-                const validate = validations.arePresent(attr);
+                const validate =
+                    validations.arePresent(attr) &&
+                    validations.allIn(attr, enumList);
 
                 if (!validate) {
                     delete testObj._EXTERNAL;
@@ -439,7 +453,10 @@ export default function cancel(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_CANCELLATION_REASON_ID_15**: $.message.cancellation_reason_id must be present in the payload`,
+                            description: `- **condition REQUIRED_MESSAGE_CANCELLATION_REASON_ID_15**: all of the following sub conditions must be met:
+
+  - **condition REQUIRED_MESSAGE_CANCELLATION_REASON_ID_15.1**: $.message.cancellation_reason_id must be present in the payload
+  - **condition REQUIRED_MESSAGE_CANCELLATION_REASON_ID_15.2**: every element of $.message.cancellation_reason_id must be in ["000", "001", "002", "003", "004", "005", "011", "012", "013", "014"]`,
                         },
                     ];
                 }
@@ -460,7 +477,15 @@ export default function cancel(input: validationInput): validationOutput {
                     testObj,
                     "$.message.descriptor.code",
                 );
-                const enumList = ["SOFT_CANCEL", "CONFIRM_CANCEL"];
+                const enumList = [
+                    "SOFT_CANCEL",
+                    "CONFIRM_CANCEL",
+                    "ACTIVE",
+                    "COMPLETE",
+                    "CANCELLED",
+                    "UPDATED",
+                    "CONFIRM_UPDATE",
+                ];
 
                 const validate =
                     validations.arePresent(attr) &&
@@ -475,37 +500,7 @@ export default function cancel(input: validationInput): validationOutput {
                             description: `- **condition REQUIRED_MESSAGE_CODE_16**: all of the following sub conditions must be met:
 
   - **condition REQUIRED_MESSAGE_CODE_16.1**: $.message.descriptor.code must be present in the payload
-  - **condition REQUIRED_MESSAGE_CODE_16.2**: every element of $.message.descriptor.code must be in ["SOFT_CANCEL", "CONFIRM_CANCEL"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_NAME_17(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.descriptor.name",
-                );
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    delete testObj._EXTERNAL;
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_NAME_17**: $.message.descriptor.name must be present in the payload`,
+  - **condition REQUIRED_MESSAGE_CODE_16.2**: every element of $.message.descriptor.code must be in ["SOFT_CANCEL", "CONFIRM_CANCEL", "ACTIVE", "COMPLETE", "CANCELLED", "UPDATED", "CONFIRM_UPDATE"]`,
                         },
                     ];
                 }
@@ -531,7 +526,6 @@ export default function cancel(input: validationInput): validationOutput {
             REQUIRED_MESSAGE_ORDER_ID_14,
             REQUIRED_MESSAGE_CANCELLATION_REASON_ID_15,
             REQUIRED_MESSAGE_CODE_16,
-            REQUIRED_MESSAGE_NAME_17,
         ];
 
         let invalidResults: validationOutput = [];

@@ -1,3 +1,4 @@
+import normalizeKeys from "./utils/json-normalizer";
 import search from "./api-tests/search";
 import select from "./api-tests/select";
 import init from "./api-tests/init";
@@ -12,17 +13,20 @@ import on_confirm from "./api-tests/on_confirm";
 import on_cancel from "./api-tests/on_cancel";
 import on_update from "./api-tests/on_update";
 import on_status from "./api-tests/on_status";
+import track from "./api-tests/track";
+import on_track from "./api-tests/on_track";
 
-export function performL1Validations(
+export function performL1validations(
     action: string,
     payload: any,
     allErrors = false,
     externalData = {},
 ) {
+    const normalizedPayload = normalizeKeys(payload);
     switch (action) {
         case "search":
             return search({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -30,7 +34,7 @@ export function performL1Validations(
             });
         case "select":
             return select({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -38,7 +42,7 @@ export function performL1Validations(
             });
         case "init":
             return init({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -46,7 +50,7 @@ export function performL1Validations(
             });
         case "confirm":
             return confirm({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -54,7 +58,7 @@ export function performL1Validations(
             });
         case "status":
             return status({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -62,7 +66,7 @@ export function performL1Validations(
             });
         case "cancel":
             return cancel({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -70,7 +74,7 @@ export function performL1Validations(
             });
         case "update":
             return update({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -78,7 +82,7 @@ export function performL1Validations(
             });
         case "on_search":
             return on_search({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -86,7 +90,7 @@ export function performL1Validations(
             });
         case "on_select":
             return on_select({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -94,7 +98,7 @@ export function performL1Validations(
             });
         case "on_init":
             return on_init({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -102,7 +106,7 @@ export function performL1Validations(
             });
         case "on_confirm":
             return on_confirm({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -110,7 +114,7 @@ export function performL1Validations(
             });
         case "on_cancel":
             return on_cancel({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -118,7 +122,7 @@ export function performL1Validations(
             });
         case "on_update":
             return on_update({
-                payload: payload,
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,
@@ -126,7 +130,23 @@ export function performL1Validations(
             });
         case "on_status":
             return on_status({
-                payload: payload,
+                payload: normalizedPayload,
+                externalData: externalData,
+                config: {
+                    runAllValidations: allErrors,
+                },
+            });
+        case "track":
+            return track({
+                payload: normalizedPayload,
+                externalData: externalData,
+                config: {
+                    runAllValidations: allErrors,
+                },
+            });
+        case "on_track":
+            return on_track({
+                payload: normalizedPayload,
                 externalData: externalData,
                 config: {
                     runAllValidations: allErrors,

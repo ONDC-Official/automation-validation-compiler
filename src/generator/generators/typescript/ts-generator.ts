@@ -60,7 +60,10 @@ export class TypescriptGenerator extends CodeGenerator {
 			path.resolve(__dirname, "./templates/test-config.mustache"),
 			"utf-8"
 		);
-
+		const normalizerTemplate = readFileSync(
+			path.resolve(__dirname, "./templates/json-normalizer.mustache"),
+			"utf-8"
+		);
 		const typesCode = Mustache.render(typesTemplate, {
 			externalData: this.getExternalKeys(),
 		});
@@ -68,6 +71,12 @@ export class TypescriptGenerator extends CodeGenerator {
 			this.rootPath,
 			"./utils/json-path-utils.ts",
 			jsonPathUtilsCode,
+			"typescript"
+		);
+		writeAndFormatCode(
+			this.rootPath,
+			"./utils/json-normalizer.ts",
+			normalizerTemplate,
 			"typescript"
 		);
 		writeAndFormatCode(
@@ -246,11 +255,12 @@ export class TypescriptGenerator extends CodeGenerator {
 			.join("\n");
 		const masterFunction = `
 				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData = {}) {
+				const normalizedPayload = normalizeKeys(payload);
 					switch (action) {
 						${apis
 							.map(
 								(api) => `case "${api}": return ${api}({
-				payload: payload,
+				payload: normalizedPayload,
 				externalData: externalData,
 				config: {
 					runAllValidations: allErrors,
@@ -262,7 +272,8 @@ export class TypescriptGenerator extends CodeGenerator {
 							throw new Error("Action not found");
 					}
 			}`;
-		return `
+		return `	
+				import normalizeKeys from "./utils/json-normalizer";
 				${importsCode}
 				${masterFunction}
 			`;
