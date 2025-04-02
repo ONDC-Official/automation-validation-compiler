@@ -917,7 +917,7 @@
 </ul>
 </blockquote>
 </li>
-<li><p><strong>condition VALID_ENUM_MESSAGE_TITLE_13</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;]</p>
+<li><p><strong>condition VALID_ENUM_MESSAGE_TITLE_13</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;, &quot;ADD_ONS&quot;]</p>
 <blockquote>
 <p>Note: <strong>Condition VALID_ENUM_MESSAGE_TITLE_13</strong> can be skipped if the following conditions are met:</p>
 <ul>
@@ -965,6 +965,8 @@
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
 </li>
+<li><p><strong>on_search_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
 <li><p><strong>condition REQUIRED_MESSAGE_NAME_14</strong>: $.message.catalog.descriptor.name must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_15</strong>: $.message.catalog.providers[*].id must be present in the payload</p>
@@ -1117,6 +1119,8 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_select</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
@@ -1155,6 +1159,8 @@
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
 </li>
+<li><p><strong>on_select_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_NAME_15</strong>: $.message.order.items[*].descriptor.name must be present in the payload</p>
@@ -1196,7 +1202,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_27</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_27.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_27.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_27.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_VALUE_28</strong>: $.message.order.quote.breakup[*].price.value must be present in the payload</p>
@@ -1313,24 +1319,10 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_init</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
-<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
-<blockquote>
-<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
-<blockquote>
-<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
-</ul>
-</blockquote>
-</li>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_CONTEXT_CODE_1.1</strong>: $.context.location.country.code must be present in the payload</li>
@@ -1366,6 +1358,24 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_init_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
+<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
+<blockquote>
+<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
+<blockquote>
+<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
+</ul>
+</blockquote>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
@@ -1416,7 +1426,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_31</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_31.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_31.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_31.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_CURRENCY_32</strong>: $.message.order.quote.breakup[*].price.currency must be present in the payload</p>
@@ -1547,24 +1557,10 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_confirm</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
-<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
-<blockquote>
-<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
-<blockquote>
-<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
-</ul>
-</blockquote>
-</li>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_CONTEXT_CODE_1.1</strong>: $.context.location.country.code must be present in the payload</li>
@@ -1600,6 +1596,24 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_confirm_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
+<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
+<blockquote>
+<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
+<blockquote>
+<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
+</ul>
+</blockquote>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
@@ -1656,7 +1670,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_32</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_32.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_32.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_32.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_CURRENCY_33</strong>: $.message.order.quote.breakup[*].price.currency must be present in the payload</p>
@@ -1793,24 +1807,10 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_cancel</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
-<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
-<blockquote>
-<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
-<blockquote>
-<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
-</ul>
-</blockquote>
-</li>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_CONTEXT_CODE_1.1</strong>: $.context.location.country.code must be present in the payload</li>
@@ -1846,6 +1846,24 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_cancel_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
+<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
+<blockquote>
+<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
+<blockquote>
+<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
+</ul>
+</blockquote>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
@@ -1912,7 +1930,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_37</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_37.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_37.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_37.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_CURRENCY_38</strong>: $.message.order.quote.breakup[*].price.currency must be present in the payload</p>
@@ -2057,24 +2075,10 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_update</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
-<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
-<blockquote>
-<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
-<blockquote>
-<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
-</ul>
-</blockquote>
-</li>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_CONTEXT_CODE_1.1</strong>: $.context.location.country.code must be present in the payload</li>
@@ -2110,6 +2114,24 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_update_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
+<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
+<blockquote>
+<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
+<blockquote>
+<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
+</ul>
+</blockquote>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
@@ -2172,7 +2194,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_35</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_35.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_35.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_35.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_CURRENCY_36</strong>: $.message.order.quote.breakup[*].price.currency must be present in the payload</p>
@@ -2305,24 +2327,10 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>on_status</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
-<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
-<blockquote>
-<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
-<blockquote>
-<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
-<ul>
-<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
-</ul>
-</blockquote>
-</li>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_CONTEXT_CODE_1.1</strong>: $.context.location.country.code must be present in the payload</li>
@@ -2358,6 +2366,24 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_status_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
+<ul>
+<li><p><strong>condition FULFILLMENT_STATE_ENDED</strong>: every element of $.message.order.fulfillments[*].state.descriptor.code must be in [&quot;RIDE_ENDED&quot;, &quot;RIDE_STARTED&quot;]</p>
+<blockquote>
+<p>Note: <strong>Condition FULFILLMENT_STATE_ENDED</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of [&quot;CLAIMED&quot;] must <strong>not</strong> be in $.message.order.fulfillments[<em>].stops[</em>].authorization.status</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>condition PAYMENT_STATUS_TRANSACTION_ID</strong>: $.message.order.payments[*].params.transaction_id must be present in the payload</p>
+<blockquote>
+<p>Note: <strong>Condition PAYMENT_STATUS_TRANSACTION_ID</strong> can be skipped if the following conditions are met:</p>
+<ul>
+<li><strong>condition B</strong>: every element of $.message.order.payments[*].status must <strong>not</strong> be in [&quot;PAID&quot;]</li>
+</ul>
+</blockquote>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_ID_14</strong>: $.message.order.items[*].id must be present in the payload</p>
 </li>
@@ -2420,7 +2446,7 @@
 <li><p><strong>condition REQUIRED_MESSAGE_TITLE_35</strong>: all of the following sub conditions must be met:</p>
 <ul>
 <li><strong>condition REQUIRED_MESSAGE_TITLE_35.1</strong>: $.message.order.quote.breakup[*].title must be present in the payload</li>
-<li><strong>condition REQUIRED_MESSAGE_TITLE_35.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;]</li>
+<li><strong>condition REQUIRED_MESSAGE_TITLE_35.2</strong>: every element of $.message.order.quote.breakup[*].title must be in [&quot;BASE_FARE&quot;, &quot;DISTANCE_FARE&quot;, &quot;CANCELLATION_CHARGES&quot;, &quot;REFUND&quot;, &quot;TOLL_CHARGES&quot;, &quot;PARKING_CHARGES&quot;, &quot;TAX&quot;, &quot;WAITING_CHARGES&quot;, &quot;DRIVER_BATA&quot;, &quot;NIGHT_CHARGES&quot;, &quot;BUYER_ADDITIONAL_AMOUNT&quot;, &quot;ADD_ONS&quot;]</li>
 </ul>
 </li>
 <li><p><strong>condition REQUIRED_MESSAGE_CURRENCY_36</strong>: $.message.order.quote.breakup[*].price.currency must be present in the payload</p>
@@ -2553,6 +2579,8 @@
 </li>
 </ul>
 </li>
+</ul>
+</li>
 <li><p><strong>track</strong> : All the following sub conditions must pass as per the api requirement</p>
 <ul>
 <li><p><strong>condition REQUIRED_CONTEXT_CODE_1</strong>: all of the following sub conditions must be met:</p>
@@ -2630,6 +2658,8 @@
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_ID_12</strong>: $.context.bpp_id must be present in the payload</p>
 </li>
 <li><p><strong>condition REQUIRED_CONTEXT_BPP_URI_13</strong>: $.context.bpp_uri must be present in the payload</p>
+</li>
+<li><p><strong>on_track_Message_TESTS</strong> : All the following sub conditions must pass as per the api requirement</p>
 </li>
 </ul>
 </li>

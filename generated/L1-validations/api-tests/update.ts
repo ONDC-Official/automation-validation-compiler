@@ -1007,6 +1007,7 @@ export default function update(input: validationInput): validationOutput {
                     "DRIVER_BATA",
                     "NIGHT_CHARGES",
                     "BUYER_ADDITIONAL_AMOUNT",
+                    "ADD_ONS",
                 ];
                 const enumPath = payloadUtils.getJsonPath(
                     testObj,
@@ -1024,7 +1025,7 @@ export default function update(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition VALID_ENUM_MESSAGE_TITLE_13**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_FARE", "DISTANCE_FARE", "CANCELLATION_CHARGES", "REFUND", "TOLL_CHARGES", "PARKING_CHARGES", "TAX", "WAITING_CHARGES", "DRIVER_BATA", "NIGHT_CHARGES", "BUYER_ADDITIONAL_AMOUNT"]
+                            description: `- **condition VALID_ENUM_MESSAGE_TITLE_13**: every element of $.message.order.quote.breakup[*].title must be in ["BASE_FARE", "DISTANCE_FARE", "CANCELLATION_CHARGES", "REFUND", "TOLL_CHARGES", "PARKING_CHARGES", "TAX", "WAITING_CHARGES", "DRIVER_BATA", "NIGHT_CHARGES", "BUYER_ADDITIONAL_AMOUNT", "ADD_ONS"]
 
 	> Note: **Condition VALID_ENUM_MESSAGE_TITLE_13** can be skipped if the following conditions are met:
 	>

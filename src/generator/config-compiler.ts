@@ -27,7 +27,7 @@ type CodeGeneratorConfig = {
 const defaultConfig: CodeGeneratorConfig = {
 	removeRequiredFromSchema: true,
 	removeEnumsFromSchema: true,
-	duplicateVariablesInChildren: true,
+	duplicateVariablesInChildren: false,
 };
 
 export class ConfigCompiler {
