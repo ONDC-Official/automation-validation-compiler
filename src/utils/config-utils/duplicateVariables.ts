@@ -22,7 +22,13 @@ export function duplicateVariablesInChildren(
 		}
 	}
 	// console.log(JSON.stringify(valConfig, null, 2));
-
+	if(valConfig[ConfigSyntax.SessionData]["search"]){
+		valConfig[ConfigSyntax.SessionData]["search"]._SELF = null;
+	}else{
+		valConfig[ConfigSyntax.SessionData]["search"] = {
+			_SELF: null,
+		};
+	}
 	return valConfig;
 }
 
@@ -31,7 +37,7 @@ function duplicateVariables(
 	parentVariables: Record<string, ConfigVariable>
 ) {
 	const variables = getVariablesFromTest(test);
-	const extractedVariables: Record<string, ConfigVariable> = {};
+	let extractedVariables: Record<string, ConfigVariable> = {};
 	for (const v of variables) {
 		const value = test[v];
 		if (typeof value === "string") {
@@ -41,6 +47,7 @@ function duplicateVariables(
 			extractedVariables[v] = value as Primitive[];
 		}
 	}
+	extractedVariables = convertToDuplicatePaths(extractedVariables);
 	if (Array.isArray(test[TestObjectSyntax.Return])) {
 		const returnArray = test[TestObjectSyntax.Return] as TestObject[];
 		for (const returnTest of returnArray) {
@@ -54,4 +61,14 @@ function duplicateVariables(
 		Object.assign(test, parentVariables);
 		// console.log(test);
 	}
+}
+
+function convertToDuplicatePaths(current : Record<string,ConfigVariable> ){
+	for(const key in current){
+		if(typeof current[key] === "string"){
+			const value = current[key].slice(2);
+			current[key] = `$._EXTERNAL._SELF.${value}`
+		}
+	}
+	return current;
 }

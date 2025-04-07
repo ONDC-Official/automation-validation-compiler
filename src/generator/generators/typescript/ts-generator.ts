@@ -256,6 +256,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		const masterFunction = `
 				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData = {}) {
 				const normalizedPayload = normalizeKeys(payload);
+				externalData._SELF = normalizedPayload;
 					switch (action) {
 						${apis
 							.map(

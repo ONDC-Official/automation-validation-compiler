@@ -4,8 +4,7 @@ function areUnique(operand: string[]) {
 }
 
 function arePresent(operand: string[]) {
-
-	return noneIn(operand, ["", "null", "undefined"]) && operand.length > 0;
+	return noneIn(operand, ["null", "undefined"]) && operand.length > 0;
 }
 
 
