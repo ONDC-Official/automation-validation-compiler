@@ -254,7 +254,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			.map((api) => `import ${api} from "./api-tests/${api}";`)
 			.join("\n");
 		const masterFunction = `
-				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData = {}) {
+				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData : any = {}) {
 				const normalizedPayload = normalizeKeys(payload);
 				externalData._SELF = normalizedPayload;
 					switch (action) {
