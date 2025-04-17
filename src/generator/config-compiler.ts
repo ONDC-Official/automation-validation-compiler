@@ -88,6 +88,7 @@ export class ConfigCompiler {
 		valConfig: ValidationConfig,
 		codeName: string = "L1-Validations"
 	) => {
+		valConfig = JSON.parse(JSON.stringify(valConfig));
 		if (this.generatorConfig?.duplicateVariablesInChildren) {
 			console.log("Duplicating variables");
 			valConfig = duplicateVariablesInChildren(valConfig);
