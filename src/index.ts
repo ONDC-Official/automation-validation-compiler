@@ -19,7 +19,7 @@ export { ConfigCompiler };
 // 	const buildYaml = readFileSync(buildPath, "utf-8");
 // 	const valConfig = JSON.parse(readFileSync(valConfigPath, "utf-8"));
 // 	await compiler.initialize(buildYaml);
-// 	await compiler.generateCode(valConfig, "L1-validations");
+// await compiler.generateCode(valConfig, "L1-validations");
 // };
 
 // (async () => {

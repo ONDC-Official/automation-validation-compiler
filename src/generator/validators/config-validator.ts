@@ -14,16 +14,29 @@ export class ConfigValidator implements IValidator {
 	config: ValidationConfig;
 	stringJsonPaths: Record<string, string[]>;
 	errorDefinitions: ErrorDefinition[];
+	validatorSettings: {
+		skipJsonPathTest: boolean;
+	};
 	constructor(
 		validationPath: string,
 		config: ValidationConfig,
 		stringJsonPaths: Record<string, string[]>,
-		errorDefinitions: ErrorDefinition[]
+		errorDefinitions: ErrorDefinition[],
+		settings?: {
+			skipJsonPathTest: boolean;
+		}
 	) {
 		this.validationPath = validationPath;
 		this.config = config;
 		this.stringJsonPaths = stringJsonPaths;
 		this.errorDefinitions = errorDefinitions;
+		if (settings) {
+			this.validatorSettings = settings;
+		} else {
+			this.validatorSettings = {
+				skipJsonPathTest: false,
+			};
+		}
 	}
 	validate = async () => {
 		if (!this.config[ConfigSyntax.Tests])

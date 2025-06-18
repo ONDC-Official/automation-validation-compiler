@@ -84,9 +84,21 @@ export class ConfigCompiler {
 		}
 	};
 
+	withMinimalValidations = async (valConfig: ValidationConfig) => {
+		try {
+			await new ConfigValidator("", valConfig, {}, [], {
+				skipJsonPathTest: true,
+			}).validate();
+		} catch (e) {
+			logger.error(e);
+			throw new Error("validation failed");
+		}
+	};
+
 	generateCode = async (
 		valConfig: ValidationConfig,
-		codeName: string = "L1-Validations"
+		codeName: string = "L1-Validations",
+		minimal: boolean = false
 	) => {
 		valConfig = JSON.parse(JSON.stringify(valConfig));
 		if (this.generatorConfig?.duplicateVariablesInChildren) {
@@ -94,7 +106,11 @@ export class ConfigCompiler {
 			valConfig = duplicateVariablesInChildren(valConfig);
 		}
 
-		await this.performValidations(valConfig);
+		if (minimal) {
+			await this.withMinimalValidations(valConfig);
+		} else {
+			await this.performValidations(valConfig);
+		}
 		// Generate code based on the language
 		switch (this.language) {
 			case SupportedLanguages.Typescript:

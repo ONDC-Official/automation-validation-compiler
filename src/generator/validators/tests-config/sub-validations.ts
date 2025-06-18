@@ -146,15 +146,18 @@ export class ErrorCodeValidator extends TestObjectValidator {
 export class VariableValidator extends TestObjectValidator {
 	possibleJsonPaths: string[];
 	externalVariables: string[];
+	skipJsonPathTest: boolean = false;
 	constructor(
 		testObject: TestObject,
 		path: string,
 		posibleJsonPaths: string[],
-		externalVariables: string[]
+		externalVariables: string[],
+		skipJsonPathTest: boolean = false
 	) {
 		super(testObject, path);
 		this.externalVariables = externalVariables;
 		this.possibleJsonPaths = posibleJsonPaths;
+		this.skipJsonPathTest = skipJsonPathTest;
 	}
 	validate = async () => {
 		for (const key in this.targetObject) {
@@ -191,7 +194,10 @@ export class VariableValidator extends TestObjectValidator {
 					path = `${scope}.${pathWithoutDollar}`;
 				}
 				const replaced = replaceBracketsWithAsteriskNested(path);
-				if (!this.possibleJsonPaths.includes(replaced)) {
+				if (
+					!this.possibleJsonPaths.includes(replaced) &&
+					!this.skipJsonPathTest
+				) {
 					throw new Error(
 						`Variable: ${key} should be a jsonPath that returns a array of strings or the path don't exist in the schema, at ${this.validationPath} found original ${path} replaces: ${replaced}`
 					);

@@ -1,11 +1,11 @@
 export interface ValidationConfig {
-runAllValidations: boolean;
+    runAllValidations: boolean;
 }
 
 export type validationOutput = {
-valid: boolean;
-code: number;
-description?: string;
+    valid: boolean;
+    code: number;
+    description?: string;
 }[];
 
 /*
@@ -17,11 +17,11 @@ description?: string;
 export type ExternalData = {};
 
 export type validationInput = {
-payload: any;
-externalData: ExternalData;
-config: ValidationConfig;
+    payload: any;
+    externalData: ExternalData;
+    config: ValidationConfig;
 };
 
 export type testFunctionArray = Array<
-(input: validationInput) => validationOutput
+    (input: validationInput) => validationOutput
 >;

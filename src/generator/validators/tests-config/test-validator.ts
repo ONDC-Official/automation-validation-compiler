@@ -52,7 +52,8 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 			this.targetObject,
 			this.validationPath,
 			this.dependencies.stringJsonPaths,
-			this.dependencies.externalVariables
+			this.dependencies.externalVariables,
+			this.dependencies.skipJsonPathTest
 		).validate();
 		if (this.targetObject[TestObjectSyntax.Continue]) {
 			await new ContinueValidator(
