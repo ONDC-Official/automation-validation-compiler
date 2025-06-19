@@ -15,7 +15,7 @@ export class ConfigValidator implements IValidator {
 	stringJsonPaths: Record<string, string[]>;
 	errorDefinitions: ErrorDefinition[];
 	validatorSettings: {
-		skipJsonPathTest: boolean;
+		minimal: boolean;
 	};
 	constructor(
 		validationPath: string,
@@ -23,7 +23,7 @@ export class ConfigValidator implements IValidator {
 		stringJsonPaths: Record<string, string[]>,
 		errorDefinitions: ErrorDefinition[],
 		settings?: {
-			skipJsonPathTest: boolean;
+			minimal: boolean;
 		}
 	) {
 		this.validationPath = validationPath;
@@ -34,7 +34,7 @@ export class ConfigValidator implements IValidator {
 			this.validatorSettings = settings;
 		} else {
 			this.validatorSettings = {
-				skipJsonPathTest: false,
+				minimal: false,
 			};
 		}
 	}
@@ -61,6 +61,7 @@ export class ConfigValidator implements IValidator {
 				stringJsonPaths: this.stringJsonPaths[api],
 				errorDefinitions: this.errorDefinitions,
 				externalVariables: externalVariables,
+				minimal: this.validatorSettings.minimal,
 			};
 			await new TestsValidator(testList, path, dependencies).validate();
 		}

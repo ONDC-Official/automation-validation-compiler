@@ -20,5 +20,5 @@ export interface TestsValidatorDependencies {
 	stringJsonPaths: string[];
 	errorDefinitions: ErrorDefinition[];
 	externalVariables: string[];
-	skipJsonPathTest?: boolean;
+	minimal: boolean;
 }

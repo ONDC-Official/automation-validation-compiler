@@ -87,7 +87,7 @@ export class ConfigCompiler {
 	withMinimalValidations = async (valConfig: ValidationConfig) => {
 		try {
 			await new ConfigValidator("", valConfig, {}, [], {
-				skipJsonPathTest: true,
+				minimal: true,
 			}).validate();
 		} catch (e) {
 			logger.error(e);

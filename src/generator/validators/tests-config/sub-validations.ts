@@ -68,9 +68,16 @@ export class NameValidator extends TestObjectValidator {
 
 export class ScopeValidator extends TestObjectValidator {
 	impossiblePaths: string[];
-	constructor(testObject: TestObject, path: string, impossiblePaths: string[]) {
+	minimal: boolean = false;
+	constructor(
+		testObject: TestObject,
+		path: string,
+		impossiblePaths: string[],
+		minimal: boolean = false
+	) {
 		super(testObject, path);
 		this.impossiblePaths = impossiblePaths;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		const path = this.targetObject[TestObjectSyntax.Scope];
@@ -89,6 +96,7 @@ export class ScopeValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Scope} json path should start with $. at ${this.validationPath}`
 			);
 		}
+		if (this.minimal) return;
 		if (
 			this.impossiblePaths.includes(replaceBracketsWithAsteriskNested(path))
 		) {
@@ -101,13 +109,16 @@ export class ScopeValidator extends TestObjectValidator {
 
 export class ErrorCodeValidator extends TestObjectValidator {
 	possibleErrorCodes: ErrorDefinition[];
+	minimal: boolean = false;
 	constructor(
 		testObject: TestObject,
 		path: string,
-		possibleErrorCodes: ErrorDefinition[]
+		possibleErrorCodes: ErrorDefinition[],
+		minimal: boolean = false
 	) {
 		super(testObject, path);
 		this.possibleErrorCodes = possibleErrorCodes;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		if (!this.targetObject[TestObjectSyntax.ErrorCode]) {
@@ -125,6 +136,7 @@ export class ErrorCodeValidator extends TestObjectValidator {
 				`${TestObjectSyntax.ErrorCode} should be a number at path ${this.validationPath}`
 			);
 		}
+		if (this.minimal) return;
 		const errorCode = this.targetObject[TestObjectSyntax.ErrorCode];
 		if (!this.possibleErrorCodes.some((code) => code.code === errorCode)) {
 			throw new Error(
@@ -146,18 +158,18 @@ export class ErrorCodeValidator extends TestObjectValidator {
 export class VariableValidator extends TestObjectValidator {
 	possibleJsonPaths: string[];
 	externalVariables: string[];
-	skipJsonPathTest: boolean = false;
+	minimal: boolean = false;
 	constructor(
 		testObject: TestObject,
 		path: string,
 		posibleJsonPaths: string[],
 		externalVariables: string[],
-		skipJsonPathTest: boolean = false
+		minimal: boolean = false
 	) {
 		super(testObject, path);
 		this.externalVariables = externalVariables;
 		this.possibleJsonPaths = posibleJsonPaths;
-		this.skipJsonPathTest = skipJsonPathTest;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		for (const key in this.targetObject) {
@@ -194,10 +206,8 @@ export class VariableValidator extends TestObjectValidator {
 					path = `${scope}.${pathWithoutDollar}`;
 				}
 				const replaced = replaceBracketsWithAsteriskNested(path);
-				if (
-					!this.possibleJsonPaths.includes(replaced) &&
-					!this.skipJsonPathTest
-				) {
+				if (this.minimal) return;
+				if (!this.possibleJsonPaths.includes(replaced)) {
 					throw new Error(
 						`Variable: ${key} should be a jsonPath that returns a array of strings or the path don't exist in the schema, at ${this.validationPath} found original ${path} replaces: ${replaced}`
 					);
