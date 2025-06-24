@@ -10,7 +10,7 @@ import { SupportedLanguages } from "../types/compiler-types.js";
 import { TypescriptGenerator } from "./generators/typescript/ts-generator.js";
 import { ConfigValidator } from "./validators/config-validator.js";
 import { writeAndFormatCode } from "../utils/fs-utils.js";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import Mustache from "mustache";
 
 import { fileURLToPath } from "url";
