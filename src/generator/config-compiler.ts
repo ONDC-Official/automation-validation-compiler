@@ -119,8 +119,8 @@ export class ConfigCompiler {
 				await new TypescriptGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
-					// `./generated/${codeName}`
-					targetPath
+					`./generated/${codeName}`
+					// targetPath
 				).generateCode({
 					codeName: codeName,
 				});

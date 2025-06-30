@@ -1,40 +1,17 @@
 import jsonpath from "jsonpath";
-
-function isPrimitive(val: any): boolean {
-    return val === null || ["string", "number", "boolean"].includes(typeof val);
-}
-
-function isListOfStringsOrNull(arr: any[]): boolean {
-    return (
-        Array.isArray(arr) &&
-        arr.every((item) => typeof item === "string" || item === null)
-    );
-}
-
 function getJsonPath(payload: any, path: string) {
     let output = jsonpath.query(payload, path);
-
-    if (!Array.isArray(output)) {
-        throw new Error(`Expected output to be an array, got ${typeof output}`);
-    }
-
-    // Check if all items are primitive
-    const allPrimitives = output.every(isPrimitive);
-
-    if (!allPrimitives) {
-        throw new Error(
-            `Expected output to be a list of primitives, but found complex types.`,
-        );
-    }
-
-    // Handle nulls
     if (isListOfStringsOrNull(output)) {
         output = output.map((o) => (o === null ? "null" : o));
     }
-
     return output.length === 0 ? [] : output;
 }
-
+function isListOfStringsOrNull(variable: any): boolean {
+    return (
+        Array.isArray(variable) &&
+        variable.every((item) => item === null || typeof item === "string")
+    );
+}
 export default {
     getJsonPath,
 };

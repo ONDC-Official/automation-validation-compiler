@@ -23,7 +23,6 @@ import {
 	TestsValidatorDependencies,
 } from "../abstract-validator.js";
 import { TestsValidator } from "./test-list-validator.js";
-import logger from "../../../utils/logger.js";
 
 export class RequiredFieldsValidator extends TestObjectValidator {
 	validate = async () => {
