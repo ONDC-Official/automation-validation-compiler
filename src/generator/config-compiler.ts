@@ -98,7 +98,8 @@ export class ConfigCompiler {
 	generateCode = async (
 		valConfig: ValidationConfig,
 		codeName: string = "L1-Validations",
-		minimal: boolean = false
+		minimal: boolean = false,
+		outputPath: string = "./"
 	) => {
 		valConfig = JSON.parse(JSON.stringify(valConfig));
 		if (this.generatorConfig?.duplicateVariablesInChildren) {
@@ -112,12 +113,14 @@ export class ConfigCompiler {
 			await this.performValidations(valConfig);
 		}
 		// Generate code based on the language
+		const targetPath = path.resolve(outputPath, `/generated/${codeName}`);
 		switch (this.language) {
 			case SupportedLanguages.Typescript:
 				await new TypescriptGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
-					`./generated/${codeName}`
+					// `./generated/${codeName}`
+					targetPath
 				).generateCode({
 					codeName: codeName,
 				});
