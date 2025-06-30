@@ -64,36 +64,36 @@ export class ConfigCompiler {
 	};
 
 	performValidations = async (valConfig: ValidationConfig) => {
-		try {
-			if (!this.buildData) throw new Error("Build data not initialized");
-			if (!this.jsonSchemas) throw new Error("Schemas not initialized");
-			if (!this.possibleJsonPaths)
-				throw new Error("Possible paths not initialized");
-			if (!this.errorDefinitions)
-				throw new Error("Error definitions not initialized");
+		// try {
+		if (!this.buildData) throw new Error("Build data not initialized");
+		if (!this.jsonSchemas) throw new Error("Schemas not initialized");
+		if (!this.possibleJsonPaths)
+			throw new Error("Possible paths not initialized");
+		if (!this.errorDefinitions)
+			throw new Error("Error definitions not initialized");
 
-			await new ConfigValidator(
-				"",
-				valConfig,
-				this.possibleJsonPaths,
-				this.errorDefinitions
-			).validate();
-		} catch (e) {
-			logger.error(e);
-			throw new Error("Validation failed");
-		}
+		await new ConfigValidator(
+			"",
+			valConfig,
+			this.possibleJsonPaths,
+			this.errorDefinitions
+		).validate();
+		// } catch (e) {
+		// 	logger.error(e);
+		// 	throw new Error(e as any);
+		// }
 	};
 
 	withMinimalValidations = async (valConfig: ValidationConfig) => {
-		try {
-			await new ConfigValidator("", valConfig, {}, [], {
-				minimal: true,
-			}).validate();
-		} catch (e) {
-			logger.error(e);
-			throw new Error("validation failed");
-		}
+		// try {
+		await new ConfigValidator("", valConfig, {}, [], {
+			minimal: true,
+		}).validate();
+		// } catch (e) {
+		// logger.error(e);
+		// throw new Error("validation failed");
 	};
+	// };
 
 	generateCode = async (
 		valConfig: ValidationConfig,
