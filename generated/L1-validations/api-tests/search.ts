@@ -28,7 +28,7 @@ export default function search(input: validationInput): validationOutput {
                 const enumList = ["IND"];
 
                 const validate =
-                    validations.arePresent(attr) &&
+                    !validations.arePresent(attr) &&
                     validations.allIn(attr, enumList);
 
                 if (!validate) {
@@ -37,10 +37,7 @@ export default function search(input: validationInput): validationOutput {
                         {
                             valid: false,
                             code: 30000,
-                            description: `- **condition REQUIRED_CONTEXT_CODE_1**: all of the following sub conditions must be met:
-
-  - **condition REQUIRED_CONTEXT_CODE_1.1**: $.context.location.country.code must be present in the payload
-  - **condition REQUIRED_CONTEXT_CODE_1.2**: every element of $.context.location.country.code must be in ["IND"]`,
+                            description: `Country code must be present and valid`,
                         },
                     ];
                 }
@@ -356,36 +353,6 @@ export default function search(input: validationInput): validationOutput {
 
   - **condition REQUIRED_MESSAGE_TYPE_12.1**: $.message.intent.fulfillment.stops[*].type must be present in the payload
   - **condition REQUIRED_MESSAGE_TYPE_12.2**: every element of $.message.intent.fulfillment.stops[*].type must be in ["START", "END", "INTERMEDIATE_STOP"]`,
-                        },
-                    ];
-                }
-
-                delete testObj._EXTERNAL;
-            }
-            return [{ valid: valid, code: 200 }, ...subResults];
-        }
-        function REQUIRED_MESSAGE_GPS_13(
-            input: validationInput,
-        ): validationOutput {
-            const scope = payloadUtils.getJsonPath(input.payload, "$");
-            let subResults: validationOutput = [];
-            let valid = true;
-            for (const testObj of scope) {
-                testObj._EXTERNAL = input.externalData;
-                const attr = payloadUtils.getJsonPath(
-                    testObj,
-                    "$.message.intent.fulfillment.stops[*].location.gps",
-                );
-
-                const validate = validations.arePresent(attr);
-
-                if (!validate) {
-                    delete testObj._EXTERNAL;
-                    return [
-                        {
-                            valid: false,
-                            code: 30000,
-                            description: `- **condition REQUIRED_MESSAGE_GPS_13**: $.message.intent.fulfillment.stops[*].location.gps must be present in the payload`,
                         },
                     ];
                 }
@@ -1384,7 +1351,6 @@ export default function search(input: validationInput): validationOutput {
             REQUIRED_CONTEXT_BAP_URI_10,
             REQUIRED_CONTEXT_TTL_11,
             REQUIRED_MESSAGE_TYPE_12,
-            REQUIRED_MESSAGE_GPS_13,
             REQUIRED_MESSAGE_COLLECTED_BY_14,
             VALID_ENUM_MESSAGE_CODE_1,
             VALID_ENUM_MESSAGE_CATEGORY_2,

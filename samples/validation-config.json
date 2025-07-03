@@ -4,8 +4,9 @@
 			{
 				"_NAME_": "REQUIRED_CONTEXT_CODE_1",
 				"attr": "$.context.location.country.code",
-				"_RETURN_": "attr are present && attr all in enumList",
-				"enumList": ["IND"]
+				"_RETURN_": "!(attr are present) && attr all in enumList",
+				"enumList": ["IND"],
+				"_DESCRIPTION_": "Country code must be present and valid"
 			},
 			{
 				"_NAME_": "REQUIRED_CONTEXT_DOMAIN_3",
@@ -59,11 +60,6 @@
 				"attr": "$.message.intent.fulfillment.stops[*].type",
 				"_RETURN_": "attr are present && attr all in enumList",
 				"enumList": ["START", "END", "INTERMEDIATE_STOP"]
-			},
-			{
-				"_NAME_": "REQUIRED_MESSAGE_GPS_13",
-				"attr": "$.message.intent.fulfillment.stops[*].location.gps",
-				"_RETURN_": "attr are present"
 			},
 			{
 				"_NAME_": "REQUIRED_MESSAGE_COLLECTED_BY_14",
