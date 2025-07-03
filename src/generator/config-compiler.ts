@@ -113,14 +113,14 @@ export class ConfigCompiler {
 			await this.performValidations(valConfig);
 		}
 		// Generate code based on the language
-		const targetPath = path.resolve(outputPath, `/generated/${codeName}`);
+		const targetPath = `${outputPath}generated/${codeName}`;
 		switch (this.language) {
 			case SupportedLanguages.Typescript:
 				await new TypescriptGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
-					`./generated/${codeName}`
-					// targetPath
+					// `./generated/${codeName}`
+					targetPath
 				).generateCode({
 					codeName: codeName,
 				});
