@@ -62,9 +62,16 @@ export function ConvertArrayToStringsInTestObject(testObject: TestObject) {
 }
 
 export function ConvertArrayToString(arr: any[]) {
-	let vals = arr.map((v) => `"${v}"`).join(", ");
-	vals = vals.replace(/"/g, `"`);
-	return `[${vals}]`;
+	// let vals = arr.map((v) => `"${v}"`).join(", ");
+	// console.log(`Converted array to string: ${vals}`);
+	// vals = vals.replace(/"/g, `"`);
+	for (const a of arr) {
+		if (typeof a !== "string") {
+			console.log(arr);
+			throw new Error(`Array contains non-string element: ${a}`);
+		}
+	}
+	return JSON.stringify(arr);
 }
 
 export function addTabToMarkdown(markdown: string) {
