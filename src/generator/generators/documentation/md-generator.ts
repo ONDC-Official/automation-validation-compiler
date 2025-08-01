@@ -59,8 +59,7 @@ export class MarkdownDocGenerator extends CodeGenerator {
 			return markdownMessageGenerator(
 				ret,
 				testObject,
-				// testObject[TestObjectSyntax.Name],
-				"A",
+				testObject[TestObjectSyntax.Name],
 				skip ? [skip] : undefined
 			);
 		}
