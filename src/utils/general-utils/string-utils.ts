@@ -71,7 +71,9 @@ export function ConvertArrayToString(arr: any[]) {
 			throw new Error(`Array contains non-string element: ${a}`);
 		}
 	}
-	return JSON.stringify(arr);
+	const values = JSON.stringify(arr);
+	const cleaned = values.replace(/\\\\/g, "\\");
+	return cleaned;
 }
 
 export function addTabToMarkdown(markdown: string) {

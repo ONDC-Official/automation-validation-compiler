@@ -4,7 +4,7 @@
 			{
 				"_NAME_": "test",
 				"action": ["$.context.search"],
-				"e": ["^P(\\d+D)?(T(\\d+H)?(\\d+M)?)?$", "true", "undefined"],
+				"e": ["^P(\\d+D)?(T(\\d+H)?(\\d+M)?)?$"],
 				"_RETURN_": "action follow regex e"
 			}
 		]
