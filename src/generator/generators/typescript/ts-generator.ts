@@ -255,7 +255,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			.join("\n");
 		const masterFunction = `
 				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData : any = {}) {
-				const normalizedPayload = normalizeKeys(payload);
+				const normalizedPayload = normalizeKeys(JSON.parse(JSON.stringify(payload)));
 				externalData._SELF = normalizedPayload;
 					switch (action) {
 						${apis
