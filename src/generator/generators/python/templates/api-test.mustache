@@ -1,0 +1,29 @@
+from ..utils.json_path_utils import payload_utils
+from ..utils.validation_utils import validation_utils
+
+
+{{{functionCode}}}
+
+
+def {{apiName}}(input_data):
+    total_results = {{apiName}}_validations(input_data)
+
+    if input_data["config"].get("_debug") is False:
+        for r in total_results:
+            if "_debug_info" in r:
+                del r["_debug_info"]
+
+    if input_data["config"].get("hide_parent_errors") is True:
+        # delete results with valid false and no description
+        total_results = [r for r in total_results if not (r["valid"] is False and "description" not in r)]
+
+    if input_data["config"].get("only_invalid") is True:
+        res = [r for r in total_results if r["valid"] is False]
+        if len(res) == 0:
+            target_success = next((r for r in total_results if r["test_name"] == "{{apiName}}_validations"), None)
+            if not target_success:
+                raise Exception("Critical: Overall test result not found")
+            return [target_success]
+        return res
+
+    return total_results

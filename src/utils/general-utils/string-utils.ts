@@ -1,7 +1,4 @@
-import {
-	nodeReservedKeywords,
-	TestObjectSyntax,
-} from "../../constants/syntax.js";
+import { ReservedKeywords, TestObjectSyntax } from "../../constants/syntax.js";
 import { TestObject } from "../../types/config-types.js";
 import { getVariablesFromTest } from "./test-object-utils.js";
 
@@ -23,7 +20,7 @@ export function isValidVariableName(input: string): boolean {
 	// Check if input matches the regex
 	const matchesPattern = validVariableNameRegex.test(input);
 
-	const isNotReservedKeyword = !nodeReservedKeywords.has(input);
+	const isNotReservedKeyword = !ReservedKeywords.has(input);
 
 	return matchesPattern && isNotReservedKeyword;
 }

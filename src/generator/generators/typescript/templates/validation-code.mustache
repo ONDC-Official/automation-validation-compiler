@@ -9,20 +9,13 @@ const testFunctions: testFunctionArray = [
     {{/names}}
 ];
 
-let invalidResults: validationOutput = [];
+let allResults : validationOutput = [];
 for (const fn of testFunctions) {
     const subResult = fn(input);
-    // .filter(r => !r.valid);
-    invalidResults = [...invalidResults, ...subResult];
-    if(!input.config.runAllValidations && invalidResults.length > 0) {
-        return invalidResults;
-    }
+    allResults  = [...allResults , ...subResult];
 }
-if(invalidResults.length > 0) {
-    // return invalidResults;
-    subResults = invalidResults;
-    valid = subResults.every(r => r.valid);
-}
+subResults = allResults ;
+valid = subResults.every((r) => r.valid);
 
 {{/isNested}}
 
@@ -32,9 +25,16 @@ const validate = {{{returnStatement}}}
 if(!validate){
     delete testObj._EXTERNAL;
     return [{
+        testName: "{{testName}}",
         valid: false,
         code: {{errorCode}},
-        description: `{{{errorDescription}}}`
+        description: `{{{errorDescription}}}`,
+        _debugInfo: {
+            fedConfig: 
+`
+{{{TEST_OBJECT}}}
+`,
+        }
     }]
 }
 {{/isNested}}

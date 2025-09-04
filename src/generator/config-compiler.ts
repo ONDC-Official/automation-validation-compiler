@@ -16,6 +16,7 @@ import Mustache from "mustache";
 import { fileURLToPath } from "url";
 import path from "path";
 import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVariables.js";
+import { PythonGenerator } from "./generators/python/py-generator.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 type CodeGeneratorConfig = {
@@ -119,7 +120,15 @@ export class ConfigCompiler {
 				await new TypescriptGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
-					// `./generated/${codeName}`
+					targetPath
+				).generateCode({
+					codeName: codeName,
+				});
+				break;
+			case SupportedLanguages.Python:
+				await new PythonGenerator(
+					valConfig,
+					this.errorDefinitions ?? [],
 					targetPath
 				).generateCode({
 					codeName: codeName,

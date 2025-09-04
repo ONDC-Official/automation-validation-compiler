@@ -28,7 +28,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		for (const key in testConfig) {
 			const testObjects = testConfig[key];
 			const betaConfig = {
-				[TestObjectSyntax.Name]: key,
+				[TestObjectSyntax.Name]: key + "Validations",
 				[TestObjectSyntax.Return]: testObjects,
 			};
 			const testFunction = await this.generateTestFunction(betaConfig);
@@ -38,6 +38,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			);
 			const finalCode = Mustache.render(apiTestTemplate, {
 				functionCode: testFunction.code,
+				apiName: key,
 			});
 			await writeAndFormatCode(
 				this.rootPath,
@@ -130,6 +131,9 @@ export class TypescriptGenerator extends CodeGenerator {
 				: undefined,
 			validationCode: await this.createValidationLogicCode(testObject),
 			successCode: testObject[TestObjectSyntax.SuccessCode] ?? 200,
+			errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
+			testName: testObject[TestObjectSyntax.Name],
+			TEST_OBJECT: `${JSON.stringify(testObject)}`,
 		};
 		return {
 			funcName: testObject[TestObjectSyntax.Name],
@@ -182,6 +186,8 @@ export class TypescriptGenerator extends CodeGenerator {
 				returnStatement: returnStatement,
 				errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
 				errorDescription: this.CreateErrorMarkdown(testObject, skipList),
+				testName: testObject[TestObjectSyntax.Name],
+				TEST_OBJECT: `${JSON.stringify(testObject)}`,
 			});
 		} else {
 			const subObjects = testObject[TestObjectSyntax.Return];
@@ -200,6 +206,8 @@ export class TypescriptGenerator extends CodeGenerator {
 				isNested: true,
 				nestedFunctions: functionCodes.map((f) => f.code).join("\n"),
 				names: names,
+				testName: testObject[TestObjectSyntax.Name],
+				TEST_OBJECT: `${JSON.stringify(testObject)}`,
 			});
 		}
 	};
@@ -250,22 +258,31 @@ export class TypescriptGenerator extends CodeGenerator {
 		functionName: string = "L1Validations"
 	) {
 		functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
-		const importsCode = apis
+		let importsCode = apis
 			.map((api) => `import ${api} from "./api-tests/${api}";`)
 			.join("\n");
+		importsCode += `\nimport { ValidationConfig,validationOutput } from "./types/test-config";`;
+		importsCode += `\nimport normalizeKeys from "./utils/json-normalizer";`;
+		const masterTemplate = readFileSync(
+			path.resolve(__dirname, "./templates/index.mustache"),
+			"utf-8"
+		);
+
 		const masterFunction = `
-				export function perform${functionName}(action: string, payload: any,allErrors = false, externalData : any = {}) {
-				const normalizedPayload = normalizeKeys(JSON.parse(JSON.stringify(payload)));
-				externalData._SELF = normalizedPayload;
+				export function perform${functionName}(action: string, payload: any, config?: Partial<ValidationConfig>, externalData: any = {}) {
+					const completeConfig: ValidationConfig = {
+						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, _debug: false },
+						...config,
+					};
+					const normalizedPayload = normalizeKeys(JSON.parse(JSON.stringify(payload)));
+					externalData._SELF = normalizedPayload;
 					switch (action) {
 						${apis
 							.map(
 								(api) => `case "${api}": return ${api}({
 				payload: normalizedPayload,
 				externalData: externalData,
-				config: {
-					runAllValidations: allErrors,
-				},
+				config: completeConfig,
 			});`
 							)
 							.join("\n")}
@@ -273,11 +290,10 @@ export class TypescriptGenerator extends CodeGenerator {
 							throw new Error("Action not found");
 					}
 			}`;
-		return `	
-				import normalizeKeys from "./utils/json-normalizer";
-				${importsCode}
-				${masterFunction}
-			`;
+		return Mustache.render(masterTemplate, {
+			importsCode: importsCode,
+			masterFunction: masterFunction,
+		});
 	}
 }
 
@@ -292,4 +308,7 @@ interface mustachRequirements {
 	skipCheckStatement?: string;
 	validationCode: string;
 	successCode: number;
+	errorCode: number;
+	testName: string;
+	TEST_OBJECT: string;
 }

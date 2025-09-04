@@ -1,0 +1,12 @@
+# API Tests module
+# This file makes the api_tests directory a Python package
+
+{{#apis}}
+from .{{name}} import {{name}}
+{{/apis}}
+
+__all__ = [
+{{#apis}}
+    "{{name}}",
+{{/apis}}
+]

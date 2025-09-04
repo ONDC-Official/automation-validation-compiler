@@ -16,5 +16,15 @@ function {{name}}(input: validationInput): validationOutput {
         {{{validationCode}}}
         delete testObj._EXTERNAL;
     }
-    return [{valid: valid,code: {{successCode}} },...subResults];
+    return [{
+        testName: "{{testName}}",
+        valid: valid,
+        code: valid ? {{successCode}} : {{errorCode}},
+        _debugInfo: {
+            fedConfig: 
+`
+{{{TEST_OBJECT}}}
+`,
+        }
+    },...subResults];
 }

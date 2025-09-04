@@ -1,6 +1,6 @@
 import {
 	TestObjectSyntax,
-	nodeReservedKeywords,
+	ReservedKeywords,
 	ExternalDataSyntax,
 	ConfigSyntax,
 } from "../../../constants/syntax.js";
@@ -52,7 +52,7 @@ export class NameValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Name} can't be a non-empty string at path ${this.validationPath}`
 			);
 		}
-		if (nodeReservedKeywords.has(name)) {
+		if (ReservedKeywords.has(name)) {
 			throw new Error(
 				`${TestObjectSyntax.Name} can't be a reserved keyword at path ${this.validationPath}`
 			);
@@ -216,7 +216,7 @@ export class VariableValidator extends TestObjectValidator {
 	};
 
 	validateKey(key: string) {
-		if (nodeReservedKeywords.has(key)) {
+		if (ReservedKeywords.has(key)) {
 			throw new Error(
 				`${key} can't be a reserved keyword at path ${this.validationPath}`
 			);

@@ -1,0 +1,93 @@
+import re
+from datetime import datetime
+from typing import List
+
+def are_unique(operand: List[str]) -> bool:
+    return len(set(operand)) == len(operand)
+
+def are_present(operand: List[str]) -> bool:
+    return none_in(operand, ["null", "undefined", None]) and len(operand) > 0
+
+def all_in(left: List[str], right: List[str]) -> bool:
+    if len(left) == 0 and len(right) != 0:
+        return False
+    return all(v in right for v in left)
+
+def any_in(left: List[str], right: List[str]) -> bool:
+    if len(left) == 0 and len(right) != 0:
+        return False
+    return any(v in right for v in left)
+
+def none_in(left: List[str], right: List[str]) -> bool:
+    return all(v not in right for v in left)
+
+def equal_to(left: List[str], right: List[str]) -> bool:
+    if len(left) != len(right):
+        return False
+    return all(v == right[i] for i, v in enumerate(left))
+
+def is_iso8601(s: str) -> bool:
+    iso8601_regex = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$'
+    if not re.match(iso8601_regex, s):
+        return False
+    try:
+        datetime.fromisoformat(s.replace('Z', '+00:00'))
+        return True
+    except ValueError:
+        return False
+
+def greater_than(left: List[str], right: List[str]) -> bool:
+    def are_all_iso(arr): return all(is_iso8601(v) for v in arr)
+    def are_all_numbers(arr): return all(is_number(v) for v in arr)
+
+    if are_all_iso(left) and are_all_iso(right):
+        left_dates = [datetime.fromisoformat(d.replace('Z', '+00:00')).timestamp() for d in left]
+        right_dates = [datetime.fromisoformat(d.replace('Z', '+00:00')).timestamp() for d in right]
+        return all(ld > right_dates[i] if i < len(right_dates) else True for i, ld in enumerate(left_dates))
+    elif are_all_numbers(left) and are_all_numbers(right):
+        left_numbers = [float(n) for n in left]
+        right_numbers = [float(n) for n in right]
+        return all(ln > right_numbers[i] if i < len(right_numbers) else True for i, ln in enumerate(left_numbers))
+    return False
+
+def less_than(left: List[str], right: List[str]) -> bool:
+    def are_all_iso(arr): return all(is_iso8601(v) for v in arr)
+    def are_all_numbers(arr): return all(is_number(v) for v in arr)
+
+    if are_all_iso(left) and are_all_iso(right):
+        left_dates = [datetime.fromisoformat(d.replace('Z', '+00:00')).timestamp() for d in left]
+        right_dates = [datetime.fromisoformat(d.replace('Z', '+00:00')).timestamp() for d in right]
+        return all(ld < right_dates[i] if i < len(right_dates) else True for i, ld in enumerate(left_dates))
+    elif are_all_numbers(left) and are_all_numbers(right):
+        left_numbers = [float(n) for n in left]
+        right_numbers = [float(n) for n in right]
+        return all(ln < right_numbers[i] if i < len(right_numbers) else True for i, ln in enumerate(left_numbers))
+    return False
+
+def follow_regex(left: List[str], regex_array: List[str]) -> bool:
+    if len(left) == 0 and len(regex_array) != 0:
+        return False
+    for regex in regex_array:
+        re_obj = re.compile(regex)
+        if any(not re_obj.match(v) for v in left):
+            return False
+    return True
+
+def is_number(s: str) -> bool:
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+validation_utils = {
+    "are_unique": are_unique,
+    "are_present": are_present,
+    "all_in": all_in,
+    "any_in": any_in,
+    "none_in": none_in,
+    "equal_to": equal_to,
+    "follow_regex": follow_regex,
+    "greater_than": greater_than,
+    "less_than": less_than,
+}

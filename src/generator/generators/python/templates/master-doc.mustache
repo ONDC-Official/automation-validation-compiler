@@ -1,0 +1,40 @@
+"""
+Perform Level-1 validations for a given `action`.
+
+Args:
+    action: string identifier of the action to validate against.
+    payload: Any JSON-like structure to validate (dict/list/nested).
+    config: Partial configuration. Can be:
+        - a plain dict (snake_case or camelCase keys),
+        - a dataclass/pydantic/object with fields,
+        - or a `ValidationConfig` TypedDict.
+        Missing fields are filled with defaults.
+    external_data: Optional dict of extra data available to rules.
+        `_SELF` is automatically set to the normalized payload.
+
+Config fields (merged with defaults):
+    - only_invalid (bool, default: True)
+    - hide_parent_errors (bool, default: True)
+    - _debug (bool, default: False)
+
+Returns:
+    ValidationOutput: a list of validation results, each shaped like:
+        {
+            "test_name": str,
+            "valid": bool,
+            "code": int,
+            "description"?: str,
+            "_debug_info"?: {
+            "fed_config"?: str,
+            "output_code"?: Any
+            }
+        }
+
+Raises:
+    ValueError: if the action is unknown.
+
+Example:
+    >>> out = perform_l1_validations("search", payload, {"only_invalid": False})
+    >>> out[0]["test_name"]
+    'REGEX_CONTEXT_LOCATION_CITY_CODE'
+"""
