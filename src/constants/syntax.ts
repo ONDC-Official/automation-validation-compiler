@@ -134,7 +134,6 @@ export const ReservedKeywords = new Set([
 	"hash",
 	"help",
 	"hex",
-	"id",
 	"input",
 	"int",
 	"isinstance",
@@ -154,7 +153,6 @@ export const ReservedKeywords = new Set([
 	"ord",
 	"pow",
 	"property",
-	"range",
 	"repr",
 	"reversed",
 	"round",
@@ -166,7 +164,6 @@ export const ReservedKeywords = new Set([
 	"str",
 	"sum",
 	"tuple",
-	"type",
 	"vars",
 	"zip",
 
