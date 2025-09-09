@@ -139,19 +139,32 @@ export class ConfigCompiler {
 		}
 	};
 
-	generateL0Schema = async () => {
+	generateL0Schema = async (
+		outputPath: string = "./",
+		type: "json" | "typescript" = "typescript"
+	) => {
 		if (!this.jsonSchemas) {
 			throw new Error("Schemas not initialized");
 		}
 
+		const targetPath = `${outputPath}generated/L0-schemas/`;
 		for (const schema in this.jsonSchemas) {
 			const json = this.jsonSchemas[schema];
-			writeAndFormatCode(
-				`./generated/L0-schemas`,
-				`${schema}.ts`,
-				`export const ${schema} = ${JSON.stringify(json, null, 2)}`,
-				"typescript"
-			);
+			if (type === "typescript") {
+				writeAndFormatCode(
+					targetPath,
+					`${schema}.ts`,
+					`export const ${schema} = ${JSON.stringify(json, null, 2)}`,
+					"typescript"
+				);
+			} else if (type === "json") {
+				writeAndFormatCode(
+					targetPath,
+					`${schema}.json`,
+					JSON.stringify(json, null, 2),
+					"json"
+				);
+			}
 		}
 
 		const actions = Object.keys(this.jsonSchemas).map((schema) => {
