@@ -166,27 +166,28 @@ export class ConfigCompiler {
 				);
 			}
 		}
-
-		const actions = Object.keys(this.jsonSchemas).map((schema) => {
-			return {
-				action: schema,
-			};
-		});
-		const template = readFileSync(
-			path.resolve(
-				__dirname,
-				"../generator/generators/typescript/templates/schema-template.mustache"
-			),
-			"utf-8"
-		);
-		console.log(actions);
-		const l0 = Mustache.render(template, { actions });
-		await writeAndFormatCode(
-			`./generated/L0-schemas`,
-			`index.ts`,
-			l0,
-			"typescript"
-		);
+		if (type === "typescript") {
+			const actions = Object.keys(this.jsonSchemas).map((schema) => {
+				return {
+					action: schema,
+				};
+			});
+			const template = readFileSync(
+				path.resolve(
+					__dirname,
+					"../generator/generators/typescript/templates/schema-template.mustache"
+				),
+				"utf-8"
+			);
+			console.log(actions);
+			const l0 = Mustache.render(template, { actions });
+			await writeAndFormatCode(
+				`./generated/L0-schemas`,
+				`index.ts`,
+				l0,
+				"typescript"
+			);
+		}
 	};
 
 	generateValidPaths = async () => {
