@@ -181,12 +181,7 @@ export class ConfigCompiler {
 			);
 			console.log(actions);
 			const l0 = Mustache.render(template, { actions });
-			await writeAndFormatCode(
-				`./generated/L0-schemas`,
-				`index.ts`,
-				l0,
-				"typescript"
-			);
+			await writeAndFormatCode(targetPath, `index.ts`, l0, "typescript");
 		}
 	};
 
