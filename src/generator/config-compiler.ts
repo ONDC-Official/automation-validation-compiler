@@ -4,7 +4,6 @@ import { loadAndDereferenceYaml } from "../utils/config-utils/yaml.js";
 import { SchemaExtactionService as SchemaExtractionService } from "../services/schema-service.js";
 import { ErrorDefinition } from "../types/error-codes.js";
 import { ValidationConfig } from "../types/config-types.js";
-import logger from "../utils/logger.js";
 import { SupportedLanguages } from "../types/compiler-types.js";
 
 import { TypescriptGenerator } from "./generators/typescript/ts-generator.js";
@@ -17,6 +16,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVariables.js";
 import { PythonGenerator } from "./generators/python/py-generator.js";
+import { JavascriptGenerator } from "./generators/javascript/js-generator.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 type CodeGeneratorConfig = {
@@ -104,7 +104,6 @@ export class ConfigCompiler {
 	) => {
 		valConfig = JSON.parse(JSON.stringify(valConfig));
 		if (this.generatorConfig?.duplicateVariablesInChildren) {
-			console.log("Duplicating variables");
 			valConfig = duplicateVariablesInChildren(valConfig);
 		}
 
@@ -127,6 +126,15 @@ export class ConfigCompiler {
 				break;
 			case SupportedLanguages.Python:
 				await new PythonGenerator(
+					valConfig,
+					this.errorDefinitions ?? [],
+					targetPath
+				).generateCode({
+					codeName: codeName,
+				});
+				break;
+			case SupportedLanguages.Javascript:
+				await new JavascriptGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
 					targetPath
@@ -179,7 +187,6 @@ export class ConfigCompiler {
 				),
 				"utf-8"
 			);
-			console.log(actions);
 			const l0 = Mustache.render(template, { actions });
 			await writeAndFormatCode(targetPath, `index.ts`, l0, "typescript");
 		}

@@ -18,23 +18,34 @@ export { ConfigCompiler };
 // 	);
 // 	const buildYaml = readFileSync(buildPath, "utf-8");
 // 	const valConfig = JSON.parse(readFileSync(valConfigPath, "utf-8"));
-// 	await compiler.initialize(buildYaml);
-// 	await compiler.generateCode(
+// 	// await compiler.initialize(buildYaml);
+// 	// await compiler.generateCode(
+// 	// 	valConfig,
+// 	// 	"L1_validations",
+// 	// 	false,
+// 	// 	"./alpha/python/"
+// 	// );
+// 	// const compilerTy = new ConfigCompiler(SupportedLanguages.Typescript);
+// 	// await compilerTy.initialize(buildYaml);
+// 	// await compilerTy.generateCode(
+// 	// 	valConfig,
+// 	// 	"L1_validations",
+// 	// 	false,
+// 	// 	"./alpha/typescript/"
+// 	// );
+
+// 	// JavaScript generation example
+// 	const compilerJs = new ConfigCompiler(SupportedLanguages.Javascript);
+// 	await compilerJs.initialize(buildYaml);
+// 	await compilerJs.generateCode(
 // 		valConfig,
 // 		"L1_validations",
 // 		false,
-// 		"./alpha/python/"
-// 	);
-// 	const compilerTy = new ConfigCompiler(SupportedLanguages.Typescript);
-// 	await compilerTy.initialize(buildYaml);
-// 	await compilerTy.generateCode(
-// 		valConfig,
-// 		"L1_validations",
-// 		false,
-// 		"./alpha/typescript/"
+// 		"./alpha/javascriptNative/"
 // 	);
 // };
 
 // (async () => {
 // 	await main();
+// 	console.log("Code generation completed.");
 // })();

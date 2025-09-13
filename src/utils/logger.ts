@@ -39,6 +39,7 @@ const logLevel = process.env.NODE_ENV === "production" ? "info" : "debug";
 // Configure Winston logger
 const logger = winston.createLogger({
 	level: logLevel,
+	silent: true,
 	format: combine(
 		timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
 		errors({ stack: true }), // Include stack trace in error messages
