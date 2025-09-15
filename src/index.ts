@@ -47,5 +47,5 @@ export { ConfigCompiler };
 
 // (async () => {
 // 	await main();
-// 	console.log("Code generation completed.");
+// 	console.log("========== Code generation completed. ==========");
 // })();

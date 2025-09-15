@@ -142,7 +142,8 @@
 							{
 								"_NAME_": "REQUIRED_CONTEXT_LOCATION_COUNTRY_CODE",
 								"attr": "$.context.location.country.code",
-								"_RETURN_": "attr are present"
+								"_CONTINUE_": "attr are unique || attr none in action",
+								"_RETURN_": "attr are present && domain all in domain"
 							},
 							{
 								"_NAME_": "REQUIRED_CONTEXT_LOCATION_CITY_CODE",
