@@ -31,7 +31,7 @@ export function markdownMessageGenerator(
 		: CompileToMarkdown(ast, /*topLevel*/ true, /*depth*/ 0, /*forNot*/ false);
 
 	let finalReturn =
-		`#### ${startingPointer}\n\n` +
+		`#### **${startingPointer}**\n\n` +
 		Mustache.render(
 			returnTemplate,
 			ConvertArrayToStringsInTestObject(variableValues)
