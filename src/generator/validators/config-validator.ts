@@ -47,10 +47,22 @@ export class ConfigValidator implements IValidator {
 		const sessionData = this.config[ConfigSyntax.SessionData];
 		const tests = this.config[ConfigSyntax.Tests];
 
-		await new SessionDataValidator(
+		const sessionDataValidator = new SessionDataValidator(
 			`${this.validationPath}/${ConfigSyntax.SessionData}`,
 			sessionData
-		).validate();
+		);
+
+		await sessionDataValidator.validate();
+
+		for (const api in sessionData) {
+			const paths = this.stringJsonPaths[api];
+			for (const key in sessionData[api]) {
+				const value = sessionData[api][key];
+				if (typeof value === "string") {
+					sessionDataValidator.validateApiPath(paths, value, api, key);
+				}
+			}
+		}
 
 		const externalVariables = getExternalVariables(sessionData);
 

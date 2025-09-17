@@ -20,10 +20,20 @@ valid = subResults.every((r) => r.valid);
 {{/isNested}}
 
 {{^isNested}}
+
+{{#isStateFull}}
+    let validate = true;
+    if(input.config.stateFullValidations === true){
+        validate = {{{returnStatement}}}
+    }
+{{/isStateFull}}
+
+{{^isStateFull}}
 const validate = {{{returnStatement}}}
+{{/isStateFull}}
 
 if(!validate){
-    delete testObj._EXTERNAL;
+    // delete testObj._EXTERNAL;
     return [{
         testName: "{{testName}}",
         valid: false,

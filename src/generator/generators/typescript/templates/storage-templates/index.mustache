@@ -1,0 +1,37 @@
+{{#actions}}
+    import { store_{{{action}}}, loadFor_{{{action}}} } from './{{{action}}}'
+{{/actions}}
+import StorageInterface from "../interfaces/storage-interface";
+import { StorageConfig } from "../types/storage-types";
+
+export async function perform{{functionName}}Save(action: string,uniquePrefix: string, payload: any, store: StorageInterface,
+config?: Partial<StorageConfig>){
+    
+    const completeConfig : StorageConfig = {
+        ...{
+            retryAttempts: 3,
+            retryDelayMs: 1000,
+        },
+        ...config
+    }
+    switch(action){
+        {{#actions}}
+        case '{{{action}}}':
+            return await store_{{{action}}}(uniquePrefix,payload,store,completeConfig);
+        {{/actions}}
+        default:
+            throw new Error('Action not found');
+    }
+}
+
+
+export async function perform{{functionName}}Load(action: string,uniquePrefix: string, store: StorageInterface){
+    switch(action){
+        {{#actions}}
+        case '{{{action}}}':
+            return await loadFor_{{{action}}}(uniquePrefix,store);
+        {{/actions}}
+        default:
+            throw new Error('Action not found');
+    }
+}

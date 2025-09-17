@@ -142,8 +142,8 @@
 							{
 								"_NAME_": "REQUIRED_CONTEXT_LOCATION_COUNTRY_CODE",
 								"attr": "$.context.location.country.code",
-								"_CONTINUE_": "attr are unique || attr none in action",
-								"_RETURN_": "attr are present && domain all in domain"
+								"cities": "$._EXTERNAL.city_code",
+								"_RETURN_": "attr all in cities"
 							},
 							{
 								"_NAME_": "REQUIRED_CONTEXT_LOCATION_CITY_CODE",
@@ -3170,6 +3170,9 @@
 		]
 	},
 	"_SESSION_DATA_": {
-		"trans": {}
+		"search": {
+			"item_id": null,
+			"city_code": "$.context.location.city.code"
+		}
 	}
 }

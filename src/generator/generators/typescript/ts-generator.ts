@@ -1,7 +1,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { ConfigSyntax, TestObjectSyntax } from "../../../constants/syntax.js";
+import {
+	ConfigSyntax,
+	ExternalDataSyntax,
+	TestObjectSyntax,
+} from "../../../constants/syntax.js";
 import Mustache from "mustache";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
 import { getVariablesFromTest as extractVariablesFromText } from "../../../utils/general-utils/test-object-utils.js";
@@ -15,13 +19,121 @@ import {
 import { writeAndFormatCode } from "../../../utils/fs-utils.js";
 import { ErrorDefinition } from "../../../types/error-codes.js";
 import { MarkdownDocGenerator } from "../documentation/md-generator.js";
+import { collectLoadData } from "../../../utils/config-utils/load-variables.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class TypescriptGenerator extends CodeGenerator {
+	codeConfig: CodeGeneratorProps | undefined;
 	generateSessionDataCode = async () => {
-		throw new Error("Method not implemented.");
+		if (!this.codeConfig) {
+			throw new Error("Code config not set. Please call generateCode first.");
+		}
+		const sessionData = this.validationConfig[ConfigSyntax.SessionData];
+		const tests = this.validationConfig[ConfigSyntax.Tests];
+
+		const relevantSessionData: Record<string, Record<string, string>> = {};
+		collectLoadData(tests, relevantSessionData);
+		console.log("Relevant Session Data for Loading:", relevantSessionData);
+		const actions = Object.keys(sessionData);
+		const sessionDataUtilsTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/save-utils.mustache"
+			),
+			"utf-8"
+		);
+		const storageInterfaceTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/storage-interface.mustache"
+			),
+			"utf-8"
+		);
+		const storageTypesTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/storage-types.mustache"
+			),
+			"utf-8"
+		);
+		const indexTemplate = readFileSync(
+			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
+			"utf-8"
+		);
+		const saveActionTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/api-save.mustache"
+			),
+			"utf-8"
+		);
+
+		const allActions = Object.keys(tests);
+
+		const indexCode = Mustache.render(indexTemplate, {
+			actions: Array.from(allActions).map((action) => {
+				return { action: action };
+			}),
+			functionName: this.codeConfig.codeName.replace(/[^a-zA-Z0-9_]/g, ""),
+		});
+		/*
+			storeActions: {
+				key: string;
+				value: string;
+			}[]
+		*/
+
+		for (const action of allActions) {
+			const loadData = relevantSessionData[action] || {};
+			const saveData = sessionData[action] || {};
+			const saveCode = Mustache.render(saveActionTemplate, {
+				storeActions: Object.keys(saveData).map((key) => {
+					return {
+						key: key,
+						value: saveData[key],
+					};
+				}),
+				loadActions: Object.keys(loadData).map((key) => {
+					console.log(loadData[key]);
+					return {
+						key: loadData[key],
+					};
+				}),
+				action: action,
+			});
+			await writeAndFormatCode(
+				this.rootPath,
+				`./storage-actions/${action}.ts`,
+				saveCode,
+				"typescript"
+			);
+		}
+		await writeAndFormatCode(
+			this.rootPath,
+			"./utils/save-utils.ts",
+			sessionDataUtilsTemplate,
+			"typescript"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./types/storage-types.ts",
+			storageTypesTemplate,
+			"typescript"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./interfaces/storage-interface.ts",
+			storageInterfaceTemplate,
+			"typescript"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./storage-actions/index.ts",
+			indexCode,
+			"typescript"
+		);
 	};
 	generateValidationCode = async () => {
 		const testConfig = this.validationConfig[ConfigSyntax.Tests];
@@ -49,6 +161,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		}
 	};
 	generateCode = async (codeConfig: CodeGeneratorProps) => {
+		this.codeConfig = codeConfig;
 		const jsonPathUtilsCode = readFileSync(
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
 			"utf-8"
@@ -113,6 +226,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			this.errorCodes,
 			this.rootPath
 		).generateCode();
+		await this.generateSessionDataCode();
 	};
 
 	generateTestFunction = async (testObject: TestObject) => {
@@ -181,8 +295,22 @@ export class TypescriptGenerator extends CodeGenerator {
 			const returnStatement = compileInputToTs(
 				testObject[TestObjectSyntax.Return]
 			);
+			let isStateFull = false;
+			for (const k in testObject) {
+				const value = testObject[k];
+				if (typeof value === "string") {
+					if (
+						value.includes(`${ExternalDataSyntax}.`) &&
+						!value.includes("_SELF")
+					) {
+						isStateFull = true;
+						break;
+					}
+				}
+			}
 			return Mustache.render(template, {
 				isNested: false,
+				isStateFull: isStateFull,
 				returnStatement: returnStatement,
 				errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
 				errorDescription: this.CreateErrorMarkdown(testObject, skipList),
@@ -241,7 +369,7 @@ export class TypescriptGenerator extends CodeGenerator {
 	}
 	private getExternalKeys() {
 		const apis = Object.keys(this.validationConfig[ConfigSyntax.SessionData]);
-		const result: { name: string }[] = [];
+		let result: { name: string }[] = [];
 		for (const api of apis) {
 			const keys = Object.keys(
 				this.validationConfig[ConfigSyntax.SessionData][api]
@@ -250,6 +378,7 @@ export class TypescriptGenerator extends CodeGenerator {
 				result.push({ name: key });
 			}
 		}
+		result = result.filter((v) => v.name !== "_SELF");
 		return result;
 	}
 
@@ -263,6 +392,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			.join("\n");
 		importsCode += `\nimport { ValidationConfig,validationOutput } from "./types/test-config";`;
 		importsCode += `\nimport normalizeKeys from "./utils/json-normalizer";`;
+		importsCode += `\nimport { perform${functionName}Save, perform${functionName}Load}  from "./storage-actions";`;
 		const masterTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/index.mustache"),
 			"utf-8"
@@ -271,11 +401,28 @@ export class TypescriptGenerator extends CodeGenerator {
 		const masterFunction = `
 				export function perform${functionName}(action: string, payload: any, config?: Partial<ValidationConfig>, externalData: any = {}) {
 					const completeConfig: ValidationConfig = {
-						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, _debug: false },
+						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, stateFullValidations: false, _debug: false },
 						...config,
 					};
+
+					if (completeConfig.stateFullValidations  && !completeConfig.store) {
+						throw new Error(
+							"State Full validations require a storage interface to be provided in the config."
+						);
+					}
+					if( completeConfig.stateFullValidations && !completeConfig.uniqueKey) {
+       	 				throw new Error(
+            				"State Full validations require a uniqueKey to be provided in the config."
+        				);
+    				}
 					const normalizedPayload = normalizeKeys(JSON.parse(JSON.stringify(payload)));
 					externalData._SELF = normalizedPayload;
+					if (completeConfig.stateFullValidations) {
+						externalData = {
+							...performL1_validationsLoad(action, completeConfig.uniqueKey!, completeConfig.store!),
+							...externalData,
+						};
+					}
 					switch (action) {
 						${apis
 							.map(
@@ -289,7 +436,10 @@ export class TypescriptGenerator extends CodeGenerator {
 						default:
 							throw new Error("Action not found");
 					}
-			}`;
+			}
+
+			export {perform${functionName}Save, perform${functionName}Load};
+			`;
 		return Mustache.render(masterTemplate, {
 			importsCode: importsCode,
 			masterFunction: masterFunction,
