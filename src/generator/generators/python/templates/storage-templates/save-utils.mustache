@@ -1,0 +1,22 @@
+from ..interfaces.storage_interface import StorageInterface
+from ..types.storage_types import StorageConfig
+import asyncio
+
+async def save_data(unique_prefix: str, key: str, save_data: str, store: StorageInterface, config: StorageConfig):
+    final_key = f"{unique_prefix}:{key}"
+    retry_times = config["retry_attempts"]
+    delay_ms = config["retry_delay_ms"]
+    attempts = 0
+    
+    while attempts < retry_times:
+        try:
+            await store.save_key(unique_prefix, final_key, save_data)
+            return
+        except Exception as e:
+            attempts += 1
+            if attempts >= retry_times:
+                raise e
+            await asyncio.sleep(delay_ms / 1000.0)  # Convert ms to seconds
+
+def create_key(unique_prefix: str, key: str):
+    return f"{unique_prefix}:{key}"

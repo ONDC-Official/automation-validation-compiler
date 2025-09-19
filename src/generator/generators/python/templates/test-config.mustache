@@ -12,10 +12,16 @@ class ValidationConfig(TypedDict, total=False):
         only_invalid (bool): If True, only invalid results will be returned.
         hide_parent_errors (Optional[bool]): If True, parent errors will be hidden.
         _debug (Optional[bool]): If True, debug mode will be enabled.
+        state_full_validations (Optional[bool]): If True, stateful validations will be enabled.
+        store (Optional[Any]): Storage interface for stateful validations.
+        unique_key (Optional[str]): Unique key for stateful validations.
     """
     only_invalid: Optional[bool]
     hide_parent_errors: Optional[bool]
     _debug: Optional[bool]
+    state_full_validations: Optional[bool]
+    store: Optional[Any]
+    unique_key: Optional[str]
 
 # Input structure for validation functions
 ValidationInput = Dict[str, Any]

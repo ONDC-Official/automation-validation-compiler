@@ -1,12 +1,13 @@
 {
 	"name": "ondc-code-generator",
-	"version": "0.5.51",
+	"version": "0.6.0",
 	"description": "generate code from build.yaml ",
 	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsc && copyfiles -u 1 \"src/**/*.{yaml,html,css,mustache}\" dist/",
 		"start": "node ./dist/index.js",
+		"test": "npm run build && node ./dist/test.js",
 		"dev": "nodemon",
 		"clean": "rm -rf dist",
 		"prepare": "npm run clean && npm run build"

@@ -393,6 +393,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		importsCode += `\nimport { ValidationConfig,validationOutput } from "./types/test-config";`;
 		importsCode += `\nimport normalizeKeys from "./utils/json-normalizer";`;
 		importsCode += `\nimport { perform${functionName}Save, perform${functionName}Load}  from "./storage-actions";`;
+		importsCode += `\nimport StorageInterface from "./interfaces/storage-interface";`;
 		const masterTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/index.mustache"),
 			"utf-8"
@@ -438,7 +439,8 @@ export class TypescriptGenerator extends CodeGenerator {
 					}
 			}
 
-			export {perform${functionName}Save, perform${functionName}Load};
+			export {perform${functionName}Save, perform${functionName}Load, StorageInterface};
+
 			`;
 		return Mustache.render(masterTemplate, {
 			importsCode: importsCode,

@@ -17,10 +17,18 @@
         valid = all(r["valid"] for r in sub_results)
 {{/isNested}}
 {{^isNested}}
+        {{#isStateFull}}
+        validate = True
+        if input_data["config"].get("state_full_validations") == True:
+            validate = {{{returnStatement}}}
+        {{/isStateFull}}
+        
+        {{^isStateFull}}
         validate = {{{returnStatement}}}
+        {{/isStateFull}}
 
         if not validate:
-            del {{testName}}_obj["_EXTERNAL"]
+            # del {{testName}}_obj["_EXTERNAL"]
             return [{
                 "test_name": "{{testName}}",
                 "valid": False,

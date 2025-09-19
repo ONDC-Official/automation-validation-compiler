@@ -1,7 +1,11 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { ConfigSyntax, TestObjectSyntax } from "../../../constants/syntax.js";
+import {
+	ConfigSyntax,
+	TestObjectSyntax,
+	ExternalDataSyntax,
+} from "../../../constants/syntax.js";
 import Mustache from "mustache";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
 import { getVariablesFromTest as extractVariablesFromText } from "../../../utils/general-utils/test-object-utils.js";
@@ -14,13 +18,125 @@ import {
 import { writeAndFormatCode } from "../../../utils/fs-utils.js";
 import { ErrorDefinition } from "../../../types/error-codes.js";
 import { MarkdownDocGenerator } from "../documentation/md-generator.js";
+import { collectLoadData } from "../../../utils/config-utils/load-variables.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export class PythonGenerator extends CodeGenerator {
+	codeConfig: CodeGeneratorProps | undefined;
+
 	generateSessionDataCode = async () => {
-		throw new Error("Method not implemented.");
+		if (!this.codeConfig) {
+			throw new Error("Code config not set. Please call generateCode first.");
+		}
+		const sessionData = this.validationConfig[ConfigSyntax.SessionData];
+		const tests = this.validationConfig[ConfigSyntax.Tests];
+
+		const relevantSessionData: Record<string, Record<string, string>> = {};
+		collectLoadData(tests, relevantSessionData);
+		console.log("Relevant Session Data for Loading:", relevantSessionData);
+
+		const sessionDataUtilsTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/save-utils.mustache"
+			),
+			"utf-8"
+		);
+		const storageInterfaceTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/storage-interface.mustache"
+			),
+			"utf-8"
+		);
+		const storageTypesTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/storage-types.mustache"
+			),
+			"utf-8"
+		);
+		const indexTemplate = readFileSync(
+			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
+			"utf-8"
+		);
+		const saveActionTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/storage-templates/api-save.mustache"
+			),
+			"utf-8"
+		);
+
+		const allActions = Object.keys(tests);
+
+		const indexCode = Mustache.render(indexTemplate, {
+			actions: Array.from(allActions).map((action) => {
+				return { action: action };
+			}),
+			functionName: this.codeConfig.codeName.replace(/[^a-zA-Z0-9_]/g, ""),
+		});
+
+		// Generate individual action files
+		for (const action of allActions) {
+			const loadData = relevantSessionData[action] || {};
+			const saveData = sessionData[action] || {};
+			const saveCode = Mustache.render(saveActionTemplate, {
+				storeActions: Object.keys(saveData).map((key) => {
+					return {
+						key: key,
+						value: saveData[key],
+					};
+				}),
+				loadActions: Object.keys(loadData).map((key) => {
+					console.log(loadData[key]);
+					return {
+						key: loadData[key],
+					};
+				}),
+				action: action,
+			});
+			await writeAndFormatCode(
+				this.rootPath,
+				`./storage_actions/${action}.py`,
+				saveCode,
+				"python"
+			);
+		}
+
+		// Generate utility and interface files
+		await writeAndFormatCode(
+			this.rootPath,
+			"./utils/save_utils.py",
+			sessionDataUtilsTemplate,
+			"python"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./types/storage_types.py",
+			storageTypesTemplate,
+			"python"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./interfaces/storage_interface.py",
+			storageInterfaceTemplate,
+			"python"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./storage_actions/__init__.py",
+			indexCode,
+			"python"
+		);
+		await writeAndFormatCode(
+			this.rootPath,
+			"./interfaces/__init__.py",
+			"# Interfaces package",
+			"python"
+		);
 	};
 
 	generateValidationCode = async () => {
@@ -50,6 +166,7 @@ export class PythonGenerator extends CodeGenerator {
 	};
 
 	generateCode = async (codeConfig: CodeGeneratorProps) => {
+		this.codeConfig = codeConfig;
 		const jsonPathUtilsCode = readFileSync(
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
 			"utf-8"
@@ -156,6 +273,7 @@ export class PythonGenerator extends CodeGenerator {
 			this.errorCodes,
 			this.rootPath
 		).generateCode();
+		await this.generateSessionDataCode();
 	};
 
 	generateTestFunction = async (testObject: TestObject) => {
@@ -243,8 +361,25 @@ export class PythonGenerator extends CodeGenerator {
 			const returnStatement = compileInputToPy(
 				testObject[TestObjectSyntax.Return]
 			);
+
+			// Check if this is a stateful validation
+			let isStateFull = false;
+			for (const k in testObject) {
+				const value = testObject[k];
+				if (typeof value === "string") {
+					if (
+						value.includes(`${ExternalDataSyntax}.`) &&
+						!value.includes("_SELF")
+					) {
+						isStateFull = true;
+						break;
+					}
+				}
+			}
+
 			return Mustache.render(template, {
 				isNested: false,
+				isStateFull: isStateFull,
 				returnStatement: returnStatement,
 				errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
 				errorDescription: this.CreateErrorMarkdown(testObject, skipList),
@@ -275,6 +410,7 @@ export class PythonGenerator extends CodeGenerator {
 				nestedFunctions: indentedNestedFunctions,
 				names: names,
 				errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
+				testName: testObject[TestObjectSyntax.Name],
 				TEST_OBJECT: `${JSON.stringify(testObject)}`,
 			});
 		}
@@ -339,12 +475,14 @@ ${errorsList}
 			.map((api) => `from .api_tests import ${api}`)
 			.join("\n");
 		importsCode += `\nfrom .types.test_config import ValidationConfig\n`;
+		importsCode += `\nfrom .storage_actions import perform_${functionName.toLowerCase()}_save, perform_${functionName.toLowerCase()}_load\n`;
+
 		const masterDoc = readFileSync(
 			path.resolve(__dirname, "./templates/master-doc.mustache"),
 			"utf-8"
 		);
 		const masterFunction = `
-def perform_${functionName.toLowerCase()}(action, payload,config: ValidationConfig = None, external_data=None):
+def perform_${functionName.toLowerCase()}(action, payload, config: ValidationConfig = None, external_data=None):
     ${masterDoc}
 
     if external_data is None:
@@ -358,12 +496,28 @@ def perform_${functionName.toLowerCase()}(action, payload,config: ValidationConf
         "standard_logs": False,
         "_debug": False,
         "hide_parent_errors": True,
+        "state_full_validations": False,
     }
     # Merge user config with default config
     if config is None:
         config = default_config
     else:
         config = {**default_config, **config}
+
+    if config.get("state_full_validations") and not config.get("store"):
+        raise Exception(
+            "State Full validations require a storage interface to be provided in the config."
+        )
+    
+    if config.get("state_full_validations") and not config.get("unique_key"):
+        raise Exception(
+            "State Full validations require a unique_key to be provided in the config."
+        )
+
+    if config.get("state_full_validations"):
+        import asyncio
+        load_data = asyncio.run(perform_${functionName.toLowerCase()}_load(action, config["unique_key"], config["store"]))
+        external_data = {**load_data, **external_data}
 
     input_data = {
         "payload": normalized_payload,

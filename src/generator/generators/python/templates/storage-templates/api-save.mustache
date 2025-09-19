@@ -1,0 +1,41 @@
+from ..utils.json_path_utils import get_json_path
+from ..utils.save_utils import save_data, load_function
+from ..interfaces.storage_interface import StorageInterface
+from ..types.storage_types import StorageConfig
+import json
+from datetime import datetime
+
+async def store_{{action}}(unique_prefix: str, payload: dict, store: StorageInterface, config: StorageConfig):
+    {{#storeActions}}
+    await save_function(payload, unique_prefix, "{{{key}}}", "{{{value}}}", store, config)
+    {{/storeActions}}
+
+async def load_for_{{action}}(unique_prefix: str, store: StorageInterface):
+    return {
+        {{#loadActions}}
+        "{{{key}}}": await load_function(store, unique_prefix, "{{{key}}}"),
+        {{/loadActions}}
+    }
+
+async def save_function(payload: dict, unique_prefix: str, key: str, path: str, store: StorageInterface, config: StorageConfig):
+    if path == "" or key == "_SELF":
+        return
+    
+    value = get_json_path(payload, path)
+    data = {
+        "stored_from": "{{action}}_action",
+        "key_path": path,
+        "value": value,
+        "timestamp": datetime.now().isoformat()
+    }
+    data_string = json.dumps(data)
+    await save_data(unique_prefix, key, data_string, store, config)
+
+async def load_function(store: StorageInterface, unique_prefix: str, key: str):
+    try:
+        value = await store.get_key(unique_prefix, key)
+        if not value:
+            return []
+        return json.loads(value)["value"]
+    except Exception:
+        return []

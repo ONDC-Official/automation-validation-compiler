@@ -45,14 +45,14 @@ async function loadFunction(
     store: StorageInterface,
     uniquePrefix: string,
     key: string
-): Promise<any | null> {
+): Promise<any[] | []> {
     try {
         const value = await store.getKey(uniquePrefix, key);
         if (!value) {
-            return null;
+            return [];
         }
         return JSON.parse(value).value;
     } catch (err) {
-        return null;
+        return [];
     }
 }
