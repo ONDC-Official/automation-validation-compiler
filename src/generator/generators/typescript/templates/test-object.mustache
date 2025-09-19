@@ -3,6 +3,7 @@ function {{name}}(input: validationInput): validationOutput {
     let subResults: validationOutput = [];
     let valid = true;
     for(const testObj of scope){
+        if(!testObj || typeof testObj !== 'object') continue;
         testObj._EXTERNAL = input.externalData;
         {{#variables}}
         const {{name}} = {{{value}}}
