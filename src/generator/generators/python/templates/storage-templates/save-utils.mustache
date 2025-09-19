@@ -3,7 +3,7 @@ from ..types.storage_types import StorageConfig
 import asyncio
 
 async def save_data(unique_prefix: str, key: str, save_data: str, store: StorageInterface, config: StorageConfig):
-    final_key = f"{unique_prefix}:{key}"
+    final_key = key
     retry_times = config["retry_attempts"]
     delay_ms = config["retry_delay_ms"]
     attempts = 0

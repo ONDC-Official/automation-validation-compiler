@@ -7,7 +7,7 @@ async function saveData(
     store: StorageInterface,
     config: StorageConfig
 ){
-    const finalKey = `${uniquePrefix}:${key}`;
+    const finalKey = key;
     const retryTimes = config.retryAttempts;
     const delayMs = config.retryDelayMs;
     let attempts = 0;
