@@ -20,13 +20,13 @@
  * @param payload - The JSON payload to validate.
  * @param config - Partial {@link ValidationConfig}. Merged with defaults.
  * @param externalData - Extra data accessible to rules (we set `_SELF` to the normalized payload).
- * @returns {@link validationOutput}
+ * @returns {@link Promise<validationOutput>}
  *
  * @example
  * ```ts
  * import { performL1_validations } from "@your/pkg";
  *
- * const out = performL1_validations("search", payload, { onlyInvalid: false });
+ * const out = await performL1_validations("search", payload, { onlyInvalid: false });
  * // e.g. out[0] => { testName, valid, code, description?, _debugInfo? }
  * ```
  */

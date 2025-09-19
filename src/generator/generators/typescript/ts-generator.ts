@@ -400,7 +400,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		);
 
 		const masterFunction = `
-				export function perform${functionName}(action: string, payload: any, config?: Partial<ValidationConfig>, externalData: any = {}) {
+				export async function perform${functionName}(action: string, payload: any, config?: Partial<ValidationConfig>, externalData: any = {}) {
 					const completeConfig: ValidationConfig = {
 						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, stateFullValidations: false, _debug: false },
 						...config,
@@ -420,7 +420,7 @@ export class TypescriptGenerator extends CodeGenerator {
 					externalData._SELF = normalizedPayload;
 					if (completeConfig.stateFullValidations) {
 						externalData = {
-							...perform${functionName}Load(action, completeConfig.uniqueKey!, completeConfig.store!),
+							...await perform${functionName}Load(action, completeConfig.uniqueKey!, completeConfig.store!),
 							...externalData,
 						};
 					}
