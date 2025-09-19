@@ -420,7 +420,7 @@ export class TypescriptGenerator extends CodeGenerator {
 					externalData._SELF = normalizedPayload;
 					if (completeConfig.stateFullValidations) {
 						externalData = {
-							...performL1_validationsLoad(action, completeConfig.uniqueKey!, completeConfig.store!),
+							...perform${functionName}Load(action, completeConfig.uniqueKey!, completeConfig.store!),
 							...externalData,
 						};
 					}

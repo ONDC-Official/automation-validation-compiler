@@ -1,6 +1,6 @@
 {
 	"name": "ondc-code-generator",
-	"version": "0.6.01",
+	"version": "0.6.02",
 	"description": "generate code from build.yaml ",
 	"main": "dist/index.js",
 	"type": "module",
