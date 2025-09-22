@@ -30,7 +30,7 @@ config: StorageConfig): Promise<void> {
     if(path === "" || key === "_SELF"){
         return;
     }
-    const value = payloadUtils.getJsonPath(payload, path);
+    const value = payloadUtils.getJsonPath(payload, path,true);
     const data = {
         stored_from: "{{action}}_action",
         key_path: path,

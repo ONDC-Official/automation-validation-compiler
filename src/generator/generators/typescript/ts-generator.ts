@@ -274,7 +274,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			const value = testObject[name] as ConfigVariable;
 			const final =
 				typeof value === "string"
-					? `payloadUtils.getJsonPath(testObj, "${value}")`
+					? `payloadUtils.getJsonPath(testObj, "${value}",true)`
 					: ConvertArrayToString(value);
 			variables.push({
 				name: name,

@@ -321,7 +321,7 @@ export class PythonGenerator extends CodeGenerator {
 			const value = testObject[name] as ConfigVariable;
 			const final =
 				typeof value === "string"
-					? `payload_utils["get_json_path"](${testObject[TestObjectSyntax.Name]}_obj, "${value}")`
+					? `payload_utils["get_json_path"](${testObject[TestObjectSyntax.Name]}_obj, "${value}", True)`
 					: this.convertArrayToStringPython(value);
 			variables.push({
 				name: name,

@@ -21,7 +21,7 @@ async def save_function(payload: dict, unique_prefix: str, key: str, path: str, 
     if path == "" or key == "_SELF":
         return
     
-    value = get_json_path(payload, path)
+    value = get_json_path(payload, path, True)
     data = {
         "stored_from": "{{action}}_action",
         "key_path": path,
