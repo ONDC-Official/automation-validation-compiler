@@ -10,6 +10,10 @@ import { ErrorDefinition } from "../../../types/error-codes";
             1. handle nested 
         2. combine all the tests
 */
+export type CodeGeneratorProps = {
+	codeName: string;
+};
+
 export abstract class CodeGenerator {
 	validationConfig: ValidationConfig;
 	rootPath: string;
@@ -25,5 +29,5 @@ export abstract class CodeGenerator {
 	}
 	abstract generateSessionDataCode(): Promise<void>;
 	abstract generateValidationCode(): Promise<void>;
-	abstract generateCode(): Promise<void>;
+	abstract generateCode(codeConfig: CodeGeneratorProps): Promise<void>;
 }

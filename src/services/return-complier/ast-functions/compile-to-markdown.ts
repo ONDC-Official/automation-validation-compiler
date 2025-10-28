@@ -19,134 +19,232 @@ import {
 	NoneIn,
 } from "../tokens.js";
 
+/**
+ * Leaf (unary/binary) message templates, rewritten to be short & human-friendly.
+ * NOTE: We keep triple-mustaches so Mustache can expand safely.
+ */
 const uniaryMessages = {
 	[AreUnique.LABEL ?? "are unique"]: (variable: string, forNot: boolean) =>
-		`all values of {{{${variable}}}} must${forNot ? " **not**" : ""} be unique`,
+		`All values of {{{${variable}}}} ${forNot ? "must **not** be unique" : "are unique"}`,
 	[ArePresent.LABEL ?? "are present"]: (variable: string, forNot: boolean) =>
-		`{{{${variable}}}} must${forNot ? " **not**" : ""} be present in the payload`,
+		`{{{${variable}}}} ${forNot ? "must **not** be present" : "must be present"} in the payload`,
 };
+
+/**
+ * Skip-specific message templates for more natural language in skip conditions
+ */
+const skipUniaryMessages = {
+	[AreUnique.LABEL ?? "are unique"]: (variable: string, forNot: boolean) =>
+		`{{{${variable}}}} values ${forNot ? "are not unique" : "are unique"}`,
+	[ArePresent.LABEL ?? "are present"]: (variable: string, forNot: boolean) =>
+		`{{{${variable}}}} ${forNot ? "is not in the payload" : "is in the payload"}`,
+};
+
 const binaryMessages = {
 	[AllIn.LABEL ?? "all in"]: (lhs: string, rhs: string, forNot: boolean) =>
-		`every element of {{{${lhs}}}} must${
-			forNot ? " **not**" : ""
-		} be in {{{${rhs}}}}`,
+		`${forNot ? "Not all" : "All"} elements of {{{${lhs}}}} ${forNot ? "may be" : "must be"} in {{{${rhs}}}}`,
 	[AnyIn.LABEL ?? "any in"]: (lhs: string, rhs: string, forNot: boolean) =>
-		`at least one element of {{{${lhs}}}} must${
-			forNot ? " **not**" : ""
-		} be in {{{${rhs}}}}`,
+		`${forNot ? "None of" : "At least one of"} {{{${lhs}}}} ${forNot ? "may be" : "must be"} in {{{${rhs}}}}`,
 	[FollowRegex.LABEL ?? "follow regex"]: (
 		lhs: string,
 		rhs: string,
 		forNot: boolean
 	) =>
-		`all elements of {{{${lhs}}}} must${
-			forNot ? " **not**" : ""
-		} follow every regex in {{{${rhs}}}}`,
+		`${forNot ? "Some elements of" : "All elements of"} {{{${lhs}}}} ${forNot ? "may fail to" : "must"} follow every regex in {{{${rhs}}}}`,
 	[NoneIn.LABEL ?? "none in"]: (lhs: string, rhs: string, forNot: boolean) =>
-		`no element of {{{${lhs}}}} must${
-			forNot ? " **not**" : ""
-		} be in {{{${rhs}}}}`,
+		`${forNot ? "Some elements of" : "No element of"} {{{${lhs}}}} ${forNot ? "may be in" : "must be in"} {{{${rhs}}}}`,
 	[EqualTo.LABEL ?? "equal to"]: (lhs: string, rhs: string, forNot: boolean) =>
-		`{{{${lhs}}}} must${forNot ? " **not**" : ""} be equal to {{{${rhs}}}}`,
+		`{{{${lhs}}}} ${forNot ? "must **not** equal" : "must equal"} {{{${rhs}}}}`,
 	[GreaterThan.LABEL ?? "greater than"]: (
 		lhs: string,
 		rhs: string,
 		forNot: boolean
 	) =>
-		`{{{${lhs}}}} must${forNot ? " **not**" : ""} be greater than {{{${rhs}}}}`,
+		`{{{${lhs}}}} ${forNot ? "must **not** be greater than" : "must be greater than"} {{{${rhs}}}}`,
 	[LessThan.LABEL ?? "less than"]: (
 		lhs: string,
 		rhs: string,
 		forNot: boolean
-	) => `{{{${lhs}}}} must${forNot ? " **not**" : ""} be less than {{{${rhs}}}}`,
+	) =>
+		`{{{${lhs}}}} ${forNot ? "must **not** be less than" : "must be less than"} {{{${rhs}}}}`,
 };
 
+/**
+ * Skip-specific binary message templates for more natural language in skip conditions
+ */
+const skipBinaryMessages = {
+	[AllIn.LABEL ?? "all in"]: (lhs: string, rhs: string, forNot: boolean) =>
+		`${forNot ? "not all" : "all"} elements of {{{${lhs}}}} are in {{{${rhs}}}}`,
+	[AnyIn.LABEL ?? "any in"]: (lhs: string, rhs: string, forNot: boolean) =>
+		`${forNot ? "none of" : "any of"} {{{${lhs}}}} are in {{{${rhs}}}}`,
+	[FollowRegex.LABEL ?? "follow regex"]: (
+		lhs: string,
+		rhs: string,
+		forNot: boolean
+	) =>
+		`{{{${lhs}}}} ${forNot ? "doesn't follow" : "follows"} regex {{{${rhs}}}}`,
+	[NoneIn.LABEL ?? "none in"]: (lhs: string, rhs: string, forNot: boolean) =>
+		`${forNot ? "some" : "none"} of {{{${lhs}}}} are in {{{${rhs}}}}`,
+	[EqualTo.LABEL ?? "equal to"]: (lhs: string, rhs: string, forNot: boolean) =>
+		`{{{${lhs}}}} ${forNot ? "is not equal to" : "equals"} {{{${rhs}}}}`,
+	[GreaterThan.LABEL ?? "greater than"]: (
+		lhs: string,
+		rhs: string,
+		forNot: boolean
+	) =>
+		`{{{${lhs}}}} ${forNot ? "is not greater than" : "is greater than"} {{{${rhs}}}}`,
+	[LessThan.LABEL ?? "less than"]: (
+		lhs: string,
+		rhs: string,
+		forNot: boolean
+	) =>
+		`{{{${lhs}}}} ${forNot ? "is not less than" : "is less than"} {{{${rhs}}}}`,
+};
+
+/**
+ * Public API: Compile an AST to *readable* Markdown with:
+ * - No pointer numbering (no 1.1.1)
+ * - Natural language groups ("All of the following…" / "Any of these…")
+ * - Leaves rendered as short sentences
+ *
+ * @param ast
+ * @param topLevel Whether this is the very first group under the title
+ * @param depth    Controls bullet/indent
+ * @param forNot   Carries NOT (!) context downward
+ */
 export function CompileToMarkdown(
 	ast: AstNode,
-	pointer: string,
-	depth = 0,
-	forNot: boolean
+	topLevel: boolean = true,
+	depth: number = 0,
+	forNot: boolean = false
 ): string {
-	const indent = "  ".repeat(depth); // 2 spaces per depth level
+	return compileToMarkdownInternal(ast, topLevel, depth, forNot, false);
+}
 
-	// Helper function to indent multi-line strings
-	function indentMultilineString(str: string, indentLevel: number): string {
-		const subIndent = "  ".repeat(indentLevel);
-		return str
+/**
+ * Skip-specific version: Compile an AST to *readable* Markdown for skip conditions with:
+ * - More natural language ("{{lhs}} is not in the payload" instead of "{{lhs}} must not be present")
+ * - Simpler phrasing suitable for skip conditions
+ *
+ * @param ast
+ * @param topLevel Whether this is the very first group under the title
+ * @param depth    Controls bullet/indent
+ * @param forNot   Carries NOT (!) context downward
+ */
+export function CompileToMarkdownForSkip(
+	ast: AstNode,
+	topLevel: boolean = true,
+	depth: number = 0,
+	forNot: boolean = false
+): string {
+	return compileToMarkdownInternal(ast, topLevel, depth, forNot, true);
+}
+
+/**
+ * Internal implementation shared by both CompileToMarkdown and CompileToMarkdownForSkip
+ */
+function compileToMarkdownInternal(
+	ast: AstNode,
+	topLevel: boolean = true,
+	depth: number = 0,
+	forNot: boolean = false,
+	isSkip: boolean = false
+): string {
+	const indent = "  ".repeat(depth);
+
+	// Render a group label (AND/OR) with correct style.
+	function groupLabel(isAnd: boolean, asBullet: boolean, indentStr: string) {
+		const label = isAnd
+			? "**All of the following must be true:**"
+			: "**Any of these must be true:**";
+		return asBullet ? `${indentStr}- ${label}` : `${indentStr}${label}`;
+	}
+
+	// Ensure each line in a block is indented (used for nested groups).
+	function indentBlock(block: string, extraDepth = 1): string {
+		const pad = "  ".repeat(extraDepth);
+		return block
 			.split("\n")
-			.map((line) => subIndent + line)
+			.map((l) => (l.length ? pad + l : l))
 			.join("\n");
 	}
 
+	// RETURN: just compile its expression at same depth/topLevel
 	if (ast.type === "returnStatement") {
-		const returnStatement = ast as ReturnStatementNode;
-		const generated = CompileToMarkdown(
-			returnStatement.expression,
-			`${pointer}`,
+		const ret = ast as ReturnStatementNode;
+		return compileToMarkdownInternal(
+			ret.expression,
+			topLevel,
 			depth,
-			forNot
+			forNot,
+			isSkip
 		);
-		return `${generated}`;
 	}
+
+	// AND / OR group
 	if (ast.type === "binaryOperator") {
-		const binary = ast as BinaryOperatorNode;
-		const subMdLhs = CompileToMarkdown(
-			binary.lhs,
-			getNextPointer(pointer, 1),
+		const { operator, lhs, rhs } = ast as BinaryOperatorNode;
+		const isAnd = operator === "&&";
+		const labelLine = groupLabel(isAnd, !topLevel, indent);
+
+		// Render children as bullet items (no numbering)
+		const leftRendered = compileToMarkdownInternal(
+			lhs,
+			false,
 			depth + 1,
-			forNot
+			forNot,
+			isSkip
 		);
-		const subMdRhs = CompileToMarkdown(
-			binary.rhs,
-			getNextPointer(pointer, 2),
+		const rightRendered = compileToMarkdownInternal(
+			rhs,
+			false,
 			depth + 1,
-			forNot
+			forNot,
+			isSkip
 		);
 
-		const indentedSubMdLhs = indentMultilineString(subMdLhs, 0); // LHS already indented
-		const indentedSubMdRhs = indentMultilineString(subMdRhs, 0); // RHS already indented
-
-		if (binary.operator === "&&") {
-			return `${indent}- **condition ${pointer}**: all of the following sub conditions must${
-				forNot ? "**not**" : ""
-			} be met:\n\n${indentedSubMdLhs}\n${indentedSubMdRhs}`;
-		}
-		if (binary.operator === "||") {
-			return `${indent}- **condition ${pointer}**: any one of the following sub conditions must${
-				forNot ? "**not**" : ""
-			} be met:\n\n${indentedSubMdLhs}\n${indentedSubMdRhs}`;
+		// If top-level group: label as standalone line, then list items
+		// If nested: label as bullet, then nested bullets further indented
+		if (topLevel) {
+			return [labelLine, leftRendered, rightRendered].join("\n");
+		} else {
+			return [labelLine, leftRendered, rightRendered].join("\n");
 		}
 	}
+
+	// NOT
 	if (ast.type === "notOperator") {
 		const not = ast as NotOperatorNode;
-		return CompileToMarkdown(not.expression, pointer, depth, !forNot);
+		return compileToMarkdownInternal(
+			not.expression,
+			topLevel,
+			depth,
+			!forNot,
+			isSkip
+		);
 	}
+
+	// LEAVES (unary / binary custom functions)
 	if (ast.type === "customUniaryFunction") {
-		const customFunction = ast as CustomUniaryFunction;
-		const func = customFunction.customFunction;
-		const messageFunction = uniaryMessages[func as keyof typeof uniaryMessages];
-		const lhs = customFunction.expression;
-		return `${indent}- **condition ${pointer}**: ${messageFunction(
-			lhs.name,
-			forNot
-		)}`;
+		const custom = ast as CustomUniaryFunction;
+		const fn = custom.customFunction;
+		const lhs = custom.expression;
+		const msgFn = isSkip
+			? skipUniaryMessages[fn as keyof typeof skipUniaryMessages]
+			: uniaryMessages[fn as keyof typeof uniaryMessages];
+		return `${indent}- ${msgFn(lhs.name, forNot)}`;
 	}
+
 	if (ast.type === "customBinaryFunction") {
-		const customFunction = ast as CustomBinaryFunction;
-		const func = customFunction.customFunction;
-		const messageFunction = binaryMessages[func as keyof typeof binaryMessages];
-		const lhs = customFunction.lhs;
-		const rhs = customFunction.rhs;
-		return `${indent}- **condition ${pointer}**: ${messageFunction(
-			lhs.name,
-			rhs.name,
-			forNot
-		)}`;
+		const custom = ast as CustomBinaryFunction;
+		const fn = custom.customFunction;
+		const lhs = custom.lhs;
+		const rhs = custom.rhs;
+		const msgFn = isSkip
+			? skipBinaryMessages[fn as keyof typeof skipBinaryMessages]
+			: binaryMessages[fn as keyof typeof binaryMessages];
+		return `${indent}- ${msgFn(lhs.name, rhs.name, forNot)}`;
 	}
 
 	throw new Error("Invalid AST node:" + JSON.stringify(ast));
-}
-
-function getNextPointer(currentPointer: string, nextIndex: number): string {
-	return `${currentPointer}.${nextIndex}`;
 }

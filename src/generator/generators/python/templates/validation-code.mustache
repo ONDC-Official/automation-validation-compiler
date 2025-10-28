@@ -1,0 +1,43 @@
+{{#isNested}}
+{{{nestedFunctions}}}
+
+        test_functions = [
+    {{#names}}
+            {{name}},
+    {{/names}}
+        ]
+
+        all_results = []
+        for fn in test_functions:
+            sub_result = fn(input_data)
+            all_results.extend(sub_result)
+
+
+        sub_results = all_results
+        valid = all(r["valid"] for r in sub_results)
+{{/isNested}}
+{{^isNested}}
+        {{#isStateFull}}
+        validate = True
+        if input_data["config"].get("state_full_validations") == True:
+            validate = {{{returnStatement}}}
+        {{/isStateFull}}
+        
+        {{^isStateFull}}
+        validate = {{{returnStatement}}}
+        {{/isStateFull}}
+
+        if not validate:
+            # del {{testName}}_obj["_EXTERNAL"]
+            return [{
+                "test_name": "{{testName}}",
+                "valid": False,
+                "code": {{errorCode}},
+                "description": r"""{{{errorDescription}}}""",
+                "_debug_info": {
+                    "fed_config": r"""
+{{{TEST_OBJECT}}}
+"""
+                }
+            }]
+{{/isNested}}

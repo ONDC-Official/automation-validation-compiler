@@ -36,7 +36,8 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 			await new ScopeValidator(
 				this.targetObject,
 				this.validationPath,
-				this.dependencies.stringJsonPaths
+				this.dependencies.stringJsonPaths,
+				this.dependencies.minimal
 			).validate();
 		}
 
@@ -44,7 +45,8 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 			await new ErrorCodeValidator(
 				this.targetObject,
 				this.validationPath,
-				this.dependencies.errorDefinitions
+				this.dependencies.errorDefinitions,
+				this.dependencies.minimal
 			).validate();
 		}
 
@@ -52,7 +54,8 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 			this.targetObject,
 			this.validationPath,
 			this.dependencies.stringJsonPaths,
-			this.dependencies.externalVariables
+			this.dependencies.externalVariables,
+			this.dependencies.minimal
 		).validate();
 		if (this.targetObject[TestObjectSyntax.Continue]) {
 			await new ContinueValidator(

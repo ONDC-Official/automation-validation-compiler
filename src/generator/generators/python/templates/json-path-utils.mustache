@@ -1,0 +1,48 @@
+# pip install jsonpath-ng
+from typing import Any, List
+from jsonpath_ng.ext import parse  # ext supports more JSONPath features
+
+def is_list_of_strings_or_none(value: Any) -> bool:
+    return (
+        isinstance(value, list)
+        and all((v is None) or isinstance(v, str) for v in value)
+    )
+
+def flatten_list(lst: List[Any]) -> List[Any]:
+    """Recursively flatten a nested list"""
+    result = []
+    for item in lst:
+        if isinstance(item, list):
+            result.extend(flatten_list(item))
+        else:
+            result.append(item)
+    return result
+
+def get_json_path(payload: Any, path: str, flatten_result: bool = False) -> List[Any]:
+    """
+    Evaluate a JSONPath against `payload`.
+
+    - If the result is a list that contains only strings and/or None,
+      convert None -> "null".
+    - Return [] when there are no matches.
+    - If flatten_result is True, flatten nested arrays completely.
+    """
+    expr = parse(path)
+    matches = [m.value for m in expr.find(payload)]  # extract raw values
+
+    if is_list_of_strings_or_none(matches):
+        matches = ["null" if v is None else v for v in matches]
+
+    # Flatten only if flag is true
+    if flatten_result:
+        matches = flatten_list(matches)
+
+    # Explicitly mirror the TS return of [] for no matches
+    return matches if len(matches) > 0 else []
+
+# Optional: emulate your default export object
+payload_utils = {
+    "get_json_path": get_json_path,
+}
+
+__all__ = ["get_json_path", "payload_utils"]

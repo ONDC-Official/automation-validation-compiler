@@ -41,7 +41,7 @@ export type BuildPath = {
 	};
 };
 
-export interface BUID_TYPE {
+export interface BUILD_TYPE {
 	paths: BuildPath;
 	"x-enum": any;
 	"x-attributes": Xattributes;

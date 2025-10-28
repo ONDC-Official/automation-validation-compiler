@@ -1,0 +1,93 @@
+from abc import ABC, abstractmethod
+from typing import List
+
+class StorageInterface(ABC):
+    """
+    Storage interface for persisting and retrieving key-value data.
+    
+    Purpose — Provides a standardized abstraction layer for storage operations
+    that can be implemented by different storage backends (Redis, Memory, File, etc.).
+    
+    Implementation Notes:
+    - All operations are asynchronous and return coroutines
+    - Keys should be strings and values are stored as strings
+    - Implementations should handle serialization/deserialization as needed
+    - Prefix-based operations allow for namespacing and bulk operations
+    """
+    
+    @abstractmethod
+    async def save_key(self, unique_prefix: str, key: str, value: str) -> None:
+        """
+        Save a key-value pair to storage with a unique prefix for namespacing.
+        
+        Args:
+            unique_prefix: A unique identifier/namespace prefix to prevent key collisions
+            key: The unique identifier for the stored value within the prefix namespace
+            value: The string value to store
+        """
+        pass
+    
+    @abstractmethod
+    async def get_key(self, unique_prefix: str, key: str) -> str:
+        """
+        Retrieve a value by its key from storage within a specific namespace.
+        
+        Args:
+            unique_prefix: The unique identifier/namespace prefix used when storing
+            key: The unique identifier for the value to retrieve within the prefix namespace
+            
+        Returns:
+            The stored value as a string
+            
+        Raises:
+            Exception if the key does not exist
+        """
+        pass
+    
+    @abstractmethod
+    async def delete_key(self, unique_prefix: str, key: str) -> None:
+        """
+        Remove a key-value pair from storage within a specific namespace.
+        
+        Args:
+            unique_prefix: The unique identifier/namespace prefix used when storing
+            key: The unique identifier for the value to delete within the prefix namespace
+        """
+        pass
+    
+    @abstractmethod
+    async def list_keys(self, unique_prefix: str) -> List[str]:
+        """
+        List all keys within a specific namespace/prefix.
+        
+        Args:
+            unique_prefix: The unique identifier/namespace prefix to list keys from
+            
+        Returns:
+            A list of keys within that namespace
+        """
+        pass
+    
+    @abstractmethod
+    async def clear_storage(self) -> None:
+        """
+        Clear all stored data from the storage backend.
+        
+        Warning: This operation is destructive and cannot be undone.
+        Use with caution, especially in production environments.
+        """
+        pass
+    
+    @abstractmethod
+    async def key_exists(self, unique_prefix: str, key: str) -> bool:
+        """
+        Check if a key exists in storage within a specific namespace.
+        
+        Args:
+            unique_prefix: The unique identifier/namespace prefix to check within
+            key: The unique identifier to check for existence within the prefix namespace
+            
+        Returns:
+            True if the key exists, False otherwise
+        """
+        pass

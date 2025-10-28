@@ -1,0 +1,68 @@
+from typing import Dict, Any, List
+from typing import TypedDict, Optional
+
+
+# External data type definitions
+ExternalData = Dict[str, Any]
+
+
+class ValidationConfig(TypedDict, total=False):
+    """Config options for validations.
+    Attributes:
+        only_invalid (bool): If True, only invalid results will be returned.
+        hide_parent_errors (Optional[bool]): If True, parent errors will be hidden.
+        _debug (Optional[bool]): If True, debug mode will be enabled.
+        state_full_validations (Optional[bool]): If True, stateful validations will be enabled.
+        store (Optional[Any]): Storage interface for stateful validations.
+        unique_key (Optional[str]): Unique key for stateful validations.
+    """
+    only_invalid: Optional[bool]
+    hide_parent_errors: Optional[bool]
+    _debug: Optional[bool]
+    state_full_validations: Optional[bool]
+    store: Optional[Any]
+    unique_key: Optional[str]
+
+# Input structure for validation functions
+ValidationInput = Dict[str, Any]
+
+class DebugInfo(TypedDict, total=False):
+    """
+    Diagnostic information useful for debugging.
+
+    Attributes:
+        fed_config: The configuration used to generate the validation.
+        output_code: The identifier/code of the validation rule that was executed.
+    """
+    fed_config: Any
+    output_code: Any
+
+
+class ValidationResult(TypedDict, total=False):
+    """
+    Represents the output of a single validation test.
+
+    Attributes:
+        test_name: The name of the validation test.
+        valid: Whether the test passed (True) or failed (False).
+        code: Numeric code representing the result or error type.
+        description: Optional. Additional details about the test result.
+        _debug_info: Optional. Diagnostic information useful for debugging.
+    """
+    test_name: str
+    valid: bool
+    code: int
+    description: Optional[str]
+    _debug_info: Optional[DebugInfo]
+
+
+# Represents the output of a validation run:
+# a list of individual validation results.
+ValidationOutput = List[ValidationResult]
+
+# Test function array type
+TestFunctionArray = List[callable]
+
+{{#externalData}}
+# {{name}}: Any
+{{/externalData}}

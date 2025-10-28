@@ -1,0 +1,29 @@
+def {{name}}(input_data):
+    scope = payload_utils["get_json_path"](input_data["payload"], "{{{scopePath}}}")
+    sub_results = []
+    valid = True
+
+    for {{testName}}_obj in scope:
+        {{testName}}_obj["_EXTERNAL"] = input_data["external_data"]
+{{#variables}}
+        {{name}} = {{{value}}}
+{{/variables}}
+        
+{{#hasContinue}}
+        skip_check = {{{skipCheckStatement}}}
+        if skip_check:
+            continue
+{{/hasContinue}}
+
+{{{validationCode}}}
+        # del {{testName}}_obj["_EXTERNAL"]
+
+    return [{
+        "test_name": "{{testName}}",
+        "valid": valid,
+        "code": {{successCode}} if valid else {{errorCode}}, 
+        "_debug_info": {
+            "fed_config": r"""
+{{{TEST_OBJECT}}}
+"""
+    }}] + sub_results

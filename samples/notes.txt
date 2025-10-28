@@ -1,0 +1,17 @@
+to explain
+
+JVAL SYNTAX
+
+1. syntax of single test object:
+   > > _NAME_, _CONTINUE_, _RETURN_ , _SCOPE_, _DESCRIPTION_
+   > > _ERROR_CODE_, _SUCCESS_CODE_ , variable types , nesting, \_EXTERNAL
+
+> > _RETURN_ compiler: all operators, big examples,
+
+Code generation:
+
+1. structure of generated folder
+2. markdown descriptions, html, and the code example corresponding to a test object.
+
+how to use generated code :
+input ? output ?

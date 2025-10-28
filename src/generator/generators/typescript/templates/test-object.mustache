@@ -3,6 +3,7 @@ function {{name}}(input: validationInput): validationOutput {
     let subResults: validationOutput = [];
     let valid = true;
     for(const testObj of scope){
+        if(!testObj || typeof testObj !== 'object') continue;
         testObj._EXTERNAL = input.externalData;
         {{#variables}}
         const {{name}} = {{{value}}}
@@ -14,7 +15,17 @@ function {{name}}(input: validationInput): validationOutput {
         {{/hasContinue}}
 
         {{{validationCode}}}
-        delete testObj._EXTERNAL;
+        // delete testObj._EXTERNAL;
     }
-    return [{valid: valid,code: {{successCode}} },...subResults];
+    return [{
+        testName: "{{testName}}",
+        valid: valid,
+        code: valid ? {{successCode}} : {{errorCode}},
+        _debugInfo: {
+            fedConfig: 
+`
+{{{TEST_OBJECT}}}
+`,
+        }
+    },...subResults];
 }

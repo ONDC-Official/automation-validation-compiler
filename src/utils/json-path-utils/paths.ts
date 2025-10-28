@@ -18,9 +18,10 @@ export function isValidJsonPath(jsonPath: string) {
 export function replaceBracketsWithAsteriskNested(jsonPath: string): string {
 	let result = "";
 	let i = 0;
+
 	while (i < jsonPath.length) {
-		if (jsonPath[i] === "[") {
-			// Start of bracketed expression
+		if (jsonPath[i] === "[" && jsonPath.substring(i).startsWith("[?(@.")) {
+			// Start of query bracketed expression
 			let bracketDepth = 1;
 			let j = i + 1;
 			while (j < jsonPath.length && bracketDepth > 0) {
@@ -31,7 +32,7 @@ export function replaceBracketsWithAsteriskNested(jsonPath: string): string {
 				}
 				j++;
 			}
-			// Replace the content inside the brackets with '*'
+			// Replace the query condition with '*'
 			result += "[*]";
 			i = j; // Move i to after the closing ']'
 		} else {

@@ -14,16 +14,29 @@ export class ConfigValidator implements IValidator {
 	config: ValidationConfig;
 	stringJsonPaths: Record<string, string[]>;
 	errorDefinitions: ErrorDefinition[];
+	validatorSettings: {
+		minimal: boolean;
+	};
 	constructor(
 		validationPath: string,
 		config: ValidationConfig,
 		stringJsonPaths: Record<string, string[]>,
-		errorDefinitions: ErrorDefinition[]
+		errorDefinitions: ErrorDefinition[],
+		settings?: {
+			minimal: boolean;
+		}
 	) {
 		this.validationPath = validationPath;
 		this.config = config;
 		this.stringJsonPaths = stringJsonPaths;
 		this.errorDefinitions = errorDefinitions;
+		if (settings) {
+			this.validatorSettings = settings;
+		} else {
+			this.validatorSettings = {
+				minimal: false,
+			};
+		}
 	}
 	validate = async () => {
 		if (!this.config[ConfigSyntax.Tests])
@@ -34,10 +47,22 @@ export class ConfigValidator implements IValidator {
 		const sessionData = this.config[ConfigSyntax.SessionData];
 		const tests = this.config[ConfigSyntax.Tests];
 
-		await new SessionDataValidator(
+		const sessionDataValidator = new SessionDataValidator(
 			`${this.validationPath}/${ConfigSyntax.SessionData}`,
 			sessionData
-		).validate();
+		);
+
+		await sessionDataValidator.validate();
+
+		for (const api in sessionData) {
+			const paths = this.stringJsonPaths[api];
+			for (const key in sessionData[api]) {
+				const value = sessionData[api][key];
+				if (typeof value === "string") {
+					sessionDataValidator.validateApiPath(paths, value, api, key);
+				}
+			}
+		}
 
 		const externalVariables = getExternalVariables(sessionData);
 
@@ -48,6 +73,7 @@ export class ConfigValidator implements IValidator {
 				stringJsonPaths: this.stringJsonPaths[api],
 				errorDefinitions: this.errorDefinitions,
 				externalVariables: externalVariables,
+				minimal: this.validatorSettings.minimal,
 			};
 			await new TestsValidator(testList, path, dependencies).validate();
 		}

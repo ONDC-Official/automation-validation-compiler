@@ -1,6 +1,7 @@
+import { ConfigSyntax } from "../../../constants/syntax.js";
 import { SessionDataApi } from "../../../types/config-types.js";
 import { isPrimitive } from "../../../utils/general-utils/validation-utils.js";
-
+import { isValidJsonPath } from "../../../utils/json-path-utils/paths.js";
 import { IValidator } from "../abstract-validator.js";
 
 export class SessionDataValidator implements IValidator {
@@ -54,5 +55,23 @@ export class SessionDataValidator implements IValidator {
 				);
 			}
 		});
+	}
+
+	public validateApiPath(
+		apiPaths: string[],
+		path: string,
+		api: string,
+		key: string
+	): void {
+		if (!isValidJsonPath(path)) {
+			throw new Error(
+				`Invalid ${ConfigSyntax.SessionData} path at ${path}: Path should be a valid JSONPath expression for ${api} and key: ${key}`
+			);
+		}
+		if (!apiPaths.includes(path)) {
+			throw new Error(
+				`Invalid ${ConfigSyntax.SessionData} path at ${path}: Path should be a valid path which returns a linear array for ${api} and key: ${key}`
+			);
+		}
 	}
 }

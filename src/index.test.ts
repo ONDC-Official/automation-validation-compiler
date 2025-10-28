@@ -1,0 +1,49 @@
+import { readFileSync } from "fs";
+
+import path from "path";
+import { fileURLToPath } from "url";
+import { ConfigCompiler } from "./generator/config-compiler.js";
+import { SupportedLanguages } from "./types/compiler-types.js";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const main = async () => {
+	const compiler = new ConfigCompiler(SupportedLanguages.Python);
+	const buildPath = path.resolve(__dirname, "../samples/build.yaml");
+	const valConfigPath = path.resolve(
+		__dirname,
+		"../samples/validation-config.json"
+	);
+	const buildYaml = readFileSync(buildPath, "utf-8");
+	const valConfig = JSON.parse(readFileSync(valConfigPath, "utf-8"));
+	await compiler.initialize(buildYaml);
+	await compiler.generateCode(
+		valConfig,
+		"L1_validations",
+		false,
+		"./alpha/python/"
+	);
+	const compilerTy = new ConfigCompiler(SupportedLanguages.Typescript);
+	await compilerTy.initialize(buildYaml);
+	await compilerTy.generateCode(
+		valConfig,
+		"L1_validations",
+		false,
+		"./alpha/typescript/"
+	);
+
+	// JavaScript generation example
+	// const compilerJs = new ConfigCompiler(SupportedLanguages.Javascript);
+	// await compilerJs.initialize(buildYaml);
+	// await compilerJs.generateCode(
+	// 	valConfig,
+	// 	"L1_validations",
+	// 	false,
+	// 	"./alpha/javascriptNative/"
+	// );
+};
+
+(async () => {
+	await main();
+	console.log("========== Code generation completed. ==========");
+})();

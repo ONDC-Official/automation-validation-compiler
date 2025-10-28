@@ -1,7 +1,4 @@
-import {
-	nodeReservedKeywords,
-	TestObjectSyntax,
-} from "../../constants/syntax.js";
+import { ReservedKeywords, TestObjectSyntax } from "../../constants/syntax.js";
 import { TestObject } from "../../types/config-types.js";
 import { getVariablesFromTest } from "./test-object-utils.js";
 
@@ -23,7 +20,7 @@ export function isValidVariableName(input: string): boolean {
 	// Check if input matches the regex
 	const matchesPattern = validVariableNameRegex.test(input);
 
-	const isNotReservedKeyword = !nodeReservedKeywords.has(input);
+	const isNotReservedKeyword = !ReservedKeywords.has(input);
 
 	return matchesPattern && isNotReservedKeyword;
 }
@@ -62,9 +59,15 @@ export function ConvertArrayToStringsInTestObject(testObject: TestObject) {
 }
 
 export function ConvertArrayToString(arr: any[]) {
-	let vals = arr.map((v) => `"${v}"`).join(", ");
-	vals = vals.replace(/"/g, `"`);
-	return `[${vals}]`;
+	for (const a of arr) {
+		if (typeof a !== "string") {
+			console.log(arr);
+			throw new Error(`Array contains non-string element: ${a}`);
+		}
+	}
+	let values = JSON.stringify(arr);
+	values = values.replace(/\\\\\\/g, "\\");
+	return values;
 }
 
 export function addTabToMarkdown(markdown: string) {

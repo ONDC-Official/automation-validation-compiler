@@ -1,11 +1,11 @@
 import { JSONSchema7 } from "json-schema";
-import { BUID_TYPE } from "../types/build.js";
+import { BUILD_TYPE } from "../types/build.js";
 import { removeRequiredAndEnum } from "../utils/config-utils/json-schema-utils.js";
 import { getAllJsonPaths } from "../utils/json-path-utils/extract-string-paths.js";
 
 export class SchemaExtactionService {
 	extractSchemas = async (
-		data: BUID_TYPE,
+		data: BUILD_TYPE,
 		removeRequired: boolean,
 		removeEnums: boolean
 	) => {
@@ -18,10 +18,6 @@ export class SchemaExtactionService {
 			const existingSchema =
 				paths[`/${targetApi}`].post.requestBody.content["application/json"]
 					.schema;
-			// output["response"] =
-			// 	paths[`/${targetApi}`].post.responses.default.content[
-			// 		"application/json"
-			// 	].schema;
 			const filtteredSchema = removeRequiredAndEnum(
 				existingSchema,
 				removeEnums,
@@ -35,7 +31,14 @@ export class SchemaExtactionService {
 	extractPossiblePaths = (schemas: Record<string, JSONSchema7>) => {
 		const paths: Record<string, string[]> = {};
 		for (const [key, schema] of Object.entries(schemas)) {
-			paths[key] = getAllJsonPaths(schema);
+			paths[key] = getAllJsonPaths(schema).map((p) =>
+				p
+					.replace(
+						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
+						(_, match) => `['${match}']`
+					)
+					.replace(/\.(@[\w-\/]+)/g, (_, match) => `['@${match.substring(1)}']`)
+			);
 		}
 		return paths;
 	};

@@ -1,6 +1,6 @@
 import {
 	TestObjectSyntax,
-	nodeReservedKeywords,
+	ReservedKeywords,
 	ExternalDataSyntax,
 	ConfigSyntax,
 } from "../../../constants/syntax.js";
@@ -23,7 +23,6 @@ import {
 	TestsValidatorDependencies,
 } from "../abstract-validator.js";
 import { TestsValidator } from "./test-list-validator.js";
-import logger from "../../../utils/logger.js";
 
 export class RequiredFieldsValidator extends TestObjectValidator {
 	validate = async () => {
@@ -53,7 +52,7 @@ export class NameValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Name} can't be a non-empty string at path ${this.validationPath}`
 			);
 		}
-		if (nodeReservedKeywords.has(name)) {
+		if (ReservedKeywords.has(name)) {
 			throw new Error(
 				`${TestObjectSyntax.Name} can't be a reserved keyword at path ${this.validationPath}`
 			);
@@ -68,9 +67,16 @@ export class NameValidator extends TestObjectValidator {
 
 export class ScopeValidator extends TestObjectValidator {
 	impossiblePaths: string[];
-	constructor(testObject: TestObject, path: string, impossiblePaths: string[]) {
+	minimal: boolean = false;
+	constructor(
+		testObject: TestObject,
+		path: string,
+		impossiblePaths: string[],
+		minimal: boolean = false
+	) {
 		super(testObject, path);
 		this.impossiblePaths = impossiblePaths;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		const path = this.targetObject[TestObjectSyntax.Scope];
@@ -89,6 +95,7 @@ export class ScopeValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Scope} json path should start with $. at ${this.validationPath}`
 			);
 		}
+		if (this.minimal) return;
 		if (
 			this.impossiblePaths.includes(replaceBracketsWithAsteriskNested(path))
 		) {
@@ -101,13 +108,16 @@ export class ScopeValidator extends TestObjectValidator {
 
 export class ErrorCodeValidator extends TestObjectValidator {
 	possibleErrorCodes: ErrorDefinition[];
+	minimal: boolean = false;
 	constructor(
 		testObject: TestObject,
 		path: string,
-		possibleErrorCodes: ErrorDefinition[]
+		possibleErrorCodes: ErrorDefinition[],
+		minimal: boolean = false
 	) {
 		super(testObject, path);
 		this.possibleErrorCodes = possibleErrorCodes;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		if (!this.targetObject[TestObjectSyntax.ErrorCode]) {
@@ -125,6 +135,7 @@ export class ErrorCodeValidator extends TestObjectValidator {
 				`${TestObjectSyntax.ErrorCode} should be a number at path ${this.validationPath}`
 			);
 		}
+		if (this.minimal) return;
 		const errorCode = this.targetObject[TestObjectSyntax.ErrorCode];
 		if (!this.possibleErrorCodes.some((code) => code.code === errorCode)) {
 			throw new Error(
@@ -146,15 +157,18 @@ export class ErrorCodeValidator extends TestObjectValidator {
 export class VariableValidator extends TestObjectValidator {
 	possibleJsonPaths: string[];
 	externalVariables: string[];
+	minimal: boolean = false;
 	constructor(
 		testObject: TestObject,
 		path: string,
 		posibleJsonPaths: string[],
-		externalVariables: string[]
+		externalVariables: string[],
+		minimal: boolean = false
 	) {
 		super(testObject, path);
 		this.externalVariables = externalVariables;
 		this.possibleJsonPaths = posibleJsonPaths;
+		this.minimal = minimal;
 	}
 	validate = async () => {
 		for (const key in this.targetObject) {
@@ -163,7 +177,6 @@ export class VariableValidator extends TestObjectValidator {
 			}
 			this.validateKey(key);
 			const value = this.targetObject[key];
-			console.log(value);
 			if (!isValidVariableValueType(value)) {
 				throw new Error(
 					`Variable: ${key} should be a string or array of primitives at path ${this.validationPath}`
@@ -192,6 +205,7 @@ export class VariableValidator extends TestObjectValidator {
 					path = `${scope}.${pathWithoutDollar}`;
 				}
 				const replaced = replaceBracketsWithAsteriskNested(path);
+				if (this.minimal) return;
 				if (!this.possibleJsonPaths.includes(replaced)) {
 					throw new Error(
 						`Variable: ${key} should be a jsonPath that returns a array of strings or the path don't exist in the schema, at ${this.validationPath} found original ${path} replaces: ${replaced}`
@@ -202,7 +216,7 @@ export class VariableValidator extends TestObjectValidator {
 	};
 
 	validateKey(key: string) {
-		if (nodeReservedKeywords.has(key)) {
+		if (ReservedKeywords.has(key)) {
 			throw new Error(
 				`${key} can't be a reserved keyword at path ${this.validationPath}`
 			);

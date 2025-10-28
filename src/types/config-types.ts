@@ -8,6 +8,7 @@ export type TestObject = {
 	[TestObjectSyntax.ErrorCode]?: number;
 	[TestObjectSyntax.SuccessCode]?: number;
 	[TestObjectSyntax.Continue]?: string;
+	[TestObjectSyntax.Description]?: string;
 	[key: string]: ConfigVariable | number | TestObject[] | undefined;
 };
 

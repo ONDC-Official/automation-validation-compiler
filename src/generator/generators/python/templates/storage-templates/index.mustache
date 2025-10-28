@@ -1,0 +1,40 @@
+{{#actions}}
+from .{{{action}}} import store_{{{action}}}, load_for_{{{action}}}
+{{/actions}}
+from ..interfaces.storage_interface import StorageInterface
+from ..types.storage_types import StorageConfig
+from typing import Optional, Dict, Any
+
+async def perform_{{functionName}}_save(action: str, unique_prefix: str, payload: Dict[Any, Any], store: StorageInterface, config: Optional[StorageConfig] = None):
+    complete_config: StorageConfig = {
+        "retry_attempts": 3,
+        "retry_delay_ms": 1000,
+        **(config or {})
+    }
+    
+    {{#actions}}
+    {{#-first}}
+    if action == "{{{action}}}":
+        return await store_{{{action}}}(unique_prefix, payload, store, complete_config)
+    {{/-first}}
+    {{^-first}}
+    elif action == "{{{action}}}":
+        return await store_{{{action}}}(unique_prefix, payload, store, complete_config)
+    {{/-first}}
+    {{/actions}}
+    else:
+        raise Exception("Action not found")
+
+async def perform_{{functionName}}_load(action: str, unique_prefix: str, store: StorageInterface):
+    {{#actions}}
+    {{#-first}}
+    if action == "{{{action}}}":
+        return await load_for_{{{action}}}(unique_prefix, store)
+    {{/-first}}
+    {{^-first}}
+    elif action == "{{{action}}}":
+        return await load_for_{{{action}}}(unique_prefix, store)
+    {{/-first}}
+    {{/actions}}
+    else:
+        raise Exception("Action not found")

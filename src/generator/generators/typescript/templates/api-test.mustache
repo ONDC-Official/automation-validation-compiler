@@ -4,4 +4,32 @@ import { testFunctionArray, validationInput, validationOutput } from "../types/t
 
 
 
-export default {{{functionCode}}}
+export default function {{apiName}}(input: validationInput): validationOutput{
+
+    let totalResults = {{apiName}}Validations(input);
+
+    if (input.config._debug === false) {
+		totalResults.forEach((r) => {
+			delete r._debugInfo;
+		});
+	}
+	if(input.config.hideParentErrors === true) {
+		// delete results with valid false and no description
+		totalResults = totalResults.filter((r) => !(r.valid === false && !r.description));
+	}
+	if (input.config.onlyInvalid === true) {
+		const res = totalResults.filter((r) => r.valid === false);
+		if(res.length === 0) {
+			const targetSuccess = totalResults.find((r) => r.testName === "{{apiName}}Validations");
+			if(!targetSuccess) {
+				throw new Error("Critical: Overall test result not found");
+			}
+			return [targetSuccess];
+		}
+		return res;
+	}
+
+    return totalResults;
+}
+
+{{{functionCode}}}
