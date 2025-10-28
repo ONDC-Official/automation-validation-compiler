@@ -7,6 +7,7 @@ import { ValidationConfig } from "../types/config-types.js";
 import { SupportedLanguages } from "../types/compiler-types.js";
 
 import { TypescriptGenerator } from "./generators/typescript/ts-generator.js";
+import { SqlGenerator } from "./generators/sql/sql-generator.js";
 import { ConfigValidator } from "./validators/config-validator.js";
 import { writeAndFormatCode } from "../utils/fs-utils.js";
 import { readFileSync } from "fs";
@@ -141,6 +142,13 @@ export class ConfigCompiler {
 				).generateCode({
 					codeName: codeName,
 				});
+				break;
+			case SupportedLanguages.Sql:
+				await new SqlGenerator(
+					valConfig,
+					this.errorDefinitions ?? [],
+					"./generated/sql-rules"
+				).generateCode();
 				break;
 			default:
 				throw new Error("Language not supported");
