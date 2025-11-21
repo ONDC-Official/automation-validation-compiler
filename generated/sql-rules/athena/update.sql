@@ -8,7 +8,7 @@ WITH payload_source AS (
     FROM <payload_table>
     WHERE action = 'update'
 ),
-validate_attribute_4_scope AS (
+required_context_domain_scope AS (
     SELECT
         payload,
         doc,
@@ -17,27 +17,30 @@ validate_attribute_4_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_4_vars AS (
+required_context_domain_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.timestamp') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.timestamp')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.context.domain') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.context.domain')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.timestamp')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.context.domain')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.timestamp')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.timestamp'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.context.domain')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.context.domain'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.timestamp')]
-END) AS attr
-    FROM validate_attribute_4_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.domain')]
+END) AS attr,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM required_context_domain_scope
 ),
-validate_attribute_5_scope AS (
+required_context_action_scope AS (
     SELECT
         payload,
         doc,
@@ -46,27 +49,30 @@ validate_attribute_5_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_5_vars AS (
+required_context_action_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.bap_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.bap_id')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.context.action') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.context.action')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.bap_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.context.action')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.bap_id')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.bap_id'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.context.action')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.context.action'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.bap_id')]
-END) AS attr
-    FROM validate_attribute_5_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.action')]
+END) AS attr,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM required_context_action_scope
 ),
-validate_attribute_6_scope AS (
+required_context_version_scope AS (
     SELECT
         payload,
         doc,
@@ -75,65 +81,7 @@ validate_attribute_6_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_6_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        (CASE
-    WHEN json_extract(test_obj, '$.context.transaction_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.transaction_id')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.transaction_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.transaction_id')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.transaction_id'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.transaction_id')]
-END) AS attr
-    FROM validate_attribute_6_scope
-),
-validate_attribute_7_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_attribute_7_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        (CASE
-    WHEN json_extract(test_obj, '$.context.message_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.message_id')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.message_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.message_id')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.message_id'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.message_id')]
-END) AS attr
-    FROM validate_attribute_7_scope
-),
-validate_attribute_8_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_attribute_8_vars AS (
+required_context_version_vars AS (
     SELECT
         payload,
         doc,
@@ -150,10 +98,13 @@ validate_attribute_8_vars AS (
             )
         END
     ELSE ARRAY[json_extract_scalar(test_obj, '$.context.version')]
-END) AS attr
-    FROM validate_attribute_8_scope
+END) AS attr,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM required_context_version_scope
 ),
-validate_attribute_10_scope AS (
+required_context_message_id_scope AS (
     SELECT
         payload,
         doc,
@@ -162,27 +113,30 @@ validate_attribute_10_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_10_vars AS (
+required_context_message_id_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.bap_uri') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.bap_uri')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.context.message_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.context.message_id')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.bap_uri')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.context.message_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.bap_uri')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.bap_uri'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.context.message_id')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.context.message_id'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.bap_uri')]
-END) AS attr
-    FROM validate_attribute_10_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.message_id')]
+END) AS attr,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM required_context_message_id_scope
 ),
-validate_attribute_11_scope AS (
+required_context_transaction_id_scope AS (
     SELECT
         payload,
         doc,
@@ -191,27 +145,30 @@ validate_attribute_11_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_11_vars AS (
+required_context_transaction_id_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.ttl') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.ttl')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.context.transaction_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.context.transaction_id')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.ttl')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.context.transaction_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.ttl')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.ttl'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.context.transaction_id')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.context.transaction_id'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.ttl')]
-END) AS attr
-    FROM validate_attribute_11_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.transaction_id')]
+END) AS attr,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM required_context_transaction_id_scope
 ),
-validate_attribute_12_scope AS (
+regex_context_timestamp_scope AS (
     SELECT
         payload,
         doc,
@@ -220,27 +177,31 @@ validate_attribute_12_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_12_vars AS (
+regex_context_timestamp_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.bpp_id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.bpp_id')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.context.timestamp') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.context.timestamp')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.bpp_id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.context.timestamp')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.bpp_id')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.bpp_id'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.context.timestamp')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.context.timestamp'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.bpp_id')]
-END) AS attr
-    FROM validate_attribute_12_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.timestamp')]
+END) AS attr,
+        ARRAY['^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$'] AS reg,
+        ARRAY['update'] AS action,
+        ARRAY['ONDC:TRV13'] AS domain,
+        ARRAY['2.0.0'] AS version
+    FROM regex_context_timestamp_scope
 ),
-validate_attribute_13_scope AS (
+required_update_target_scope AS (
     SELECT
         payload,
         doc,
@@ -249,36 +210,7 @@ validate_attribute_13_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_13_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        (CASE
-    WHEN json_extract(test_obj, '$.context.bpp_uri') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.bpp_uri')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.bpp_uri')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.bpp_uri')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.bpp_uri'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.bpp_uri')]
-END) AS attr
-    FROM validate_attribute_13_scope
-),
-validate_attribute_14_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_attribute_14_vars AS (
+required_update_target_vars AS (
     SELECT
         payload,
         doc,
@@ -295,10 +227,11 @@ validate_attribute_14_vars AS (
             )
         END
     ELSE ARRAY[json_extract_scalar(test_obj, '$.message.update_target')]
-END) AS attr
-    FROM validate_attribute_14_scope
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_update_target_scope
 ),
-validate_attribute_15_scope AS (
+valid_update_target_scope AS (
     SELECT
         payload,
         doc,
@@ -307,7 +240,38 @@ validate_attribute_15_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_attribute_15_vars AS (
+valid_update_target_vars AS (
+    SELECT
+        payload,
+        doc,
+        external_doc,
+        test_obj,
+        (CASE
+    WHEN json_extract(test_obj, '$.message.update_target') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.update_target')) = 'array' THEN
+        CASE
+            WHEN json_array_length(json_extract(test_obj, '$.message.update_target')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            ELSE transform(
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.update_target')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.update_target'), format('$[%d]', idx))
+            )
+        END
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.update_target')]
+END) AS attr,
+        ARRAY['fulfillment', 'payment', 'billing', 'items'] AS enumList,
+        ARRAY['update'] AS action
+    FROM valid_update_target_scope
+),
+required_order_id_scope AS (
+    SELECT
+        payload,
+        doc,
+        external_doc,
+        scope_item AS test_obj
+    FROM payload_source
+    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
+),
+required_order_id_vars AS (
     SELECT
         payload,
         doc,
@@ -324,10 +288,11 @@ validate_attribute_15_vars AS (
             )
         END
     ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.id')]
-END) AS attr
-    FROM validate_attribute_15_scope
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_order_id_scope
 ),
-validate_enum_1_scope AS (
+required_fulfillment_id_scope AS (
     SELECT
         payload,
         doc,
@@ -336,28 +301,28 @@ validate_enum_1_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_enum_1_vars AS (
+required_fulfillment_id_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
-        ARRAY['update'] AS enumList,
         (CASE
-    WHEN json_extract(test_obj, '$.context.action') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.action')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].id') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].id')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.action')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].id')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.action')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.action'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].id')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].id'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.action')]
-END) AS enumPath
-    FROM validate_enum_1_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].id')]
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_fulfillment_id_scope
 ),
-validate_enum_2_scope AS (
+required_tag_descriptor_code_scope AS (
     SELECT
         payload,
         doc,
@@ -366,28 +331,28 @@ validate_enum_2_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_enum_2_vars AS (
+required_tag_descriptor_code_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
-        ARRAY['IND'] AS enumList,
         (CASE
-    WHEN json_extract(test_obj, '$.context.location.country.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.location.country.code')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.location.country.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.location.country.code')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.location.country.code'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.location.country.code')]
-END) AS enumPath
-    FROM validate_enum_2_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')]
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_tag_descriptor_code_scope
 ),
-validate_enum_3_scope AS (
+valid_tag_descriptor_code_scope AS (
     SELECT
         payload,
         doc,
@@ -396,27 +361,29 @@ validate_enum_3_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_enum_3_vars AS (
+valid_tag_descriptor_code_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
         (CASE
-    WHEN json_extract(test_obj, '$.context.location.city.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.location.city.code')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.location.city.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.location.city.code')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.location.city.code'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.location.city.code')]
-END) AS enumPath
-    FROM validate_enum_3_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')]
+END) AS attr,
+        ARRAY['UPDATE_REQUEST', 'MODIFY'] AS enumList,
+        ARRAY['update'] AS action
+    FROM valid_tag_descriptor_code_scope
 ),
-validate_enum_4_scope AS (
+required_tag_list_descriptor_code_scope AS (
     SELECT
         payload,
         doc,
@@ -425,28 +392,28 @@ validate_enum_4_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_enum_4_vars AS (
+required_tag_list_descriptor_code_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
-        ARRAY['ONDC:TRV11'] AS enumList,
         (CASE
-    WHEN json_extract(test_obj, '$.context.domain') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.context.domain')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.context.domain')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.context.domain')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.context.domain'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.context.domain')]
-END) AS enumPath
-    FROM validate_enum_4_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')]
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_tag_list_descriptor_code_scope
 ),
-validate_enum_5_scope AS (
+required_tag_list_value_scope AS (
     SELECT
         payload,
         doc,
@@ -455,741 +422,218 @@ validate_enum_5_scope AS (
     FROM payload_source
     CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
 ),
-validate_enum_5_vars AS (
+required_tag_list_value_vars AS (
     SELECT
         payload,
         doc,
         external_doc,
         test_obj,
-        ARRAY['SJT', 'SFSJT', 'RJT', 'PASS'] AS enumList,
         (CASE
-    WHEN json_extract(test_obj, '$.message.order.items[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.items[*].descriptor.code'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.items[*].descriptor.code')]
-END) AS enumPath
-    FROM validate_enum_5_scope
-),
-validate_enum_6_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_6_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['BUS', 'METRO'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].vehicle.category')]
-END) AS enumPath
-    FROM validate_enum_6_scope
-),
-validate_enum_7_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_7_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['ROUTE', 'TRIP'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
-END) AS enumPath
-    FROM validate_enum_7_scope
-),
-validate_enum_8_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_8_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['START', 'END', 'INTERMEDIATE_STOP', 'TRANSIT_STOP'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
-END) AS enumPath
-    FROM validate_enum_8_scope
-),
-validate_enum_9_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_9_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['QR'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')]
-END) AS enumPath
-    FROM validate_enum_9_scope
-),
-validate_enum_10_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_10_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['UNCLAIMED', 'CLAIMED'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')]
-END) AS enumPath
-    FROM validate_enum_10_scope
-),
-validate_enum_11_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_11_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['NOT-PAID', 'PAID'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].status')]
-END) AS enumPath
-    FROM validate_enum_11_scope
-),
-validate_enum_12_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_12_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['BPP', 'BAP'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].collected_by') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].collected_by'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].collected_by')]
-END) AS enumPath
-    FROM validate_enum_12_scope
-),
-validate_enum_13_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_13_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['PRE-ORDER', 'ON-FULFILLMENT', 'POST-FULFILLMENT'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].type')]
-END) AS enumPath
-    FROM validate_enum_13_scope
-),
-validate_enum_14_scope AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        scope_item AS test_obj
-    FROM payload_source
-    CROSS JOIN UNNEST(ARRAY[doc]) AS scope(scope_item)
-),
-validate_enum_14_vars AS (
-    SELECT
-        payload,
-        doc,
-        external_doc,
-        test_obj,
-        ARRAY['BASE_PRICE', 'REFUND', 'CANCELLATION_CHARGES', 'OFFER', 'TOLL'] AS enumList,
-        (CASE
-    WHEN json_extract(test_obj, '$.message.order.quote.breakup[*].title') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.quote.breakup[*].title'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.quote.breakup[*].title')]
-END) AS enumPath
-    FROM validate_enum_14_scope
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')]
+END) AS attr,
+        ARRAY['update'] AS action
+    FROM required_tag_list_value_scope
 )
 , violations AS (
 SELECT
     'update' AS api,
-    'validate_attribute_4' AS rule_name,
+    'REQUIRED_CONTEXT_DOMAIN' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_4_vars
+FROM required_context_domain_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_5' AS rule_name,
+    'REQUIRED_CONTEXT_ACTION' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_5_vars
+FROM required_context_action_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_6' AS rule_name,
+    'REQUIRED_CONTEXT_VERSION' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_6_vars
+FROM required_context_version_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_7' AS rule_name,
+    'REQUIRED_CONTEXT_MESSAGE_ID' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_7_vars
+FROM required_context_message_id_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_8' AS rule_name,
+    'REQUIRED_CONTEXT_TRANSACTION_ID' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_8_vars
+FROM required_context_transaction_id_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_10' AS rule_name,
+    'REGEX_CONTEXT_TIMESTAMP' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_10_vars
+FROM regex_context_timestamp_vars
+WHERE TRUE AND NOT (all_match(reg, pattern -> all_match(attr, value -> regexp_like(value, pattern))))
+UNION ALL
+SELECT
+    'update' AS api,
+    'REQUIRED_UPDATE_TARGET' AS rule_name,
+    30000 AS error_code,
+    200 AS success_code,
+    payload
+FROM required_update_target_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_11' AS rule_name,
+    'VALID_UPDATE_TARGET' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_11_vars
+FROM valid_update_target_vars
+WHERE TRUE AND NOT (any_match(attr, value -> contains(enumList, value)))
+UNION ALL
+SELECT
+    'update' AS api,
+    'REQUIRED_ORDER_ID' AS rule_name,
+    30000 AS error_code,
+    200 AS success_code,
+    payload
+FROM required_order_id_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_12' AS rule_name,
+    'REQUIRED_FULFILLMENT_ID' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_12_vars
+FROM required_fulfillment_id_vars
 WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_attribute_13' AS rule_name,
+    'REQUIRED_TAG_DESCRIPTOR_CODE' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_attribute_13_vars
-WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_attribute_14' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_attribute_14_vars
-WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_attribute_15' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_attribute_15_vars
-WHERE TRUE AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_1' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_1_vars
-WHERE TRUE AND NOT ((all_match(enumPath, value -> contains(enumList, value))) AND (cardinality(enumPath) > 0 AND all_match(enumPath, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_2' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_2_vars
-WHERE TRUE AND NOT ((all_match(enumPath, value -> contains(enumList, value))) AND (cardinality(enumPath) > 0 AND all_match(enumPath, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_3' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_3_vars
-WHERE TRUE AND NOT (cardinality(enumPath) > 0 AND all_match(enumPath, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_4' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_4_vars
-WHERE TRUE AND NOT ((all_match(enumPath, value -> contains(enumList, value))) AND (cardinality(enumPath) > 0 AND all_match(enumPath, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_5' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_5_vars
+FROM required_tag_descriptor_code_vars
 WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.items[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.items[*].descriptor.code'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.items[*].descriptor.code')]
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')]
 END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.items[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.items[*].descriptor.code')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.items[*].descriptor.code'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.items[*].descriptor.code')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].descriptor.code')]
+END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_enum_6' AS rule_name,
+    'VALID_TAG_DESCRIPTOR_CODE' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_enum_6_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].vehicle.category')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].vehicle.category'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].vehicle.category')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
+FROM valid_tag_descriptor_code_vars
+WHERE TRUE AND NOT (any_match(attr, value -> contains(enumList, value)))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_enum_7' AS rule_name,
+    'REQUIRED_TAG_LIST_DESCRIPTOR_CODE' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_enum_7_vars
+FROM required_tag_list_descriptor_code_vars
 WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')]
 END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].descriptor.code')]
+END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 UNION ALL
 SELECT
     'update' AS api,
-    'validate_enum_8' AS rule_name,
+    'REQUIRED_TAG_LIST_VALUE' AS rule_name,
     30000 AS error_code,
     200 AS success_code,
     payload
-FROM validate_enum_8_vars
+FROM required_tag_list_value_vars
 WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')]
 END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 'array' THEN
+    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 'array' THEN
         CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
+            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
             ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].type'), format('$[%d]', idx))
+                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')) - 1),
+                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value'), format('$[%d]', idx))
             )
         END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].type')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_9' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_9_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.type')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_10' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_10_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].stops[*].authorization.status')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_11' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_11_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].status')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].status') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].status')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].status')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].status'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].status')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_12' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_12_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].collected_by') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].collected_by'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].collected_by')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].collected_by') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].collected_by')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].collected_by'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].collected_by')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_13' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_13_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].type')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.payments[*].type') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.payments[*].type')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.payments[*].type')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.payments[*].type'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.payments[*].type')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
-UNION ALL
-SELECT
-    'update' AS api,
-    'validate_enum_14' AS rule_name,
-    30000 AS error_code,
-    200 AS success_code,
-    payload
-FROM validate_enum_14_vars
-WHERE NOT COALESCE(((NOT (cardinality((CASE
-    WHEN json_extract(test_obj, '$.message.order.quote.breakup[*].title') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.quote.breakup[*].title'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.quote.breakup[*].title')]
-END)) > 0 AND all_match((CASE
-    WHEN json_extract(test_obj, '$.message.order.quote.breakup[*].title') IS NULL THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-    WHEN json_type(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 'array' THEN
-        CASE
-            WHEN json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) = 0 THEN CAST(ARRAY[] AS ARRAY(VARCHAR))
-            ELSE transform(
-                sequence(0, json_array_length(json_extract(test_obj, '$.message.order.quote.breakup[*].title')) - 1),
-                idx -> json_extract_scalar(json_extract(test_obj, '$.message.order.quote.breakup[*].title'), format('$[%d]', idx))
-            )
-        END
-    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.quote.breakup[*].title')]
-END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (all_match(enumPath, value -> contains(enumList, value)))
+    ELSE ARRAY[json_extract_scalar(test_obj, '$.message.order.fulfillments[*].tags[*].list[*].value')]
+END), value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined'))))), FALSE) AND NOT (cardinality(attr) > 0 AND all_match(attr, value -> value IS NOT NULL AND trim(value) <> '' AND lower(value) NOT IN ('null', 'undefined')))
 )
 SELECT * FROM violations;
