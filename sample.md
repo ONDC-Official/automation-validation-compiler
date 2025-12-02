@@ -28,20 +28,36 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 - **Use descriptive names** that clearly indicate the data being extracted
 - **Follow snake_case** convention
-- **Include data type hints** when helpful start constants with ("\_const") and json paths variable with ("\_var")
+- **Include data type hints** when helpful (e.g., `_codes`, `_ids`, `_values`)
 
 ```json
 // ✅ Good
-"var_action": "$.context.action",
-"var_location_codes": "$.message.catalog.providers[*].locations[*].id",
-"var_settlement_terms": "$.message.order.tags[?(@.descriptor.code=='SETTLEMENT_TERMS')].list[*].code"
-"const_valid_actions": ["search", "select", "init"]
+"context_action": "$.context.action",
+"provider_location_codes": "$.message.catalog.providers[*].locations[*].id",
+"settlement_terms": "$.message.order.tags[?(@.descriptor.code=='SETTLEMENT_TERMS')].list[*].code"
 
 // ❌ Avoid
 "var1": "$.context.action",
 "x": "$.message.catalog.providers[*].locations[*].id",
 "data": "$.some.path"
-"validActions": ["search", "select", "init"]
+```
+
+### Test Set Names
+
+- **Use lowercase with underscores** for test set keys
+- **Group by API action** or logical functionality
+- **Be specific about the validation scope**
+
+```json
+// ✅ Good
+"search_validations": [...],
+"on_search_catalog_validations": [...],
+"payment_settlement_checks": [...]
+
+// ❌ Avoid
+"Search": [...],
+"tests": [...],
+"validations": [...]
 ```
 
 ## JSONPath Best Practices
@@ -54,35 +70,31 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 ```json
 // ✅ Good - Specific filtering
-"var_settlement_codes": "$.message.order.tags[?(@.descriptor.code=='SETTLEMENT_TERMS')].list[*].code"
+"settlement_codes": "$.message.order.tags[?(@.descriptor.code=='SETTLEMENT_TERMS')].list[*].code"
 
 // ⚠️ Less optimal - Too broad
-"var_all_codes": "$.message..code"
+"all_codes": "$.message..code"
 ```
 
 ### Scoping Strategy
 
 - **Use `_SCOPE_`** to iterate over arrays of objects
+- **Keep variables relative** to the scope when possible
 - **Avoid deep nesting** in scoped validations
-- `NOTE` : to use json path outside the scope with scope present in the test, use $.\_EXTERNAL.\_SELF.context.action as complete payload is saved in \_EXTERNAL.\_SELF.<payload>
 
 ```json
 // ✅ Good - Proper scoping
 {
     "_SCOPE_": "$.message.catalog.providers[*]",
-    "var_provider_id": "$.id",
-    "var_location_ids": "$.locations[*].id",
-    "var_action": "$._EXTERNAL._SELF.context.action",
-    "const_valid_actions": ["search", "select", "init"],
-    "_CONTINUE_" : "var_action all in const_valid_actions",
-    "_RETURN_": "var_provider_id are present && var_location_ids are present",
-    "_DESCRIPTION_": "provider.id and provider.locations[].id must be present for search, select, init actions",
+    "provider_id": "$.id",
+    "location_ids": "$.locations[*].id",
+    "_RETURN_": "provider_id are present && location_ids are present"
 }
 
-// ❌ Wrong - Absolute paths in scope
+// ❌ Avoid - Absolute paths in scope
 {
     "_SCOPE_": "$.message.catalog.providers[*]",
-    "var_provider_id": "$.message.catalog.providers[*].id",  // wrong will throw error
+    "provider_id": "$.message.catalog.providers[*].id",  // Redundant
     "_RETURN_": "provider_id are present"
 }
 ```
@@ -136,40 +148,6 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 ## Configuration Structure
 
-### TEST Key sequencing
-
-- **Always start with the _NAME_ key** for clarity
-- **Followed with _SCOPE_** if applicable
-- **Then list variable extractions**
-- **Then _CONTINUE_** if needed
-- **End with _RETURN_, _ERROR_CODE_,_SUCCESS_CODE_ and _DESCRIPTION_**
-
-```JSON
-// ✅ Good
-{
-    "_NAME_": "validate_payments_transaction_id",
-    "_SCOPE_": "$.message.payment[*]",
-    "var_transaction_ids": "$.params.transaction_id",
-    "var_payment_statuses": "$.status",
-    "const_paid_status": ["PAID"],
-    "_CONTINUE_": "!(var_payment_statuses all in const_paid_status)",
-    "_RETURN_": "var_transaction_ids are present",
-    "_ERROR_CODE_": 40001,
-    "_DESCRIPTION_": "All payment.transaction_id must be present for PAID payments"
-}
-// ❌ BAD - messy order
-{
-    "var_transaction_ids": "$.params.transaction_id",
-    "_RETURN_": "var_transaction_ids are present",
-    "var_payment_statuses": "$.status",
-    "_NAME_": "validate_payments_transaction_id",
-    "const_paid_status": ["PAID"],
-    "_CONTINUE_": "!(var_payment_statuses all in const_paid_status)",
-    "_ERROR_CODE_": 40001,
-    "_DESCRIPTION_": "All payment.transaction_id must be present for PAID payments"
-}
-```
-
 ### Test Organization
 
 - **Group related validations** in the same test set
@@ -180,29 +158,14 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 {
 	"x-validations": {
 		"_TESTS_": {
-			"search": [
-				{
-                    "_NAME_": "validate_context",
-                    "_RETURN_": [
-                        {
-                            ...
-                        }
-                    ]
-                }
-                {
-                    "_NAME_": "validate_message",
-                    "_RETURN_": [
-                        {
-                            ...
-                        }
-                    ]
-                }
+			"basic_structure_validations": [
+				// Basic field presence checks first
 			],
-			"on_search": [
-                // on_search specific validations
+			"business_logic_validations": [
+				// Complex business rules second
 			],
-			"select": [
-                // select specific validations
+			"cross_field_validations": [
+				// Inter-field dependency checks last
 			]
 		},
 		"_SESSION_DATA_": {
@@ -265,9 +228,9 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 ```json
 {
-	"var_field_value": "$.path.to.field",
-	"const_allowed_values": ["value1", "value2", "value3"],
-	"_RETURN_": "var_field_value all in const_allowed_values"
+	"field_value": "$.path.to.field",
+	"allowed_values": ["value1", "value2", "value3"],
+	"_RETURN_": "field_value all in allowed_values"
 }
 ```
 
@@ -275,26 +238,18 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 ```json
 {
-	"var_required_fields": "$.path.to.required_field",
-	"_RETURN_": "var_required_fields are present"
+	"required_fields": ["$.field1", "$.field2", "$.field3"],
+	"_RETURN_": "required_fields are present"
 }
 ```
 
 ### Uniqueness Validation
 
 ```json
-// ❌ WRONG this wont work as after scoping the id will be in the scope so
-// uniqueness will be checked in the scope only
 {
 	"_SCOPE_": "$.array.path[*]",
-	"var_id_values": "$.id",
-	"_RETURN_": "var_id_values are unique"
-}
-
-// ✅ CORRECT
-{
-    "var_id_values": "$.array.path[*].id",
-    "_RETURN_": "var_id_values are unique"
+	"id_values": "$.id",
+	"_RETURN_": "id_values are unique"
 }
 ```
 
@@ -302,10 +257,9 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 ```json
 {
-    "var_email_field": "$.contact.email",
-    "const_email_pattern": ["^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"],
-    "_RETURN_": "var_email_field follow regex const_email_pattern"
-    "_DESCRIPTION_": "Email format is invalid"
+	"email_field": "$.contact.email",
+	"email_pattern": ["^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"],
+	"_RETURN_": "email_field follow regex email_pattern"
 }
 ```
 

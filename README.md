@@ -169,7 +169,10 @@ To write validation syntax you need a set of valid variables which are defined a
 
 ### Supported Generation Languages:
 
-- Typescript
+- TypeScript
+- Python
+- JavaScript
+- Golang
 
 ### Installation
 

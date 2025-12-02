@@ -1,0 +1,46 @@
+package utils
+
+import (
+	"encoding/json"
+	"strings"
+)
+
+// NormalizeKeys converts all keys in a JSON object to snake_case
+func NormalizeKeys(data interface{}) interface{} {
+	switch v := data.(type) {
+	case map[string]interface{}:
+		normalized := make(map[string]interface{})
+		for key, value := range v {
+			normalizedKey := toSnakeCase(key)
+			normalized[normalizedKey] = NormalizeKeys(value)
+		}
+		return normalized
+	case []interface{}:
+		normalized := make([]interface{}, len(v))
+		for i, value := range v {
+			normalized[i] = NormalizeKeys(value)
+		}
+		return normalized
+	default:
+		return v
+	}
+}
+
+// toSnakeCase converts a string to snake_case
+func toSnakeCase(s string) string {
+	var result strings.Builder
+	for i, r := range s {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			result.WriteRune('_')
+		}
+		result.WriteRune(r)
+	}
+	return strings.ToLower(result.String())
+}
+
+// FromJSON parses JSON bytes into interface{}
+func FromJSON(data []byte) (interface{}, error) {
+	var result interface{}
+	err := json.Unmarshal(data, &result)
+	return result, err
+}

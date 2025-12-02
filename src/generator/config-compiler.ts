@@ -17,6 +17,7 @@ import path from "path";
 import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVariables.js";
 import { PythonGenerator } from "./generators/python/py-generator.js";
 import { JavascriptGenerator } from "./generators/javascript/js-generator.js";
+import { GolangGenerator } from "./generators/golang/go-generator.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 type CodeGeneratorConfig = {
@@ -135,6 +136,15 @@ export class ConfigCompiler {
 				break;
 			case SupportedLanguages.Javascript:
 				await new JavascriptGenerator(
+					valConfig,
+					this.errorDefinitions ?? [],
+					targetPath
+				).generateCode({
+					codeName: codeName,
+				});
+				break;
+			case SupportedLanguages.Golang:
+				await new GolangGenerator(
 					valConfig,
 					this.errorDefinitions ?? [],
 					targetPath

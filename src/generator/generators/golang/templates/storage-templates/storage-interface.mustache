@@ -1,0 +1,96 @@
+package interfaces
+
+// StorageInterface provides a standardized abstraction layer for storage operations
+// that can be implemented by different storage backends (Redis, Memory, File, etc.).
+//
+// All operations return errors for failure cases.
+// Keys are strings and values are stored as strings.
+// Implementations should handle serialization/deserialization as needed.
+// Prefix-based operations allow for namespacing and bulk operations.
+//
+// Example implementation:
+//
+//	type RedisStorage struct {
+//	    client *redis.Client
+//	}
+//
+//	func (r *RedisStorage) SaveKey(uniquePrefix, key, value string) error {
+//	    fullKey := fmt.Sprintf("%s:%s", uniquePrefix, key)
+//	    return r.client.Set(ctx, fullKey, value, 0).Err()
+//	}
+type StorageInterface interface {
+	// SaveKey saves a key-value pair to storage with a unique prefix for namespacing.
+	//
+	// Parameters:
+	//   - uniquePrefix: A unique identifier/namespace prefix to prevent key collisions
+	//   - key: The unique identifier for the stored value within the prefix namespace
+	//   - value: The string value to store
+	//
+	// Returns an error if the operation fails.
+	//
+	// Example:
+	//   err := storage.SaveKey("app1", "session:abc123", sessionDataJSON)
+	SaveKey(uniquePrefix, key, value string) error
+
+	// GetKey retrieves a value by its key from storage within a specific namespace.
+	//
+	// Parameters:
+	//   - uniquePrefix: The unique identifier/namespace prefix used when storing
+	//   - key: The unique identifier for the value to retrieve within the prefix namespace
+	//
+	// Returns the stored value or an error if the key does not exist.
+	//
+	// Example:
+	//   sessionData, err := storage.GetKey("app1", "session:abc123")
+	GetKey(uniquePrefix, key string) (string, error)
+
+	// DeleteKey removes a key-value pair from storage within a specific namespace.
+	//
+	// Parameters:
+	//   - uniquePrefix: The unique identifier/namespace prefix used when storing
+	//   - key: The unique identifier for the value to delete within the prefix namespace
+	//
+	// Returns an error if the operation fails.
+	//
+	// Example:
+	//   err := storage.DeleteKey("app1", "session:abc123")
+	DeleteKey(uniquePrefix, key string) error
+
+	// ListKeys returns all keys within a specific namespace/prefix.
+	//
+	// Parameters:
+	//   - uniquePrefix: The unique identifier/namespace prefix to list keys from
+	//
+	// Returns an array of keys within that namespace or an error.
+	//
+	// Example:
+	//   app1Keys, err := storage.ListKeys("app1")
+	//   // Returns keys like: ["session:abc123", "user:456", "config:settings"]
+	ListKeys(uniquePrefix string) ([]string, error)
+
+	// ClearStorage removes all stored data from the storage backend.
+	//
+	// WARNING: This operation is destructive and cannot be undone.
+	// Use with caution, especially in production environments.
+	//
+	// Returns an error if the operation fails.
+	//
+	// Example:
+	//   err := storage.ClearStorage() // All data is now removed
+	ClearStorage() error
+
+	// KeyExists checks if a key exists in storage within a specific namespace.
+	//
+	// Parameters:
+	//   - uniquePrefix: The unique identifier/namespace prefix to check within
+	//   - key: The unique identifier to check for existence within the prefix namespace
+	//
+	// Returns true if the key exists, false otherwise, or an error.
+	//
+	// Example:
+	//   exists, err := storage.KeyExists("app1", "user:123")
+	//   if exists {
+	//       userData, _ := storage.GetKey("app1", "user:123")
+	//   }
+	KeyExists(uniquePrefix, key string) (bool, error)
+}

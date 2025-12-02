@@ -1,0 +1,39 @@
+package types
+
+import "L1_validations/interfaces"
+
+// ValidationConfig holds configuration for validation execution
+type ValidationConfig struct {
+	OnlyInvalid           bool                          `json:"only_invalid"`
+	StandardLogs          bool                          `json:"standard_logs"`
+	Debug                 bool                          `json:"_debug"`
+	HideParentErrors      bool                          `json:"hide_parent_errors"`
+	StateFullValidations  bool                          `json:"state_full_validations"`
+	Store                 interfaces.StorageInterface   `json:"-"`
+	StorageConfig         *StorageConfig                `json:"storage_config,omitempty"`
+	UniqueKey             string                        `json:"unique_key,omitempty"`
+}
+
+// ValidationInput is the input structure for validation functions
+type ValidationInput struct {
+	Payload      map[string]interface{} `json:"payload"`
+	ExternalData map[string]interface{} `json:"external_data"`
+	Config       ValidationConfig       `json:"config"`
+}
+
+// ValidationOutput represents a single validation result
+type ValidationOutput struct {
+	TestName    string                 `json:"test_name,omitempty"`
+	Valid       bool                   `json:"valid"`
+	Code        int                    `json:"code"`
+	Description string                 `json:"description,omitempty"`
+	DebugInfo   map[string]interface{} `json:"_debug_info,omitempty"`
+}
+
+// ExternalData structure
+type ExternalData struct {
+	{{#externalData}}
+	{{name}} interface{} `json:"{{name}}"`
+	{{/externalData}}
+	Self interface{} `json:"_SELF"`
+}

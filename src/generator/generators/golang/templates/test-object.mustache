@@ -1,0 +1,39 @@
+func {{name}}(input types.ValidationInput) []types.ValidationOutput {
+	scope := utils.GetJSONPath(input.Payload, "{{{scopePath}}}")
+	subResults := []types.ValidationOutput{}
+	valid := true
+
+	for _, testObjRaw := range scope {
+		testObj, ok := testObjRaw.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		testObj["_EXTERNAL"] = input.ExternalData
+
+		{{#variables}}
+		{{name}} {{#isAssignment}}={{/isAssignment}}{{^isAssignment}}:={{/isAssignment}} {{{value}}}
+		{{^isAssignment}}utils.UNUSED({{name}}){{/isAssignment}}
+		{{/variables}}
+
+		{{#hasContinue}}
+		skipCheck := {{{skipCheckStatement}}}
+		if skipCheck {
+			continue
+		}
+		{{/hasContinue}}
+
+{{{validationCode}}}
+		// delete(testObj, "_EXTERNAL")
+	}
+
+	return append([]types.ValidationOutput{
+		{
+			TestName: "{{testName}}",
+			Valid:    valid,
+			Code:     func() int { if valid { return {{successCode}} } else { return {{errorCode}} } }(),
+			DebugInfo: map[string]interface{}{
+				"fed_config": `{{{TEST_OBJECT}}}`,
+			},
+		},
+	}, subResults...)
+}

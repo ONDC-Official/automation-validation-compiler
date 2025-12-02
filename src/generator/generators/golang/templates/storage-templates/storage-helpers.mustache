@@ -1,0 +1,51 @@
+package storageactions
+
+import (
+	"encoding/json"
+	"time"
+	"L1_validations/utils"
+	"L1_validations/interfaces"
+	"L1_validations/types"
+)
+
+// SaveFunction saves a value from payload at specified path to storage
+func SaveFunction(payload map[string]interface{}, uniquePrefix, key, path, action string, store interfaces.StorageInterface, config types.StorageConfig) error {
+	if path == "" || key == "_SELF" {
+		return nil
+	}
+
+	value := utils.GetJSONPath(payload, path)
+
+	data := map[string]interface{}{
+		"stored_from": action + "_action",
+		"key_path":    path,
+		"value":       value,
+		"timestamp":   time.Now().Format(time.RFC3339),
+	}
+
+	dataBytes, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	return utils.SaveData(uniquePrefix, key, string(dataBytes), store, config)
+}
+
+// LoadFunction loads a value from storage by key
+func LoadFunction(store interfaces.StorageInterface, uniquePrefix, key string) (interface{}, error) {
+	value, err := store.GetKey(uniquePrefix, key)
+	if err != nil {
+		return []interface{}{}, nil
+	}
+
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(value), &data); err != nil {
+		return []interface{}{}, nil
+	}
+
+	if val, ok := data["value"]; ok {
+		return val, nil
+	}
+
+	return []interface{}{}, nil
+}

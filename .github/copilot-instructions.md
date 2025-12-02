@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**JVAL** (JSON Validation Language) is a domain-specific language and code generator that creates validation functions in multiple target languages (TypeScript, Python, JavaScript) from YAML/JSON configurations. It's specifically designed for ONDC (Open Network for Digital Commerce) API validation.
+**JVAL** (JSON Validation Language) is a domain-specific language and code generator that creates validation functions in multiple target languages (TypeScript, Python, JavaScript, Golang) from YAML/JSON configurations. It's specifically designed for ONDC (Open Network for Digital Commerce) API validation.
 
 ## Key Architecture Components
 

@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -17,6 +17,12 @@ const main = async () => {
 	const buildYaml = readFileSync(buildPath, "utf-8");
 	const valConfig = JSON.parse(readFileSync(valConfigPath, "utf-8"));
 	await compiler.initialize(buildYaml);
+	const validPaths = await compiler.generateValidPaths();
+	writeFileSync(
+		path.resolve(__dirname, "../alpha/possible-json-paths.json"),
+		JSON.stringify(validPaths, null, 2),
+		"utf-8"
+	);
 	await compiler.generateCode(
 		valConfig,
 		"L1_validations",
@@ -30,6 +36,16 @@ const main = async () => {
 		"L1_validations",
 		false,
 		"./alpha/typescript/"
+	);
+	await compilerTy.generateL0Schema("./alpha/typescript/L0_schema/");
+
+	const compilerGo = new ConfigCompiler(SupportedLanguages.Golang);
+	await compilerGo.initialize(buildYaml);
+	await compilerGo.generateCode(
+		valConfig,
+		"L1_validations",
+		false,
+		"./alpha/golang/"
 	);
 
 	// JavaScript generation example

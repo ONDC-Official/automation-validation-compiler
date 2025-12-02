@@ -1,0 +1,21 @@
+package utils
+
+import (
+	"github.com/PaesslerAG/jsonpath"
+)
+
+// GetJSONPath extracts values from a JSON object using JSONPath
+func GetJSONPath(data interface{}, path string) []interface{} {
+	result, err := jsonpath.Get(path, data)
+	if err != nil {
+		return []interface{}{}
+	}
+
+	// If result is already a slice, return it
+	if slice, ok := result.([]interface{}); ok {
+		return slice
+	}
+
+	// Otherwise, wrap the single result in a slice
+	return []interface{}{result}
+}

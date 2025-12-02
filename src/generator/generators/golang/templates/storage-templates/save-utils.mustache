@@ -1,0 +1,37 @@
+package utils
+
+import (
+	"fmt"
+	"time"
+	"L1_validations/interfaces"
+	"L1_validations/types"
+)
+
+// SaveData saves data to storage with retry logic
+func SaveData(uniquePrefix, key, saveData string, store interfaces.StorageInterface, config types.StorageConfig) error {
+	finalKey := key
+	retryTimes := config.RetryAttempts
+	delayMs := config.RetryDelayMs
+	attempts := 0
+
+	for attempts < retryTimes {
+		err := store.SaveKey(uniquePrefix, finalKey, saveData)
+		if err == nil {
+			return nil
+		}
+
+		attempts++
+		if attempts >= retryTimes {
+			return err
+		}
+
+		time.Sleep(time.Duration(delayMs) * time.Millisecond)
+	}
+
+	return fmt.Errorf("failed to save data after %d attempts", retryTimes)
+}
+
+// CreateKey creates a composite key from prefix and key
+func CreateKey(uniquePrefix, key string) string {
+	return fmt.Sprintf("%s:%s", uniquePrefix, key)
+}

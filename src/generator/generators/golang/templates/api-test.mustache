@@ -1,0 +1,48 @@
+package apitests
+
+import (
+	"L1_validations/types"
+	"L1_validations/utils"
+)
+
+func {{apiName}}(input types.ValidationInput) []types.ValidationOutput {
+	totalResults := {{apiName}}_{{apiName}}Validations(input)
+
+	if !input.Config.Debug {
+		for i := range totalResults {
+			totalResults[i].DebugInfo = nil
+		}
+	}
+
+	if input.Config.HideParentErrors {
+		filtered := []types.ValidationOutput{}
+		for _, r := range totalResults {
+			if !(r.Valid == false && r.Description == "") {
+				filtered = append(filtered, r)
+			}
+		}
+		totalResults = filtered
+	}
+
+	if input.Config.OnlyInvalid {
+		invalid := []types.ValidationOutput{}
+		for _, r := range totalResults {
+			if !r.Valid {
+				invalid = append(invalid, r)
+			}
+		}
+		if len(invalid) == 0 {
+			for _, r := range totalResults {
+				if r.TestName == "{{apiName}}Validations" {
+					return []types.ValidationOutput{r}
+				}
+			}
+			panic("Critical: Overall test result not found")
+		}
+		return invalid
+	}
+
+	return totalResults
+}
+
+{{{functionCode}}}

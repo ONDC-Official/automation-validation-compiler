@@ -1,0 +1,41 @@
+package storageactions
+
+import (
+	"fmt"
+	"L1_validations/interfaces"
+	"L1_validations/types"
+)
+
+// Perform{{functionName}}Save saves validation data based on the action
+func Perform{{functionName}}Save(action, uniquePrefix string, payload map[string]interface{}, store interfaces.StorageInterface, config *types.StorageConfig) error {
+	completeConfig := types.DefaultStorageConfig()
+	if config != nil {
+		if config.RetryAttempts > 0 {
+			completeConfig.RetryAttempts = config.RetryAttempts
+		}
+		if config.RetryDelayMs > 0 {
+			completeConfig.RetryDelayMs = config.RetryDelayMs
+		}
+	}
+
+	switch action {
+	{{#actions}}
+	case "{{{action}}}":
+		return Store_{{{action}}}(uniquePrefix, payload, store, completeConfig)
+	{{/actions}}
+	default:
+		return fmt.Errorf("action not found: %s", action)
+	}
+}
+
+// Perform{{functionName}}Load loads validation data based on the action
+func Perform{{functionName}}Load(action, uniquePrefix string, store interfaces.StorageInterface) (map[string]interface{}, error) {
+	switch action {
+	{{#actions}}
+	case "{{{action}}}":
+		return LoadFor_{{{action}}}(uniquePrefix, store)
+	{{/actions}}
+	default:
+		return nil, fmt.Errorf("action not found: %s", action)
+	}
+}

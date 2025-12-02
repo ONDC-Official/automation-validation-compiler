@@ -1,0 +1,30 @@
+package storageactions
+
+import (
+	"L1_validations/interfaces"
+	"L1_validations/types"
+)
+
+// Store_{{action}} saves data for the {{action}} action
+func Store_{{action}}(uniquePrefix string, payload map[string]interface{}, store interfaces.StorageInterface, config types.StorageConfig) error {
+	{{#storeActions}}
+	if err := SaveFunction(payload, uniquePrefix, "{{{key}}}", "{{{value}}}", "{{action}}", store, config); err != nil {
+		return err
+	}
+	{{/storeActions}}
+	return nil
+}
+
+// LoadFor_{{action}} loads data for the {{action}} action
+func LoadFor_{{action}}(uniquePrefix string, store interfaces.StorageInterface) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+	
+	{{#loadActions}}
+	{{{key}}}Data, err := LoadFunction(store, uniquePrefix, "{{{key}}}")
+	if err == nil {
+		result["{{{key}}}"] = {{{key}}}Data
+	}
+	{{/loadActions}}
+	
+	return result, nil
+}
