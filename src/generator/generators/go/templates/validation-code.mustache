@@ -1,0 +1,61 @@
+
+
+{{#isNested}}
+
+{{{nestedFunctions}}}
+
+var testFunctions = validationutils.TestFunctionArray{
+    {{#names}}
+    {{name}},
+    {{/names}}
+}
+
+allResults := make([]validationutils.ValidationOutput, 0)
+
+for _, testFunc := range testFunctions {
+    results, err := testFunc(input)
+    if err != nil {
+        return nil, err
+    }
+    allResults = append(allResults, results...)
+}
+
+subResults = allResults
+// if all subResults are valid, then valid is true
+valid = true
+for _, res := range subResults {
+    if !res.Valid {
+        valid = false
+        break
+    }
+}
+
+{{/isNested}}
+
+{{^isNested}}
+
+{{#isStateFull}}
+    validate := true
+    if( input.Config.StateFullValidations == false ) {
+        validate = {{{returnStatement}}}
+    }
+{{/isStateFull}}
+
+{{^isStateFull}}
+    validate := {{{returnStatement}}}
+{{/isStateFull}}
+
+if(!validate){
+    result := validationutils.ValidationOutput{
+        TestName: "{{testName}}",
+        Valid: false,
+        Code: {{errorCode}},
+        Description: `{{{errorDescription}}}`,
+        DebugInfo: &validationutils.DebugInfo{
+            FedConfig: `{{{TEST_OBJECT}}}`,
+        },
+    }
+    return []validationutils.ValidationOutput{result},nil
+}
+
+{{/isNested}}

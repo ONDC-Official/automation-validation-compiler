@@ -166,7 +166,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
 			"utf-8"
 		);
-		const validtionUtils = readFileSync(
+		const validationUtils = readFileSync(
 			path.resolve(__dirname, "./templates/validation-utils.mustache"),
 			"utf-8"
 		);
@@ -196,7 +196,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		writeAndFormatCode(
 			this.rootPath,
 			"./utils/validation-utils.ts",
-			validtionUtils,
+			validationUtils,
 			"typescript"
 		);
 		writeAndFormatCode(

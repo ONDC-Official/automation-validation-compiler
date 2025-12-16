@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import * as path from "path";
 import prettier from "prettier";
 import logger from "./logger.js";
-
+import { spawnSync } from "node:child_process";
 export function writeFileWithFsExtra(
 	rootPath: string,
 	relativeFilePath: string,
@@ -27,7 +27,7 @@ export async function formatCode(code: string, lang: string) {
 
 	if (lang === "go") {
 		// Basic Go formatting - clean up extra whitespace and blank lines
-		return formatGoCode(code);
+		return formatGo(code);
 	}
 
 	return await prettier.format(code, {
@@ -83,52 +83,23 @@ function formatPythonCode(code: string): string {
 	return cleanedLines.join("\n") + "\n";
 }
 
-function formatGoCode(code: string): string {
-	// Similar to Python formatting - basic cleanup
-	const lines = code.split("\n");
-	const formattedLines: string[] = [];
+export function formatGo(code: string): string {
+	const result = spawnSync("gofmt", [], {
+		input: code,
+		encoding: "utf8",
+	});
 
-	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i];
-
-		// Skip lines that are only whitespace
-		if (line.trim() === "") {
-			// Only add empty line if the previous line wasn't empty
-			if (
-				formattedLines.length > 0 &&
-				formattedLines[formattedLines.length - 1].trim() !== ""
-			) {
-				formattedLines.push("");
-			}
-			continue;
-		}
-
-		// Add the line as-is (preserve existing indentation)
-		formattedLines.push(line);
+	if (result.error) {
+		throw result.error;
+		// return code; // If gofmt is not available, return the original code
 	}
 
-	// Remove multiple consecutive empty lines
-	const cleanedLines: string[] = [];
-	let lastWasEmpty = false;
-
-	for (const line of formattedLines) {
-		const isEmpty = line.trim() === "";
-		if (isEmpty && lastWasEmpty) {
-			continue; // Skip consecutive empty lines
-		}
-		cleanedLines.push(line);
-		lastWasEmpty = isEmpty;
+	if (result.status !== 0) {
+		throw new Error(result.stderr);
+		// return code; // If gofmt fails, return the original code
 	}
 
-	// Remove trailing empty lines
-	while (
-		cleanedLines.length > 0 &&
-		cleanedLines[cleanedLines.length - 1].trim() === ""
-	) {
-		cleanedLines.pop();
-	}
-
-	return cleanedLines.join("\n") + "\n";
+	return result.stdout;
 }
 
 export async function writeAndFormatCode(

@@ -65,14 +65,14 @@ function compileToGo(node: AstNode): string {
 		const unary = node as CustomUniaryFunction;
 		const func = uniaryFunction[unary.customFunction];
 		const varName = unary.expression.name;
-		return `utils.${func}(${varName})`;
+		return `validationutils.${func}(${varName})`;
 	}
 	if (node.type === "customBinaryFunction") {
 		const binary = node as CustomBinaryFunction;
 		const func = binaryFunction[binary.customFunction];
 		const lhs = binary.lhs.name;
 		const rhs = binary.rhs.name;
-		return `utils.${func}(${lhs}, ${rhs})`;
+		return `validationutils.${func}(${lhs}, ${rhs})`;
 	}
 	throw new Error("Unknown node type");
 }

@@ -38,6 +38,7 @@ const main = async () => {
 		"./alpha/typescript/"
 	);
 	await compilerTy.generateL0Schema("./alpha/typescript/L0_schema/");
+	await compilerTy.generateL0Schema("./alpha/json/", "json");
 
 	const compilerGo = new ConfigCompiler(SupportedLanguages.Golang);
 	await compilerGo.initialize(buildYaml);

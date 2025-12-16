@@ -70,6 +70,18 @@ export function ConvertArrayToString(arr: any[]) {
 	return values;
 }
 
+export function ConvertArrayToStringGoStyle(arr: any[]) {
+	for (const a of arr) {
+		if (typeof a !== "string") {
+			console.log(arr);
+			throw new Error(`Array contains non-string element: ${a}`);
+		}
+	}
+	let values = arr.map((v) => `\`${v}"\``).join(", ");
+	values = values.replace(/\\\\\\/g, "\\");
+	return `validationutils.StringSliceToInterface([]string{${values}})`;
+}
+
 export function addTabToMarkdown(markdown: string) {
 	// Split the markdown into lines, add a tab to each line, and rejoin
 	return markdown

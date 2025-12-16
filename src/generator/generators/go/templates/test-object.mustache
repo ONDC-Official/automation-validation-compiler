@@ -1,0 +1,52 @@
+var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.ValidationOutput, error) {
+    scope := validationutils.GetJsonPath(input.Payload,"{{{scopePath}}}",true)
+    
+    subResults := make([]validationutils.ValidationOutput, 0)
+    valid := true
+    for _, testObj := range scope {
+        testObjMap, ok := testObj.(map[string]interface{})
+        if !ok {
+            return nil, fmt.Errorf("Invalid object structure in scope for test {{name}}")
+        }
+
+        testObjMap["_EXTERNAL"] = input.ExternalData
+        
+        {{#variables}}
+        {{name}} := {{{value}}}
+        validationutils.UnusedFunction({{name}})
+        {{/variables}}
+
+        {{#hasContinue}}
+        skipCheck := {{{skipCheckStatement}}}
+        if( skipCheck ) {
+            continue
+        }
+        {{/hasContinue}}
+
+        {{{validationCode}}}
+
+    }
+
+    debugConfig := `{{{TEST_OBJECT}}}`
+
+    result := validationutils.ValidationOutput{
+        TestName: "{{name}}",
+        Valid: valid,
+        Code: 0,
+        DebugInfo: &validationutils.DebugInfo{
+            FedConfig: debugConfig,
+        },
+    }
+
+    if valid {
+		result.Code = {{successCode}}
+	} else {
+		result.Code = {{errorCode}}
+	}
+
+	results := make([]validationutils.ValidationOutput, 0, len(subResults)+1)
+	results = append(results, result)
+	results = append(results, subResults...)
+
+	return results,nil
+}
