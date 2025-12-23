@@ -23,7 +23,7 @@ func {{apiName}}_Tests(input validationutils.ValidationInput) ([]validationutils
 		// Delete results with valid false and no description
 		filtered := make([]validationutils.ValidationOutput, 0)
 		for _, r := range totalResults {
-			if r.Valid == false {
+			if !r.Valid && r.Description == "" {
 				continue
 			}
 			filtered = append(filtered, r)

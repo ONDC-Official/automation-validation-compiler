@@ -1,3 +1,4 @@
+import { ValidationConfig } from "./config-types";
 import { ErrorDefinition } from "./error-codes";
 
 export interface Xattributes {
@@ -48,4 +49,5 @@ export interface BUILD_TYPE {
 	"x-errorcodes": {
 		code: ErrorDefinition[];
 	};
+	"x-validations"?: ValidationConfig;
 }

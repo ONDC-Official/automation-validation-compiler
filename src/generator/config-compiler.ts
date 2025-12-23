@@ -212,4 +212,14 @@ export class ConfigCompiler {
 		// );
 		return this.possibleJsonPaths;
 	};
+
+	generateValidationFromBuild = async (
+		codeName: string,
+		outputPath: string
+	) => {
+		if (!this.buildData) throw new Error("Build data not initialized");
+		const valConfig = this.buildData["x-validations"];
+		if (!valConfig) throw new Error("No validation config found in build data");
+		await this.generateCode(valConfig, codeName, false, outputPath);
+	};
 }

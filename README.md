@@ -190,3 +190,9 @@ await comp.initialize(buildString);
 const x_validations = JSON.parse(buildString)["x-validations"] as any;
 await comp.generateCode(x_validations, "L1-validations"); // pass the validations object and the name of the function of the generated code
 ```
+
+## scripts:
+
+```
+node ./dist/bin/cli.js xval -c "./samples/build.yaml" -o "./alpha/" -l "go"
+```

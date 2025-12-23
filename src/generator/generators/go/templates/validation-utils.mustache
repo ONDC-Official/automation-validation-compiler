@@ -4,9 +4,10 @@ package validationutils
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/dlclark/regexp2"
 )
 
 // toStringSlice converts []interface{} to []string, returns false if any element is not a string
@@ -269,12 +270,13 @@ func FollowRegex(left []interface{}, regexArray []interface{}) bool {
 		return false
 	}
 	for _, regexStr := range regexStrs {
-		re, err := regexp.Compile(regexStr)
+		re, err := regexp2.Compile(regexStr, 0)
 		if err != nil {
 			return false
 		}
 		for _, v := range leftStrs {
-			if !re.MatchString(v) {
+			match, err := re.MatchString(v)
+			if err != nil || !match {
 				return false
 			}
 		}
@@ -283,13 +285,17 @@ func FollowRegex(left []interface{}, regexArray []interface{}) bool {
 }
 
 func isISO8601(str string) bool {
-	iso8601Regex := regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$`)
+	iso8601Regex, err := regexp2.Compile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$`, 0)
+	if err != nil {
+		return false
+	}
 	
-	if !iso8601Regex.MatchString(str) {
+	match, err := iso8601Regex.MatchString(str)
+	if err != nil || !match {
 		return false
 	}
 
-	_, err := time.Parse(time.RFC3339, str)
+	_, err = time.Parse(time.RFC3339, str)
 	return err == nil
 }
 

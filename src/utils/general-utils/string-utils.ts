@@ -77,8 +77,8 @@ export function ConvertArrayToStringGoStyle(arr: any[]) {
 			throw new Error(`Array contains non-string element: ${a}`);
 		}
 	}
-	let values = arr.map((v) => `\`${v}"\``).join(", ");
-	values = values.replace(/\\\\\\/g, "\\");
+	let values = arr.map((v) => `\`${v}\``).join(", ");
+	values = values.replace(/\\\\/g, "\\");
 	return `validationutils.StringSliceToInterface([]string{${values}})`;
 }
 

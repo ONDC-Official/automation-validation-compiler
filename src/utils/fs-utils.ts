@@ -84,19 +84,22 @@ function formatPythonCode(code: string): string {
 }
 
 export function formatGo(code: string): string {
+	// return code;
 	const result = spawnSync("gofmt", [], {
 		input: code,
 		encoding: "utf8",
+		// stdio: "inherit",
+		maxBuffer: 10 * 1024 * 1024, // 10MB (default is 200KB)
 	});
 
 	if (result.error) {
-		throw result.error;
-		// return code; // If gofmt is not available, return the original code
+		// throw result.error;
+		return code; // If gofmt is not available, return the original code
 	}
 
 	if (result.status !== 0) {
-		throw new Error(result.stderr);
-		// return code; // If gofmt fails, return the original code
+		// throw new Error(result.stderr);
+		return code; // If gofmt fails, return the original code
 	}
 
 	return result.stdout;
@@ -108,6 +111,7 @@ export async function writeAndFormatCode(
 	content: string,
 	lang: string
 ) {
+	// console.log(`Formatting and writing file: ${relativeFilePath}`);
 	const formattedCode = await formatCode(content, lang);
 	writeFileWithFsExtra(rootPath, relativeFilePath, formattedCode);
 }

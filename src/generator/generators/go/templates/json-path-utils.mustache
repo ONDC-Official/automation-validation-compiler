@@ -3,7 +3,7 @@
 package validationutils
 
 import (
-	"github.com/PaesslerAG/jsonpath"
+	"github.com/AsaiYusuke/jsonpath"
 )
 
 // isListOfStringsOrNull checks if the variable is a slice containing only strings or nil values
@@ -26,17 +26,9 @@ func isListOfStringsOrNull(variable interface{}) bool {
 
 // GetJsonPath queries a payload using JSONPath and returns the results
 func GetJsonPath(payload interface{}, path string, flattenResult bool) []interface{} {
-	result, err := jsonpath.Get(path, payload)
+	output, err := jsonpath.Retrieve(path, payload)
 	if err != nil {
 		return []interface{}{}
-	}
-
-	var output []interface{}
-	switch v := result.(type) {
-	case []interface{}:
-		output = v
-	default:
-		output = []interface{}{v}
 	}
 
 	if isListOfStringsOrNull(output) {
@@ -54,7 +46,6 @@ func GetJsonPath(payload interface{}, path string, flattenResult bool) []interfa
 	if len(output) == 0 {
 		return []interface{}{}
 	}
-
 	return output
 }
 

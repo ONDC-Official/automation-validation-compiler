@@ -30,6 +30,8 @@ for _, res := range subResults {
     }
 }
 
+configureDebugInfo = `NESTED_TEST_OBJECT`
+
 {{/isNested}}
 
 {{^isNested}}
@@ -45,6 +47,8 @@ for _, res := range subResults {
     validate := {{{returnStatement}}}
 {{/isStateFull}}
 
+configureDebugInfo = `{{{TEST_OBJECT}}}`
+
 if(!validate){
     result := validationutils.ValidationOutput{
         TestName: "{{testName}}",
@@ -52,9 +56,10 @@ if(!validate){
         Code: {{errorCode}},
         Description: `{{{errorDescription}}}`,
         DebugInfo: &validationutils.DebugInfo{
-            FedConfig: `{{{TEST_OBJECT}}}`,
+            FedConfig: configureDebugInfo,
         },
     }
+    delete(testObjMap, "_EXTERNAL")
     return []validationutils.ValidationOutput{result},nil
 }
 
