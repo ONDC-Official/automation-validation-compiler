@@ -160,13 +160,16 @@ export class ConfigCompiler {
 
 	generateL0Schema = async (
 		outputPath: string = "./",
-		type: "json" | "typescript" = "typescript"
+		type: "json" | "typescript" = "typescript",
+		absolutePath: boolean = false
 	) => {
 		if (!this.jsonSchemas) {
 			throw new Error("Schemas not initialized");
 		}
 
-		const targetPath = `${outputPath}generated/L0-schemas/`;
+		const targetPath = absolutePath
+			? outputPath
+			: `${outputPath}generated/L0-schemas/`;
 		for (const schema in this.jsonSchemas) {
 			const json = this.jsonSchemas[schema];
 			if (type === "typescript") {

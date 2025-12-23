@@ -101,7 +101,7 @@ program
 			const compiler = new ConfigCompiler(SupportedLanguages.Typescript);
 			await compiler.initialize(buildYaml);
 			const formatType = getSchemaFormat(format);
-			await compiler.generateL0Schema(output, formatType);
+			await compiler.generateL0Schema(output, formatType, true);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			console.error(Cli.description.error(`Error: ${message}`));
