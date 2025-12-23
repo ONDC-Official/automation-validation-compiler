@@ -3,13 +3,13 @@
 package validationutils
 
 import (
-	"encoding/json"
+	"github.com/bytedance/sonic"
 )
 
 // NormalizeKeys normalizes JSON structures so that:
-//  - All objects with the same property name share the union of keys seen anywhere
-//  - All objects inside the same array share the union of keys at that array level
-//  - Missing keys are filled with nil
+//   - All objects with the same property name share the union of keys seen anywhere
+//   - All objects inside the same array share the union of keys at that array level
+//   - Missing keys are filled with nil
 func NormalizeKeys(input interface{}) interface{} {
 	// Step 1: Collect templates by property name
 	templatesByPropName := make(map[string]map[string]struct{})
@@ -67,12 +67,12 @@ func applyTemplates(node interface{}, templates map[string]map[string]struct{}) 
 			if obj, ok := item.(map[string]interface{}); ok {
 				// Create new object with array union keys
 				next := make(map[string]interface{})
-				
+
 				// Copy existing keys
 				for k, val := range obj {
 					next[k] = val
 				}
-				
+
 				// Add missing keys from array union
 				for key := range arrayUnion {
 					if _, exists := next[key]; !exists {
@@ -141,14 +141,14 @@ func fillFromTemplate(propName string, obj map[string]interface{}, templates map
 	return filled
 }
 
-// DeepCloneJSON creates a deep clone of a JSON-serializable structure
+// DeepCloneJSON creates a deep clone of a JSON-serializable structure using sonic
 func DeepCloneJSON(v interface{}) interface{} {
-	b, err := json.Marshal(v)
+	b, err := sonic.Marshal(v)
 	if err != nil {
 		panic(err) // or handle error
 	}
 	var out interface{}
-	if err := json.Unmarshal(b, &out); err != nil {
+	if err := sonic.Unmarshal(b, &out); err != nil {
 		panic(err)
 	}
 	return out

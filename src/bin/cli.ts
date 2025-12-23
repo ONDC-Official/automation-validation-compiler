@@ -80,8 +80,33 @@ program
 	.option("-o, --output <directory>", "Output directory for generated schema")
 	.option("-f, --format <format>", "Output format (json, yaml,typescript)")
 	.description("Generate L0 schema")
-	.action(async () => {
-		console.log("Schema generation command invoked");
+	.action(async (options) => {
+		console.log(Cli.title("Ondc Schema Generator"));
+		try {
+			const { config, output, format } = options;
+			if (!config || !output || !format) {
+				console.log(
+					Cli.description.error(
+						"Please provide all required options: --config, --output, --format"
+					)
+				);
+				process.exit(1);
+			}
+			console.log(Cli.description.info(`Generating L0 schema...`));
+			const buildPath = path.resolve(process.cwd(), config);
+			console.log(
+				Cli.description.info(`Reading build file from ${buildPath}...`)
+			);
+			const buildYaml = await fs.readFile(buildPath, "utf-8");
+			const compiler = new ConfigCompiler(SupportedLanguages.Typescript);
+			await compiler.initialize(buildYaml);
+			const formatType = getSchemaFormat(format);
+			await compiler.generateL0Schema(output, formatType);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(Cli.description.error(`Error: ${message}`));
+			process.exit(1);
+		}
 	});
 
 program.parse();
@@ -99,6 +124,21 @@ function getSupportedLanguage(lang: string): SupportedLanguages {
 		default:
 			throw new Error(
 				`Unsupported language: ${lang}. Supported languages are: ${getValidLanguageOptions()}`
+			);
+	}
+}
+
+function getSchemaFormat(format: string): "json" | "typescript" {
+	switch (format.toLowerCase()) {
+		case "json":
+			return "json";
+		case "typescript":
+			return "typescript";
+		case "yaml":
+			throw new Error("YAML format is not yet supported");
+		default:
+			throw new Error(
+				`Unsupported format: ${format}. Supported formats are: json, typescript`
 			);
 	}
 }
