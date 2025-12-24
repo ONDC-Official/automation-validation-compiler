@@ -60,7 +60,7 @@ program
 			console.log(Cli.description.info("Initializing compiler..."));
 			await compiler.initialize(buildYaml);
 			console.log(Cli.description.info("Generating validation code..."));
-			await compiler.generateValidationFromBuild(functionName, output);
+			await compiler.generateValidationFromBuild(functionName, output, true);
 			console.log(
 				Cli.description.success(
 					`Validation code generated successfully in ${output} for language ${lang}`

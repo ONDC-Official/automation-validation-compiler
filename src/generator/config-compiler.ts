@@ -102,7 +102,8 @@ export class ConfigCompiler {
 		valConfig: ValidationConfig,
 		codeName: string = "L1-Validations",
 		minimal: boolean = false,
-		outputPath: string = "./"
+		outputPath: string = "./",
+		absolutePath: boolean = false
 	) => {
 		valConfig = JSON.parse(JSON.stringify(valConfig));
 		if (this.generatorConfig?.duplicateVariablesInChildren) {
@@ -115,7 +116,9 @@ export class ConfigCompiler {
 			await this.performValidations(valConfig);
 		}
 		// Generate code based on the language
-		const targetPath = `${outputPath}generated/${codeName}`;
+		const targetPath = absolutePath
+			? outputPath
+			: `${outputPath}generated/${codeName}`;
 		switch (this.language) {
 			case SupportedLanguages.Typescript:
 				await new TypescriptGenerator(
@@ -218,11 +221,18 @@ export class ConfigCompiler {
 
 	generateValidationFromBuild = async (
 		codeName: string,
-		outputPath: string
+		outputPath: string,
+		absolutePath: boolean = false
 	) => {
 		if (!this.buildData) throw new Error("Build data not initialized");
 		const valConfig = this.buildData["x-validations"];
 		if (!valConfig) throw new Error("No validation config found in build data");
-		await this.generateCode(valConfig, codeName, false, outputPath);
+		await this.generateCode(
+			valConfig,
+			codeName,
+			false,
+			outputPath,
+			absolutePath
+		);
 	};
 }
