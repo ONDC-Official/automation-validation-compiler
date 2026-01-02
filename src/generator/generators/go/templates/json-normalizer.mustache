@@ -2,9 +2,6 @@
 
 package validationutils
 
-import (
-	"github.com/bytedance/sonic"
-)
 
 // NormalizeKeys normalizes JSON structures so that:
 //   - All objects with the same property name share the union of keys seen anywhere
@@ -143,7 +140,7 @@ func fillFromTemplate(propName string, obj map[string]interface{}, templates map
 
 // DeepCloneJSON creates a deep clone of a JSON-serializable structure using sonic
 func DeepCloneJSON(v interface{}) interface{} {
-	b, err := sonic.Marshal(v)
+	/* b, err := sonic.Marshal(v)
 	if err != nil {
 		panic(err) // or handle error
 	}
@@ -151,5 +148,6 @@ func DeepCloneJSON(v interface{}) interface{} {
 	if err := sonic.Unmarshal(b, &out); err != nil {
 		panic(err)
 	}
-	return out
+	return out */
+	return v
 }

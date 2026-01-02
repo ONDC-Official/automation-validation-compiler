@@ -50,4 +50,5 @@ export interface BUILD_TYPE {
 		code: ErrorDefinition[];
 	};
 	"x-validations"?: ValidationConfig;
+	"x-examples"?: any;
 }

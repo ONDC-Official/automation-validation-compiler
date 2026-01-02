@@ -18,6 +18,9 @@ export class MarkdownDocGenerator extends CodeGenerator {
 	generateSessionDataCode(): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
+	generateUnitTestingCode(): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
 	generateValidationCode = async () => {
 		const testConfig = this.validationConfig[ConfigSyntax.Tests];
 		let finalMarkdown = "";

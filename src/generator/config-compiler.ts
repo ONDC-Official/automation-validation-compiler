@@ -1,7 +1,7 @@
 import { JSONSchema7 } from "json-schema";
 import { BUILD_TYPE } from "../types/build.js";
 import { loadAndDereferenceYaml } from "../utils/config-utils/yaml.js";
-import { SchemaExtactionService as SchemaExtractionService } from "../services/schema-service.js";
+import { ExtractionService as SchemaExtractionService } from "../services/schema-service.js";
 import { ErrorDefinition } from "../types/error-codes.js";
 import { ValidationConfig } from "../types/config-types.js";
 import { SupportedLanguages } from "../types/compiler-types.js";
@@ -233,6 +233,13 @@ export class ConfigCompiler {
 			false,
 			outputPath,
 			absolutePath
+		);
+	};
+
+	extractPayloadsFromBuild = async (outputPath: string) => {
+		if (!this.buildData) throw new Error("Build data not initialized");
+		const payloads = this.SchemaExtractionService.extractPayloadExamples(
+			this.buildData
 		);
 	};
 }

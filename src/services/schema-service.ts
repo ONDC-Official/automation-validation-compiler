@@ -3,7 +3,7 @@ import { BUILD_TYPE } from "../types/build.js";
 import { removeRequiredAndEnum } from "../utils/config-utils/json-schema-utils.js";
 import { getAllJsonPaths } from "../utils/json-path-utils/extract-string-paths.js";
 
-export class SchemaExtactionService {
+export class ExtractionService {
 	extractSchemas = async (
 		data: BUILD_TYPE,
 		removeRequired: boolean,
@@ -42,4 +42,6 @@ export class SchemaExtactionService {
 		}
 		return paths;
 	};
+
+	extractPayloadExamples = (data: BUILD_TYPE) => {};
 }

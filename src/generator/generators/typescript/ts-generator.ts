@@ -447,6 +447,10 @@ export class TypescriptGenerator extends CodeGenerator {
 			masterFunction: masterFunction,
 		});
 	}
+
+	public generateUnitTestingCode(): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
 }
 
 interface mustachRequirements {

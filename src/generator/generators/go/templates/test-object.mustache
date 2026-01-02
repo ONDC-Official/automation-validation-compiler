@@ -4,13 +4,9 @@ var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.V
     subResults := make([]validationutils.ValidationOutput, 0)
     valid := true
     configureDebugInfo := ""
-    for _, testObj := range scope {
-        testObjMap, ok := validationutils.DeepCloneJSON(testObj).(map[string]interface{})
-        if !ok {
-            return nil, fmt.Errorf("Invalid object structure in scope for test {{name}}")
-        }
-
-        testObjMap["_EXTERNAL"] = validationutils.DeepCloneJSON(input.ExternalData)
+    for _, testObjMap := range scope {
+        validationutils.UnusedFunction(testObjMap)
+        // testObjMap["_EXTERNAL"] = validationutils.DeepCloneJSON(input.ExternalData)
         
         {{#variables}}
         {{name}} := {{{value}}}
@@ -26,7 +22,7 @@ var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.V
 
         {{{validationCode}}}
 
-        delete(testObjMap, "_EXTERNAL")
+        // delete(testObjMap, "_EXTERNAL")
     }
     
     result := validationutils.ValidationOutput{

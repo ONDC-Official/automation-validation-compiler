@@ -49,9 +49,9 @@ type ExternalData struct {
 
 // ValidationInput represents the input data for validation functions
 type ValidationInput struct {
-	Payload      interface{}
-	ExternalData ExternalData
-	Config       ValidationConfig
+	Payload      interface{} `json:"payload"`
+	ExternalData ExternalData `json:"_EXTERNAL,omitempty"`
+	Config       ValidationConfig `json:"_CONFIG,omitempty"`
 }
 
 // TestFunction is a function type that takes ValidationInput and returns a slice of ValidationOutput

@@ -109,6 +109,40 @@ program
 		}
 	});
 
+program
+	.command("extract-payloads")
+	.alias("ext-payloads")
+	.description("Extract sample payloads from build.yaml")
+	.option("-c, --config <path>", "Path to build.yaml file")
+	.option("-o, --output <directory>", "Output directory for extracted payloads")
+	.action(async (options) => {
+		console.log(Cli.title("Ondc Sample Payload Extractor"));
+		try {
+			const { config, output } = options;
+			if (!config || !output) {
+				console.log(
+					Cli.description.error(
+						"Please provide all required options: --config, --output"
+					)
+				);
+				process.exit(1);
+			}
+			console.log(Cli.description.info(`Extracting sample payloads...`));
+			const buildPath = path.resolve(process.cwd(), config);
+			console.log(
+				Cli.description.info(`Reading build file from ${buildPath}...`)
+			);
+			const buildYaml = await fs.readFile(buildPath, "utf-8");
+			const compiler = new ConfigCompiler(SupportedLanguages.Typescript);
+			await compiler.initialize(buildYaml);
+			await compiler.extractPayloadsFromBuild(output);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(Cli.description.error(`Error: ${message}`));
+			process.exit(1);
+		}
+	});
+
 program.parse();
 
 function getSupportedLanguage(lang: string): SupportedLanguages {

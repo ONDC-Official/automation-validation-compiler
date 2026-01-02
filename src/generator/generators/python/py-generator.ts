@@ -26,6 +26,10 @@ const __dirname = path.dirname(__filename);
 export class PythonGenerator extends CodeGenerator {
 	codeConfig: CodeGeneratorProps | undefined;
 
+	public generateUnitTestingCode(): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+
 	generateSessionDataCode = async () => {
 		if (!this.codeConfig) {
 			throw new Error("Code config not set. Please call generateCode first.");

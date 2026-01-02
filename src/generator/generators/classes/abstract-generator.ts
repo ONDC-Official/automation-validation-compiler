@@ -30,4 +30,5 @@ export abstract class CodeGenerator {
 	abstract generateSessionDataCode(): Promise<void>;
 	abstract generateValidationCode(): Promise<void>;
 	abstract generateCode(codeConfig: CodeGeneratorProps): Promise<void>;
+	abstract generateUnitTestingCode(): Promise<void>;
 }

@@ -16,7 +16,10 @@ import { collectLoadData } from "../../../utils/config-utils/load-variables.js";
 import { ConfigVariable, TestObject } from "../../../types/config-types.js";
 import { compileInputToGo } from "./go-ast.js";
 import { getVariablesFromTest } from "../../../utils/general-utils/test-object-utils.js";
-import { ConvertArrayToStringGoStyle } from "../../../utils/general-utils/string-utils.js";
+import {
+	ConvertArrayToStringGoStyle,
+	removeAllSpecialCharacters,
+} from "../../../utils/general-utils/string-utils.js";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -226,6 +229,7 @@ export class GoGenerator extends CodeGenerator {
 			"text"
 		);
 		await this.generateSessionDataCode();
+		await this.generateUnitTestingCode();
 	};
 
 	private generateIndexFile(
@@ -405,12 +409,44 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 	private createVariablesCode(testObject: TestObject) {
 		const variables: { name: string; value: string }[] = [];
 		const varNames = getVariablesFromTest(testObject);
+
+		const returnStatement = testObject[TestObjectSyntax.Return];
+		const continueStatement = testObject[TestObjectSyntax.Continue];
+		let elementsList: string[] = [];
+
+		// REPLACE ALL special WITH empty AND SPLIT
+		if (typeof returnStatement === "string") {
+			elementsList = removeAllSpecialCharacters(returnStatement).split(" ");
+		}
+		if (continueStatement) {
+			const contElements =
+				removeAllSpecialCharacters(continueStatement).split(" ");
+			for (const elem of contElements) {
+				if (!elementsList.includes(elem)) {
+					elementsList.push(elem);
+				}
+			}
+		}
+
 		for (const name of varNames) {
 			const value = testObject[name] as ConfigVariable;
-			const final =
-				typeof value === "string"
-					? `validationutils.GetJsonPath(testObjMap, "${value}",true)`
-					: ConvertArrayToStringGoStyle(value);
+			if (!elementsList.includes(name)) {
+				console.log(
+					`Variable ${name} not used in return or continue statements, skipping generation.: \n ${returnStatement} \n ${continueStatement}`
+				);
+				console.log(elementsList);
+				continue;
+			}
+			let final = "";
+			if (value.includes("_EXTERNAL")) {
+				final = `validationutils.GetJsonPath(input, "${value}",true)`;
+			} else {
+				final =
+					typeof value === "string"
+						? `validationutils.GetJsonPath(testObjMap, "${value}",true)`
+						: ConvertArrayToStringGoStyle(value);
+			}
+
 			variables.push({
 				name: name,
 				value: final,
@@ -484,6 +520,25 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 			testObject,
 			testObject[TestObjectSyntax.Name],
 			skipList
+		);
+	}
+
+	public async generateUnitTestingCode() {
+		const testTemplate = readFileSync(
+			path.resolve(
+				__dirname,
+				"./templates/test-templates/validator-test.mustache"
+			),
+			"utf-8"
+		);
+		const finalTestCode = Mustache.render(testTemplate, {
+			functionName: this.codeConfig?.codeName ?? "L1Validations",
+		});
+		await writeAndFormatCode(
+			this.rootPath,
+			`./${packageName}/main-validator_test.go`,
+			finalTestCode,
+			"go"
 		);
 	}
 }

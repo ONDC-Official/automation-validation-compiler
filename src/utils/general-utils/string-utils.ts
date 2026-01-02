@@ -89,3 +89,7 @@ export function addTabToMarkdown(markdown: string) {
 		.map((line) => `\t${line}`) // Add a tab character at the beginning of each line
 		.join("\n"); // Rejoin the lines into a single string
 }
+
+export function removeAllSpecialCharacters(input: string): string {
+	return input.replace(/[()!]/g, "").trim();
+}

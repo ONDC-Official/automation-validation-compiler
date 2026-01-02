@@ -19,6 +19,10 @@ const __dirname = path.dirname(__filename);
 export class JavascriptGenerator extends CodeGenerator {
 	private tempTsPath: string;
 
+	public generateUnitTestingCode(): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
+
 	constructor(
 		validationConfig: any,
 		errorCodes: any[],
