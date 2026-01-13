@@ -431,10 +431,6 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 		for (const name of varNames) {
 			const value = testObject[name] as ConfigVariable;
 			if (!elementsList.includes(name)) {
-				console.log(
-					`Variable ${name} not used in return or continue statements, skipping generation.: \n ${returnStatement} \n ${continueStatement}`
-				);
-				console.log(elementsList);
 				continue;
 			}
 			let final = "";

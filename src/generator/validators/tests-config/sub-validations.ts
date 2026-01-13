@@ -90,11 +90,6 @@ export class ScopeValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Scope} should be a valid json path at path ${this.validationPath}`
 			);
 		}
-		if (!path.startsWith(`$.`)) {
-			throw new Error(
-				`${TestObjectSyntax.Scope} json path should start with $. at ${this.validationPath}`
-			);
-		}
 		if (this.minimal) return;
 		if (
 			this.impossiblePaths.includes(replaceBracketsWithAsteriskNested(path))
@@ -188,11 +183,7 @@ export class VariableValidator extends TestObjectValidator {
 						`Variable: ${key} should be a valid jsonPath at ${this.validationPath}`
 					);
 				}
-				if (!value.startsWith(`$.`)) {
-					throw new Error(
-						`Variable: ${key} should start with $. at ${this.validationPath}`
-					);
-				}
+
 				if (value.startsWith(`$.${ExternalDataSyntax}`)) {
 					this.validateExternalData(value, this.externalVariables);
 					return;
@@ -201,7 +192,7 @@ export class VariableValidator extends TestObjectValidator {
 				let path = value;
 				if (this.targetObject[TestObjectSyntax.Scope]) {
 					const scope = this.targetObject[TestObjectSyntax.Scope];
-					const pathWithoutDollar = path.slice(2);
+					const pathWithoutDollar = cleanseDollarDot(path);
 					path = `${scope}.${pathWithoutDollar}`;
 				}
 				const replaced = replaceBracketsWithAsteriskNested(path);
@@ -313,4 +304,13 @@ export class ReturnValidator extends TestObjectValidator {
 			throw new Error(err.message + " at path " + this.validationPath);
 		}
 	};
+}
+
+function cleanseDollarDot(path: string): string {
+	if (path.startsWith(`$.`)) {
+		return path.slice(2);
+	} else if (path.startsWith(`$`)) {
+		return path.slice(1);
+	}
+	return path;
 }
