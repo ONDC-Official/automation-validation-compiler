@@ -397,11 +397,11 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 			validationCode: await this.createValidationLogicCode(testObject),
 			successCode: testObject[TestObjectSyntax.SuccessCode] ?? 200,
 			errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
-			testName: testObject[TestObjectSyntax.Name],
+			testName: stringToCaps(testObject[TestObjectSyntax.Name]),
 			TEST_OBJECT: `${JSON.stringify(testObject)}`,
 		};
 		return {
-			funcName: testObject[TestObjectSyntax.Name],
+			funcName: stringToCaps(testObject[TestObjectSyntax.Name]),
 			code: Mustache.render(template, view),
 		};
 	};

@@ -4112,7 +4112,7 @@ x-validations:
         _RETURN_:
           - _NAME_: CONTEXT_REQUIRED
             _RETURN_:
-              - _NAME_: CONTEXT_REQUIRED_DOMAIN
+              - _NAME_: cONTEXT_REQUIRED_DOMAIN
                 attr: $.context.domain
                 _RETURN_: attr are present
               - _NAME_: CONTEXT_REQUIRED_ACTION
