@@ -3,6 +3,9 @@
 package validationutils
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/AsaiYusuke/jsonpath"
 )
 
@@ -26,8 +29,10 @@ func isListOfStringsOrNull(variable interface{}) bool {
 
 // GetJsonPath queries a payload using JSONPath and returns the results
 func GetJsonPath(payload interface{}, path string, flattenResult bool) []interface{} {
-	output, err := jsonpath.Retrieve(path, payload)
+    resolvedPath, resolvedData, err := resolveJSONPathData(path, payload)
+	output, err := jsonpath.Retrieve(resolvedPath, resolvedData)
 	if err != nil {
+		fmt.Printf("Error retrieving JSONPath %s: %v\n", path, err)
 		return []interface{}{}
 	}
 
@@ -60,4 +65,19 @@ func flattenSlice(slice []interface{}) []interface{} {
 		}
 	}
 	return result
+}
+
+
+
+func resolveJSONPathData(path string, data interface{}) (string, interface{}, error) {
+    if input, ok := data.(ValidationInput); ok {
+        if strings.HasPrefix(path, "$._EXTERNAL._SELF") {
+            resolvedPath := strings.Replace(path, "$._EXTERNAL._SELF", "$", 1)
+            return resolvedPath, input.ExternalData.Self, nil
+        }else if( strings.HasPrefix(path, "$._EXTERNAL")){
+			resolvedPath := strings.Replace(path, "$._EXTERNAL", "$", 1)
+			return resolvedPath, input.ExternalData, nil
+		}
+    }
+    return path, data, nil
 }
