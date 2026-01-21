@@ -1,4 +1,8 @@
 def {{name}}(input_data):
+
+    if input_data["config"].get("_skip_tests_dict", {}).get("{{testName}}", False):
+        return []
+
     scope = payload_utils["get_json_path"](input_data["payload"], "{{{scopePath}}}")
     sub_results = []
     valid = True

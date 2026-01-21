@@ -18,10 +18,12 @@ class ValidationConfig(TypedDict, total=False):
     """
     only_invalid: Optional[bool]
     hide_parent_errors: Optional[bool]
+    skip_tests: Optional[List[str]]
     _debug: Optional[bool]
     state_full_validations: Optional[bool]
     store: Optional[Any]
     unique_key: Optional[str]
+    _skip_tests_dict: Optional[Dict[str, bool]]
 
 # Input structure for validation functions
 ValidationInput = Dict[str, Any]

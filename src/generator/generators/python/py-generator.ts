@@ -44,34 +44,34 @@ export class PythonGenerator extends CodeGenerator {
 		const sessionDataUtilsTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/save-utils.mustache"
+				"./templates/storage-templates/save-utils.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const storageInterfaceTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/storage-interface.mustache"
+				"./templates/storage-templates/storage-interface.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const storageTypesTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/storage-types.mustache"
+				"./templates/storage-templates/storage-types.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const indexTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const saveActionTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/api-save.mustache"
+				"./templates/storage-templates/api-save.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 
 		const allActions = Object.keys(tests);
@@ -106,7 +106,7 @@ export class PythonGenerator extends CodeGenerator {
 				this.rootPath,
 				`./storage_actions/${action}.py`,
 				saveCode,
-				"python"
+				"python",
 			);
 		}
 
@@ -115,31 +115,31 @@ export class PythonGenerator extends CodeGenerator {
 			this.rootPath,
 			"./utils/save_utils.py",
 			sessionDataUtilsTemplate,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./types/storage_types.py",
 			storageTypesTemplate,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./interfaces/storage_interface.py",
 			storageInterfaceTemplate,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./storage_actions/__init__.py",
 			indexCode,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./interfaces/__init__.py",
 			"# Interfaces package",
-			"python"
+			"python",
 		);
 	};
 
@@ -154,7 +154,7 @@ export class PythonGenerator extends CodeGenerator {
 			const testFunction = await this.generateTestFunction(betaConfig);
 			const apiTestTemplate = readFileSync(
 				path.resolve(__dirname, "./templates/api-test.mustache"),
-				"utf-8"
+				"utf-8",
 			);
 			const finalCode = Mustache.render(apiTestTemplate, {
 				functionCode: testFunction.code,
@@ -164,7 +164,7 @@ export class PythonGenerator extends CodeGenerator {
 				this.rootPath,
 				`./api_tests/${key}.py`,
 				finalCode,
-				"python"
+				"python",
 			);
 		}
 	};
@@ -173,28 +173,28 @@ export class PythonGenerator extends CodeGenerator {
 		this.codeConfig = codeConfig;
 		const jsonPathUtilsCode = readFileSync(
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const validationUtils = readFileSync(
 			path.resolve(__dirname, "./templates/validation-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const typesTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/test-config.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const normalizerTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/json-normalizer.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const apiTestsInitTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/api-tests-init.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const requirementsTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/requirements.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const typesCode = Mustache.render(typesTemplate, {
@@ -212,43 +212,43 @@ export class PythonGenerator extends CodeGenerator {
 			this.rootPath,
 			"./utils/json_path_utils.py",
 			jsonPathUtilsCode,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./utils/json_normalizer.py",
 			normalizerTemplate,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./utils/validation_utils.py",
 			validationUtils,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./utils/__init__.py",
 			"# Utils package",
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./types/test_config.py",
 			typesCode,
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./types/__init__.py",
 			"# Types package",
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./api_tests/__init__.py",
 			apiTestsInitCode,
-			"python"
+			"python",
 		);
 
 		await this.generateValidationCode();
@@ -257,25 +257,25 @@ export class PythonGenerator extends CodeGenerator {
 			this.rootPath,
 			"requirements.txt",
 			requirements,
-			"text"
+			"text",
 		);
 
 		await writeAndFormatCode(
 			this.rootPath,
 			"error.py",
 			this.generateErrorFile(this.errorCodes),
-			"python"
+			"python",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"__init__.py",
 			this.generateIndexFile(apiNames, codeConfig.codeName),
-			"python"
+			"python",
 		);
 		await new MarkdownDocGenerator(
 			this.validationConfig,
 			this.errorCodes,
-			this.rootPath
+			this.rootPath,
 		).generateCode();
 		await this.generateSessionDataCode();
 	};
@@ -283,7 +283,7 @@ export class PythonGenerator extends CodeGenerator {
 	generateTestFunction = async (testObject: TestObject) => {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/test-object.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const view: mustachRequirements = {
@@ -308,13 +308,13 @@ export class PythonGenerator extends CodeGenerator {
 
 	private CreateErrorMarkdown(
 		testObject: TestObject,
-		skipList: string[] | undefined
+		skipList: string[] | undefined,
 	) {
 		return markdownMessageGenerator(
 			testObject[TestObjectSyntax.Return] as string,
 			testObject,
 			testObject[TestObjectSyntax.Name],
-			skipList
+			skipList,
 		);
 	}
 
@@ -357,13 +357,13 @@ export class PythonGenerator extends CodeGenerator {
 	private createValidationLogicCode = async (testObject: TestObject) => {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/validation-code.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const skip = testObject[TestObjectSyntax.Continue];
 		const skipList = skip ? [skip] : undefined;
 		if (typeof testObject[TestObjectSyntax.Return] === "string") {
 			const returnStatement = compileInputToPy(
-				testObject[TestObjectSyntax.Return]
+				testObject[TestObjectSyntax.Return],
 			);
 
 			// Check if this is a stateful validation
@@ -437,7 +437,7 @@ export class PythonGenerator extends CodeGenerator {
 		const errorsList = errors
 			.map(
 				(error) =>
-					`    {"code": ${error.code}, "message": "${error.Description}"}`
+					`    {"code": ${error.code}, "message": "${error.Description}"}`,
 			)
 			.join(",\n");
 
@@ -459,7 +459,7 @@ ${errorsList}
 		const result: { name: string }[] = [];
 		for (const api of apis) {
 			const keys = Object.keys(
-				this.validationConfig[ConfigSyntax.SessionData][api]
+				this.validationConfig[ConfigSyntax.SessionData][api],
 			);
 			for (const key of keys) {
 				result.push({ name: key });
@@ -470,7 +470,7 @@ ${errorsList}
 
 	private generateIndexFile(
 		apis: string[],
-		functionName: string = "L1Validations"
+		functionName: string = "L1Validations",
 	) {
 		// Clean function name for Python
 		functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
@@ -483,7 +483,7 @@ ${errorsList}
 
 		const masterDoc = readFileSync(
 			path.resolve(__dirname, "./templates/master-doc.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const masterFunction = `
 def perform_${functionName.toLowerCase()}(action, payload, config: ValidationConfig = None, external_data=None):
@@ -501,12 +501,17 @@ def perform_${functionName.toLowerCase()}(action, payload, config: ValidationCon
         "_debug": False,
         "hide_parent_errors": True,
         "state_full_validations": False,
+		"skip_tests": [],
+        "_skip_tests_dict": {},
     }
     # Merge user config with default config
     if config is None:
         config = default_config
     else:
         config = {**default_config, **config}
+
+	for test_name in config.get("skip_tests", []):
+		config["_skip_tests_dict"][test_name] = True
 
     if config.get("state_full_validations") and not config.get("store"):
         raise Exception(
@@ -535,7 +540,7 @@ ${apis
 	.slice(1)
 	.map(
 		(api) => `    elif action == "${api}":
-        return ${api}(input_data)`
+        return ${api}(input_data)`,
 	)
 	.join("\n")}
     else:

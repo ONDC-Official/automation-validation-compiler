@@ -42,35 +42,35 @@ export class GoGenerator extends CodeGenerator {
 		const sessionDataUtilsTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/save-utils.mustache"
+				"./templates/storage-templates/save-utils.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const storageInterfaceTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/storage-interface.mustache"
+				"./templates/storage-templates/storage-interface.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 
 		const indexTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const saveActionTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/api-save.mustache"
+				"./templates/storage-templates/api-save.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const saveActionUtilsTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/api-save-utils.mustache"
+				"./templates/storage-templates/api-save-utils.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 
 		const allActions = Object.keys(tests);
@@ -103,33 +103,33 @@ export class GoGenerator extends CodeGenerator {
 				this.rootPath,
 				`./${packageName}/storageutils/${action}.go`,
 				saveCode,
-				"go"
+				"go",
 			);
 		}
 		await writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/storageutils/save_utils.go`,
 			sessionDataUtilsTemplate,
-			"go"
+			"go",
 		);
 
 		await writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/validationutils/storage-interface.go`,
 			storageInterfaceTemplate,
-			"go"
+			"go",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/storageutils/index.go`,
 			indexCode,
-			"go"
+			"go",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/storageutils/api_save_utils.go`,
 			saveActionUtilsTemplate,
-			"go"
+			"go",
 		);
 	}
 	async generateValidationCode() {
@@ -144,7 +144,7 @@ export class GoGenerator extends CodeGenerator {
 			const testFunction = await this.generateTestFunction(betaConfig);
 			const apiTestTemplate = readFileSync(
 				path.resolve(__dirname, "./templates/api-tests.mustache"),
-				"utf-8"
+				"utf-8",
 			);
 			const finalCode = Mustache.render(apiTestTemplate, {
 				functionCode: testFunction.code,
@@ -154,7 +154,7 @@ export class GoGenerator extends CodeGenerator {
 				this.rootPath,
 				`./${packageName}/jsonvalidations/${key}.go`,
 				finalCode,
-				"go"
+				"go",
 			);
 		}
 	}
@@ -162,25 +162,25 @@ export class GoGenerator extends CodeGenerator {
 		this.codeConfig = codeConfig;
 		const jsonPathUtilsCode = readFileSync(
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const validationUtils = readFileSync(
 			path.resolve(__dirname, "./templates/validation-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const typesTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/test-config.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const normalizerTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/json-normalizer.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const goMod = readFileSync(
 			path.resolve(__dirname, "./templates/go-mod.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const typesCode = Mustache.render(typesTemplate, {
@@ -191,25 +191,25 @@ export class GoGenerator extends CodeGenerator {
 			this.rootPath,
 			`./${packageName}/validationutils/json_path_utils.go`,
 			jsonPathUtilsCode,
-			"go"
+			"go",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/validationutils/validation_utils.go`,
 			validationUtils,
-			"go"
+			"go",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/validationutils/test-config.go`,
 			typesCode,
-			"go"
+			"go",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/validationutils/json_normalizer.go`,
 			normalizerTemplate,
-			"go"
+			"go",
 		);
 		await this.generateValidationCode();
 		await writeAndFormatCode(
@@ -217,16 +217,16 @@ export class GoGenerator extends CodeGenerator {
 			`./${packageName}/main-validator.go`,
 			this.generateIndexFile(
 				Object.keys(this.validationConfig[ConfigSyntax.Tests]),
-				codeConfig.codeName
+				codeConfig.codeName,
 			),
-			"go"
+			"go",
 		);
 
 		await writeAndFormatCode(
 			this.rootPath,
 			`./${packageName}/go.mod`,
 			goMod,
-			"text"
+			"text",
 		);
 		await this.generateSessionDataCode();
 		await this.generateUnitTestingCode();
@@ -234,7 +234,7 @@ export class GoGenerator extends CodeGenerator {
 
 	private generateIndexFile(
 		apis: string[],
-		functionName: string = "L1Validations"
+		functionName: string = "L1Validations",
 	): string {
 		functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
 		let importList = [
@@ -246,7 +246,7 @@ export class GoGenerator extends CodeGenerator {
 		];
 		const masterTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/index.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const masterFunction = `func Perform${functionName}(
@@ -256,6 +256,13 @@ export class GoGenerator extends CodeGenerator {
 	        externalData validationutils.ExternalData,
             ) ([]validationutils.ValidationOutput, error) {
                 completeConfig := getCompleteConfig(config)
+				if completeConfig.SkipTests == nil {
+					completeConfig.SkipTests = []string{}
+				}
+				completeConfig.SkipTestsDict = make(map[string]bool)
+				for _, testName := range completeConfig.SkipTests {
+					completeConfig.SkipTestsDict[testName] = true
+				}
 
                 // Validate stateful requirements
 	            if completeConfig.StateFullValidations {
@@ -297,7 +304,7 @@ export class GoGenerator extends CodeGenerator {
 										(api) => `
                 case "${api}":
                     return jsonvalidations.${stringToCaps(api)}_Tests(input)
-                `
+                `,
 									)
 									.join("\n")}
                 default:
@@ -313,6 +320,8 @@ func getCompleteConfig(config *validationutils.ValidationConfig) validationutils
 			HideParentErrors:     true,
 			StateFullValidations: false,
 			Debug:                false,
+			SkipTestsDict:       make(map[string]bool),
+			SkipTests:            []string{},
 		}
 	}
 
@@ -370,7 +379,7 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 		let result: { name: string }[] = [];
 		for (const api of apis) {
 			const keys = Object.keys(
-				this.validationConfig[ConfigSyntax.SessionData][api]
+				this.validationConfig[ConfigSyntax.SessionData][api],
 			);
 			for (const key of keys) {
 				result.push({ name: key });
@@ -383,7 +392,7 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 	private generateTestFunction = async (testObject: TestObject) => {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/test-object.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const view: mustachRequirements = {
@@ -454,13 +463,13 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 	private async createValidationLogicCode(testObject: TestObject) {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/validation-code.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const skip = testObject[TestObjectSyntax.Continue];
 		const skipList = skip ? [skip] : undefined;
 		if (typeof testObject[TestObjectSyntax.Return] === "string") {
 			const returnStatement = compileInputToGo(
-				testObject[TestObjectSyntax.Return]
+				testObject[TestObjectSyntax.Return],
 			);
 			let isStateFull = false;
 			for (const k in testObject) {
@@ -509,13 +518,13 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 
 	private CreateErrorMarkdown(
 		testObject: TestObject,
-		skipList: string[] | undefined
+		skipList: string[] | undefined,
 	) {
 		return markdownMessageGenerator(
 			testObject[TestObjectSyntax.Return] as string,
 			testObject,
 			testObject[TestObjectSyntax.Name],
-			skipList
+			skipList,
 		);
 	}
 
@@ -523,9 +532,9 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 		const testTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/test-templates/validator-test.mustache"
+				"./templates/test-templates/validator-test.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const finalTestCode = Mustache.render(testTemplate, {
 			functionName: this.codeConfig?.codeName ?? "L1Validations",
@@ -534,7 +543,7 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 			this.rootPath,
 			`./${packageName}/main-validator_test.go`,
 			finalTestCode,
-			"go"
+			"go",
 		);
 	}
 }

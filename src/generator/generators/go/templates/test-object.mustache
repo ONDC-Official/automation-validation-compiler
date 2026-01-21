@@ -1,4 +1,11 @@
 var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.ValidationOutput, error) {
+
+    if input.Config.SkipTestsDict != nil {
+        if _, skip := input.Config.SkipTestsDict["{{name}}"]; skip {
+            return []validationutils.ValidationOutput{}, nil
+        }
+    }
+
     scope := validationutils.GetJsonPath(input.Payload,"{{{scopePath}}}",true)
     
     subResults := make([]validationutils.ValidationOutput, 0)

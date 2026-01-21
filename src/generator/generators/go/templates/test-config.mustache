@@ -6,6 +6,8 @@ package validationutils
 type ValidationConfig struct {
 	// StateFullValidations enables stateful validations that may depend on previous data
 	StateFullValidations bool
+	// SkipTests is a list of test names to be skipped during validation
+	SkipTests []string
 	// UniqueKey is an optional unique key for the validation instance
 	UniqueKey *string
 	// Store is an optional implementation of StorageInterface for persisting data across validations
@@ -16,6 +18,8 @@ type ValidationConfig struct {
 	HideParentErrors bool
 	// Debug enables debug mode for additional diagnostic information
 	Debug bool
+	// SkipTestsDict is an internal map for quick lookup of tests to skip
+	SkipTestsDict map[string]bool
 }
 
 // ValidationOutput represents the output of a validation run.
