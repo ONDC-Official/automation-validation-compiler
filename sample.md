@@ -271,3 +271,19 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 4. **Inconsistent naming** - stick to snake_case throughout
 5. **Hard-coded values in expressions** - use variables for maintainability
 6. **Too broad JSONPath selectors** - be as specific as possible
+
+## some complex test examples
+
+```json
+{
+	"_NAME_": "ITEMS_RETURNABLE",
+	"_SCOPE_": "$.message.catalog['bpp/providers'][*].items[*]",
+	"typeCode": "$.tags[?(@.code=='type')].list[*].code",
+	"typeValue": "$.tags[?(@.code=='type')].list[*].value",
+	"validCode": ["type"],
+	"valueValue": ["customization"],
+	"attr": "$['@ondc/org/returnable']",
+	"_CONTINUE_": "validCode all in typeCode && valueValue all in typeValue",
+	"_RETURN_": "attr are present"
+}
+```

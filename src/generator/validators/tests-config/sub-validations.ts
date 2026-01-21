@@ -28,12 +28,12 @@ export class RequiredFieldsValidator extends TestObjectValidator {
 	validate = async () => {
 		if (!this.targetObject[TestObjectSyntax.Name]) {
 			throw new Error(
-				`${TestObjectSyntax.Name} is required at path ${this.validationPath}`
+				`${TestObjectSyntax.Name} is required at path ${this.validationPath}`,
 			);
 		}
 		if (!this.targetObject[TestObjectSyntax.Return]) {
 			throw new Error(
-				`${TestObjectSyntax.Return} is required at path ${this.validationPath}`
+				`${TestObjectSyntax.Return} is required at path ${this.validationPath}`,
 			);
 		}
 	};
@@ -43,23 +43,23 @@ export class NameValidator extends TestObjectValidator {
 	validate = async () => {
 		if (typeof this.targetObject[TestObjectSyntax.Name] !== "string") {
 			throw new Error(
-				`${TestObjectSyntax.Name} should be a string at path ${this.validationPath}`
+				`${TestObjectSyntax.Name} should be a string at path ${this.validationPath}`,
 			);
 		}
 		const name = this.targetObject[TestObjectSyntax.Name];
 		if (name.length < 1) {
 			throw new Error(
-				`${TestObjectSyntax.Name} can't be a non-empty string at path ${this.validationPath}`
+				`${TestObjectSyntax.Name} can't be a non-empty string at path ${this.validationPath}`,
 			);
 		}
 		if (ReservedKeywords.has(name)) {
 			throw new Error(
-				`${TestObjectSyntax.Name} can't be a reserved keyword at path ${this.validationPath}`
+				`${TestObjectSyntax.Name} can't be a reserved keyword at path ${this.validationPath}`,
 			);
 		}
 		if (!isSnakeCase(name)) {
 			throw new Error(
-				`${TestObjectSyntax.Name} must be in snake_case at path ${this.validationPath}`
+				`${TestObjectSyntax.Name} must be in snake_case at path ${this.validationPath}`,
 			);
 		}
 	};
@@ -72,7 +72,7 @@ export class ScopeValidator extends TestObjectValidator {
 		testObject: TestObject,
 		path: string,
 		impossiblePaths: string[],
-		minimal: boolean = false
+		minimal: boolean = false,
 	) {
 		super(testObject, path);
 		this.impossiblePaths = impossiblePaths;
@@ -82,12 +82,12 @@ export class ScopeValidator extends TestObjectValidator {
 		const path = this.targetObject[TestObjectSyntax.Scope];
 		if (typeof path !== "string") {
 			throw new Error(
-				`${TestObjectSyntax.Scope} should be a string at path ${this.validationPath}`
+				`${TestObjectSyntax.Scope} should be a string at path ${this.validationPath}`,
 			);
 		}
 		if (!isValidJsonPath(path)) {
 			throw new Error(
-				`${TestObjectSyntax.Scope} should be a valid json path at path ${this.validationPath}`
+				`${TestObjectSyntax.Scope} should be a valid json path at path ${this.validationPath}`,
 			);
 		}
 		if (this.minimal) return;
@@ -95,7 +95,7 @@ export class ScopeValidator extends TestObjectValidator {
 			this.impossiblePaths.includes(replaceBracketsWithAsteriskNested(path))
 		) {
 			throw new Error(
-				`${TestObjectSyntax.Scope} can't be a path that returns a array of string it must be a json path which returns a array of objects at path ${this.validationPath}`
+				`${TestObjectSyntax.Scope} can't be a path that returns a array of string it must be a json path which returns a array of objects at path ${this.validationPath}`,
 			);
 		}
 	};
@@ -108,7 +108,7 @@ export class ErrorCodeValidator extends TestObjectValidator {
 		testObject: TestObject,
 		path: string,
 		possibleErrorCodes: ErrorDefinition[],
-		minimal: boolean = false
+		minimal: boolean = false,
 	) {
 		super(testObject, path);
 		this.possibleErrorCodes = possibleErrorCodes;
@@ -121,20 +121,20 @@ export class ErrorCodeValidator extends TestObjectValidator {
 
 		if (typeof this.targetObject[TestObjectSyntax.Return] !== "string") {
 			throw new Error(
-				`You can't define a ${TestObjectSyntax.ErrorCode} with nested ${TestObjectSyntax.Return} at path ${this.validationPath}`
+				`You can't define a ${TestObjectSyntax.ErrorCode} with nested ${TestObjectSyntax.Return} at path ${this.validationPath}`,
 			);
 		}
 
 		if (typeof this.targetObject[TestObjectSyntax.ErrorCode] !== "number") {
 			throw new Error(
-				`${TestObjectSyntax.ErrorCode} should be a number at path ${this.validationPath}`
+				`${TestObjectSyntax.ErrorCode} should be a number at path ${this.validationPath}`,
 			);
 		}
 		if (this.minimal) return;
 		const errorCode = this.targetObject[TestObjectSyntax.ErrorCode];
 		if (!this.possibleErrorCodes.some((code) => code.code === errorCode)) {
 			throw new Error(
-				`${TestObjectSyntax.ErrorCode} don't exist in error codes at path ${this.validationPath}`
+				`${TestObjectSyntax.ErrorCode} don't exist in error codes at path ${this.validationPath}`,
 			);
 		}
 
@@ -143,7 +143,7 @@ export class ErrorCodeValidator extends TestObjectValidator {
 		}
 		if (typeof this.targetObject[TestObjectSyntax.SuccessCode] !== "number") {
 			throw new Error(
-				`${TestObjectSyntax.SuccessCode} should be a number at path ${this.validationPath}`
+				`${TestObjectSyntax.SuccessCode} should be a number at path ${this.validationPath}`,
 			);
 		}
 	};
@@ -158,7 +158,7 @@ export class VariableValidator extends TestObjectValidator {
 		path: string,
 		posibleJsonPaths: string[],
 		externalVariables: string[],
-		minimal: boolean = false
+		minimal: boolean = false,
 	) {
 		super(testObject, path);
 		this.externalVariables = externalVariables;
@@ -174,13 +174,13 @@ export class VariableValidator extends TestObjectValidator {
 			const value = this.targetObject[key];
 			if (!isValidVariableValueType(value)) {
 				throw new Error(
-					`Variable: ${key} should be a string or array of primitives at path ${this.validationPath}`
+					`Variable: ${key} should be a string or array of primitives at path ${this.validationPath}`,
 				);
 			}
 			if (typeof value === "string") {
 				if (!isValidJsonPath(value)) {
 					throw new Error(
-						`Variable: ${key} should be a valid jsonPath at ${this.validationPath}`
+						`Variable: ${key} should be a valid jsonPath at ${this.validationPath}`,
 					);
 				}
 
@@ -193,13 +193,17 @@ export class VariableValidator extends TestObjectValidator {
 				if (this.targetObject[TestObjectSyntax.Scope]) {
 					const scope = this.targetObject[TestObjectSyntax.Scope];
 					const pathWithoutDollar = cleanseDollarDot(path);
-					path = `${scope}.${pathWithoutDollar}`;
+					if (pathWithoutDollar.startsWith("[")) {
+						path = `${scope}${pathWithoutDollar}`;
+					} else {
+						path = `${scope}.${pathWithoutDollar}`;
+					}
 				}
 				const replaced = replaceBracketsWithAsteriskNested(path);
 				if (this.minimal) return;
 				if (!this.possibleJsonPaths.includes(replaced)) {
 					throw new Error(
-						`Variable: ${key} should be a jsonPath that returns a array of strings or the path don't exist in the schema, at ${this.validationPath} found original ${path} replaces: ${replaced}`
+						`Variable: ${key} should be a jsonPath that returns a array of strings or the path don't exist in the schema, at ${this.validationPath} found original ${path} replaces: ${replaced}`,
 					);
 				}
 			}
@@ -209,22 +213,22 @@ export class VariableValidator extends TestObjectValidator {
 	validateKey(key: string) {
 		if (ReservedKeywords.has(key)) {
 			throw new Error(
-				`${key} can't be a reserved keyword at path ${this.validationPath}`
+				`${key} can't be a reserved keyword at path ${this.validationPath}`,
 			);
 		}
 		if (key.includes(" ")) {
 			throw new Error(
-				`${key} can't contain spaces at path ${this.validationPath}`
+				`${key} can't contain spaces at path ${this.validationPath}`,
 			);
 		}
 		if (key === this.targetObject[TestObjectSyntax.Name]) {
 			throw new Error(
-				`${key} can't be the same as ${TestObjectSyntax.Name} at path ${this.validationPath}`
+				`${key} can't be the same as ${TestObjectSyntax.Name} at path ${this.validationPath}`,
 			);
 		}
 		if (!isValidVariableName(key)) {
 			throw new Error(
-				`${key} is not a valid variable name at path ${this.validationPath}`
+				`${key} is not a valid variable name at path ${this.validationPath}`,
 			);
 		}
 	}
@@ -232,7 +236,7 @@ export class VariableValidator extends TestObjectValidator {
 		const externalData = path.split(".")[2];
 		if (!definedExternalValues.includes(externalData)) {
 			throw new Error(
-				`${externalData} is not defined in ${ConfigSyntax.SessionData} data at path ${this.validationPath}`
+				`${externalData} is not defined in ${ConfigSyntax.SessionData} data at path ${this.validationPath}`,
 			);
 		}
 	}
@@ -244,7 +248,7 @@ export class ContinueValidator extends TestObjectValidator {
 		super(testObject, path);
 		this.definedVariables = Object.keys(testObject).filter(
 			(key) =>
-				!Object.values(TestObjectSyntax).includes(key as TestObjectSyntax)
+				!Object.values(TestObjectSyntax).includes(key as TestObjectSyntax),
 		);
 	}
 	validate = async () => {
@@ -257,7 +261,7 @@ export class ContinueValidator extends TestObjectValidator {
 				return;
 			}
 			throw new Error(
-				`${TestObjectSyntax.Continue} should be a string at path ${this.validationPath}`
+				`${TestObjectSyntax.Continue} should be a string at path ${this.validationPath}`,
 			);
 		} catch (err: any) {
 			throw new Error(err.message + " at path " + this.validationPath);
@@ -271,12 +275,12 @@ export class ReturnValidator extends TestObjectValidator {
 	constructor(
 		testObject: TestObject,
 		path: string,
-		dependencies: TestsValidatorDependencies
+		dependencies: TestsValidatorDependencies,
 	) {
 		super(testObject, path);
 		this.definedVariables = Object.keys(testObject).filter(
 			(key) =>
-				!Object.values(TestObjectSyntax).includes(key as TestObjectSyntax)
+				!Object.values(TestObjectSyntax).includes(key as TestObjectSyntax),
 		);
 		this.dependencies = dependencies;
 	}
@@ -293,12 +297,12 @@ export class ReturnValidator extends TestObjectValidator {
 				await new TestsValidator(
 					returnStatement,
 					this.validationPath,
-					this.dependencies
+					this.dependencies,
 				).validate();
 				return;
 			}
 			throw new Error(
-				`${TestObjectSyntax.Return} should be a string or arrays`
+				`${TestObjectSyntax.Return} should be a string or arrays`,
 			);
 		} catch (err: any) {
 			throw new Error(err.message + " at path " + this.validationPath);
@@ -308,9 +312,9 @@ export class ReturnValidator extends TestObjectValidator {
 
 function cleanseDollarDot(path: string): string {
 	if (path.startsWith(`$.`)) {
-		return path.slice(2);
+		return path.slice(2).trim();
 	} else if (path.startsWith(`$`)) {
-		return path.slice(1);
+		return path.slice(1).trim();
 	}
-	return path;
+	return path.trim();
 }
