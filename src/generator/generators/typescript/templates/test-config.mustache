@@ -6,6 +6,7 @@ import StorageInterface from "../interfaces/storage-interface";
  *
  * @property onlyInvalid - If true, only invalid results will be returned.
  * @property stateFullValidations - If true, enables stateful validations that may depend on previous data.
+ * @property skipTests - Optional. An array of test names to be skipped during validation.
  * @property uniqueKey - Optional. A unique key for the validation instance.
  * @property store - Optional. An implementation of StorageInterface for persisting data across validations.
  * @property hideParentErrors - Optional. Hides nested error details if set to true.
@@ -13,11 +14,13 @@ import StorageInterface from "../interfaces/storage-interface";
  */
 export interface ValidationConfig {
     stateFullValidations: boolean;
+    skipTests?: string[];
     uniqueKey?: string;
     store?: StorageInterface;
     onlyInvalid: boolean;
     hideParentErrors: boolean;
     _debug: boolean;
+    _skipTestsDict?: { [key: string]: true };
 }
 
 /**

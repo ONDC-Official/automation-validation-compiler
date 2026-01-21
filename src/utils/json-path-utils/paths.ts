@@ -1,7 +1,10 @@
 import jsonpath from "jsonpath";
 export function isValidJsonPath(jsonPath: string) {
 	try {
-		jsonpath.query({}, jsonPath);
+		console.log("Validating JSONPath:", jsonPath);
+		var output = jsonpath.parse(jsonPath);
+		console.log("Parsed output:", output);
+		// jsonpath.query({}, jsonPath);
 		return true;
 	} catch (error) {
 		return false;

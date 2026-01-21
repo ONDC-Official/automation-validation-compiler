@@ -1,4 +1,9 @@
 function {{name}}(input: validationInput): validationOutput {
+
+    if(input.config._skipTestsDict && input.config._skipTestsDict["{{testName}}"]){
+        return [];
+    }
+
     const scope = payloadUtils.getJsonPath(input.payload,"{{{scopePath}}}");
     let subResults: validationOutput = [];
     let valid = true;

@@ -40,34 +40,34 @@ export class TypescriptGenerator extends CodeGenerator {
 		const sessionDataUtilsTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/save-utils.mustache"
+				"./templates/storage-templates/save-utils.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const storageInterfaceTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/storage-interface.mustache"
+				"./templates/storage-templates/storage-interface.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const storageTypesTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/storage-types.mustache"
+				"./templates/storage-templates/storage-types.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 		const indexTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const saveActionTemplate = readFileSync(
 			path.resolve(
 				__dirname,
-				"./templates/storage-templates/api-save.mustache"
+				"./templates/storage-templates/api-save.mustache",
 			),
-			"utf-8"
+			"utf-8",
 		);
 
 		const allActions = Object.keys(tests);
@@ -107,32 +107,32 @@ export class TypescriptGenerator extends CodeGenerator {
 				this.rootPath,
 				`./storage-actions/${action}.ts`,
 				saveCode,
-				"typescript"
+				"typescript",
 			);
 		}
 		await writeAndFormatCode(
 			this.rootPath,
 			"./utils/save-utils.ts",
 			sessionDataUtilsTemplate,
-			"typescript"
+			"typescript",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./types/storage-types.ts",
 			storageTypesTemplate,
-			"typescript"
+			"typescript",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./interfaces/storage-interface.ts",
 			storageInterfaceTemplate,
-			"typescript"
+			"typescript",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"./storage-actions/index.ts",
 			indexCode,
-			"typescript"
+			"typescript",
 		);
 	};
 	generateValidationCode = async () => {
@@ -146,7 +146,7 @@ export class TypescriptGenerator extends CodeGenerator {
 			const testFunction = await this.generateTestFunction(betaConfig);
 			const apiTestTemplate = readFileSync(
 				path.resolve(__dirname, "./templates/api-test.mustache"),
-				"utf-8"
+				"utf-8",
 			);
 			const finalCode = Mustache.render(apiTestTemplate, {
 				functionCode: testFunction.code,
@@ -156,7 +156,7 @@ export class TypescriptGenerator extends CodeGenerator {
 				this.rootPath,
 				`./api-tests/${key}.ts`,
 				finalCode,
-				"typescript"
+				"typescript",
 			);
 		}
 	};
@@ -164,19 +164,19 @@ export class TypescriptGenerator extends CodeGenerator {
 		this.codeConfig = codeConfig;
 		const jsonPathUtilsCode = readFileSync(
 			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const validationUtils = readFileSync(
 			path.resolve(__dirname, "./templates/validation-utils.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const typesTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/test-config.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const normalizerTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/json-normalizer.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const typesCode = Mustache.render(typesTemplate, {
 			externalData: this.getExternalKeys(),
@@ -185,46 +185,46 @@ export class TypescriptGenerator extends CodeGenerator {
 			this.rootPath,
 			"./utils/json-path-utils.ts",
 			jsonPathUtilsCode,
-			"typescript"
+			"typescript",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			"./utils/json-normalizer.ts",
 			normalizerTemplate,
-			"typescript"
+			"typescript",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			"./utils/validation-utils.ts",
 			validationUtils,
-			"typescript"
+			"typescript",
 		);
 		writeAndFormatCode(
 			this.rootPath,
 			"./types/test-config.ts",
 			typesCode,
-			"typescript"
+			"typescript",
 		);
 		await this.generateValidationCode();
 		await writeAndFormatCode(
 			this.rootPath,
 			"error.ts",
 			this.generateErrorFile(this.errorCodes),
-			"typescript"
+			"typescript",
 		);
 		await writeAndFormatCode(
 			this.rootPath,
 			"index.ts",
 			this.generateIndexFile(
 				Object.keys(this.validationConfig[ConfigSyntax.Tests]),
-				codeConfig.codeName
+				codeConfig.codeName,
 			),
-			"typescript"
+			"typescript",
 		);
 		await new MarkdownDocGenerator(
 			this.validationConfig,
 			this.errorCodes,
-			this.rootPath
+			this.rootPath,
 		).generateCode();
 		await this.generateSessionDataCode();
 	};
@@ -232,7 +232,7 @@ export class TypescriptGenerator extends CodeGenerator {
 	generateTestFunction = async (testObject: TestObject) => {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/test-object.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const view: mustachRequirements = {
@@ -257,13 +257,13 @@ export class TypescriptGenerator extends CodeGenerator {
 
 	private CreateErrorMarkdown(
 		testObject: TestObject,
-		skipList: string[] | undefined
+		skipList: string[] | undefined,
 	) {
 		return markdownMessageGenerator(
 			testObject[TestObjectSyntax.Return] as string,
 			testObject,
 			testObject[TestObjectSyntax.Name],
-			skipList
+			skipList,
 		);
 	}
 
@@ -287,13 +287,13 @@ export class TypescriptGenerator extends CodeGenerator {
 	private createValidationLogicCode = async (testObject: TestObject) => {
 		const template = readFileSync(
 			path.resolve(__dirname, "./templates/validation-code.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 		const skip = testObject[TestObjectSyntax.Continue];
 		const skipList = skip ? [skip] : undefined;
 		if (typeof testObject[TestObjectSyntax.Return] === "string") {
 			const returnStatement = compileInputToTs(
-				testObject[TestObjectSyntax.Return]
+				testObject[TestObjectSyntax.Return],
 			);
 			let isStateFull = false;
 			for (const k in testObject) {
@@ -372,7 +372,7 @@ export class TypescriptGenerator extends CodeGenerator {
 		let result: { name: string }[] = [];
 		for (const api of apis) {
 			const keys = Object.keys(
-				this.validationConfig[ConfigSyntax.SessionData][api]
+				this.validationConfig[ConfigSyntax.SessionData][api],
 			);
 			for (const key of keys) {
 				result.push({ name: key });
@@ -384,7 +384,7 @@ export class TypescriptGenerator extends CodeGenerator {
 
 	private generateIndexFile(
 		apis: string[],
-		functionName: string = "L1Validations"
+		functionName: string = "L1Validations",
 	) {
 		functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
 		let importsCode = apis
@@ -396,15 +396,20 @@ export class TypescriptGenerator extends CodeGenerator {
 		importsCode += `\nimport StorageInterface from "./interfaces/storage-interface";`;
 		const masterTemplate = readFileSync(
 			path.resolve(__dirname, "./templates/index.mustache"),
-			"utf-8"
+			"utf-8",
 		);
 
 		const masterFunction = `
 				export async function perform${functionName}(action: string, payload: any, config?: Partial<ValidationConfig>, externalData: any = {}) {
 					const completeConfig: ValidationConfig = {
-						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, stateFullValidations: false, _debug: false },
+						...{ onlyInvalid: true, standardLogs: false, hideParentErrors: true, stateFullValidations: false, _debug: false,skipTests: [] },
 						...config,
 					};
+					completeConfig._skipTestsDict = {};
+					for(const testName of completeConfig.skipTests ?? []) {
+						completeConfig._skipTestsDict![testName] = true;
+					}
+					
 
 					if (completeConfig.stateFullValidations  && !completeConfig.store) {
 						throw new Error(
@@ -431,7 +436,7 @@ export class TypescriptGenerator extends CodeGenerator {
 				payload: normalizedPayload,
 				externalData: externalData,
 				config: completeConfig,
-			});`
+			});`,
 							)
 							.join("\n")}
 						default:
