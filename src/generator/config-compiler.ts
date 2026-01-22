@@ -18,6 +18,7 @@ import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVar
 import { PythonGenerator } from "./generators/python/py-generator.js";
 import { JavascriptGenerator } from "./generators/javascript/js-generator.js";
 import { GoGenerator } from "./generators/go/go-generator.js";
+import logger from "../utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,7 +49,7 @@ export class ConfigCompiler {
 	// 1. extract build, create schemas , extract possible paths , extract errorcodes
 	initialize = async (
 		buildYaml: string,
-		generatorConfig: Partial<CodeGeneratorConfig> = {}
+		generatorConfig: Partial<CodeGeneratorConfig> = {},
 	) => {
 		const finalConfig = { ...defaultConfig, ...generatorConfig };
 		this.generatorConfig = finalConfig;
@@ -56,10 +57,10 @@ export class ConfigCompiler {
 		this.jsonSchemas = await this.SchemaExtractionService.extractSchemas(
 			this.buildData,
 			finalConfig.removeRequiredFromSchema,
-			finalConfig.removeEnumsFromSchema
+			finalConfig.removeEnumsFromSchema,
 		);
 		this.possibleJsonPaths = this.SchemaExtractionService.extractPossiblePaths(
-			this.jsonSchemas
+			this.jsonSchemas,
 		);
 
 		const errors = this.buildData["x-errorcodes"];
@@ -79,7 +80,7 @@ export class ConfigCompiler {
 			"",
 			valConfig,
 			this.possibleJsonPaths,
-			this.errorDefinitions
+			this.errorDefinitions,
 		).validate();
 		// } catch (e) {
 		// 	logger.error(e);
@@ -103,68 +104,80 @@ export class ConfigCompiler {
 		codeName: string = "L1-Validations",
 		minimal: boolean = false,
 		outputPath: string = "./",
-		absolutePath: boolean = false
+		absolutePath: boolean = false,
 	) => {
-		valConfig = JSON.parse(JSON.stringify(valConfig));
-		if (this.generatorConfig?.duplicateVariablesInChildren) {
-			valConfig = duplicateVariablesInChildren(valConfig);
-		}
+		try {
+			console.log("[ CODE GENERATION ] Starting code generation...");
+			valConfig = JSON.parse(JSON.stringify(valConfig));
+			if (this.generatorConfig?.duplicateVariablesInChildren) {
+				valConfig = duplicateVariablesInChildren(valConfig);
+			}
 
-		if (minimal) {
-			await this.withMinimalValidations(valConfig);
-		} else {
-			await this.performValidations(valConfig);
-		}
-		// Generate code based on the language
-		const targetPath = absolutePath
-			? outputPath
-			: `${outputPath}generated/${codeName}`;
-		switch (this.language) {
-			case SupportedLanguages.Typescript:
-				await new TypescriptGenerator(
-					valConfig,
-					this.errorDefinitions ?? [],
-					targetPath
-				).generateCode({
-					codeName: codeName,
-				});
-				break;
-			case SupportedLanguages.Python:
-				await new PythonGenerator(
-					valConfig,
-					this.errorDefinitions ?? [],
-					targetPath
-				).generateCode({
-					codeName: codeName,
-				});
-				break;
-			case SupportedLanguages.Javascript:
-				await new JavascriptGenerator(
-					valConfig,
-					this.errorDefinitions ?? [],
-					targetPath
-				).generateCode({
-					codeName: codeName,
-				});
-				break;
-			case SupportedLanguages.Golang:
-				await new GoGenerator(
-					valConfig,
-					this.errorDefinitions ?? [],
-					targetPath
-				).generateCode({
-					codeName: codeName,
-				});
-				break;
-			default:
-				throw new Error("Language not supported");
+			if (minimal) {
+				await this.withMinimalValidations(valConfig);
+			} else {
+				await this.performValidations(valConfig);
+			}
+			// Generate code based on the language
+			const targetPath = absolutePath
+				? outputPath
+				: `${outputPath}generated/${codeName}`;
+			switch (this.language) {
+				case SupportedLanguages.Typescript:
+					await new TypescriptGenerator(
+						valConfig,
+						this.errorDefinitions ?? [],
+						targetPath,
+					).generateCode({
+						codeName: codeName,
+					});
+					break;
+				case SupportedLanguages.Python:
+					await new PythonGenerator(
+						valConfig,
+						this.errorDefinitions ?? [],
+						targetPath,
+					).generateCode({
+						codeName: codeName,
+					});
+					break;
+				case SupportedLanguages.Javascript:
+					await new JavascriptGenerator(
+						valConfig,
+						this.errorDefinitions ?? [],
+						targetPath,
+					).generateCode({
+						codeName: codeName,
+					});
+					break;
+				case SupportedLanguages.Golang:
+					await new GoGenerator(
+						valConfig,
+						this.errorDefinitions ?? [],
+						targetPath,
+					).generateCode({
+						codeName: codeName,
+					});
+					break;
+				default:
+					throw new Error("Language not supported");
+			}
+			console.log(
+				"[ CODE GENERATION ] Code generation completed successfully.",
+			);
+		} catch (e: any) {
+			console.error(`\n [ CODE GENERATION ERROR ] ${e?.message || e}\n`);
+			if (e?.stack) {
+				console.error("Stack trace:");
+				console.error(e.stack);
+			}
 		}
 	};
 
 	generateL0Schema = async (
 		outputPath: string = "./",
 		type: "json" | "typescript" = "typescript",
-		absolutePath: boolean = false
+		absolutePath: boolean = false,
 	) => {
 		if (!this.jsonSchemas) {
 			throw new Error("Schemas not initialized");
@@ -180,14 +193,14 @@ export class ConfigCompiler {
 					targetPath,
 					`${schema}.ts`,
 					`export const ${schema} = ${JSON.stringify(json, null, 2)}`,
-					"typescript"
+					"typescript",
 				);
 			} else if (type === "json") {
 				writeAndFormatCode(
 					targetPath,
 					`${schema}.json`,
 					JSON.stringify(json, null, 2),
-					"json"
+					"json",
 				);
 			}
 		}
@@ -200,9 +213,9 @@ export class ConfigCompiler {
 			const template = readFileSync(
 				path.resolve(
 					__dirname,
-					"../generator/generators/typescript/templates/schema-template.mustache"
+					"../generator/generators/typescript/templates/schema-template.mustache",
 				),
-				"utf-8"
+				"utf-8",
 			);
 			const l0 = Mustache.render(template, { actions });
 			await writeAndFormatCode(targetPath, `index.ts`, l0, "typescript");
@@ -222,7 +235,7 @@ export class ConfigCompiler {
 	generateValidationFromBuild = async (
 		codeName: string,
 		outputPath: string,
-		absolutePath: boolean = false
+		absolutePath: boolean = false,
 	) => {
 		if (!this.buildData) throw new Error("Build data not initialized");
 		const valConfig = this.buildData["x-validations"];
@@ -232,14 +245,14 @@ export class ConfigCompiler {
 			codeName,
 			false,
 			outputPath,
-			absolutePath
+			absolutePath,
 		);
 	};
 
 	extractPayloadsFromBuild = async (outputPath: string) => {
 		if (!this.buildData) throw new Error("Build data not initialized");
 		const payloads = this.SchemaExtractionService.extractPayloadExamples(
-			this.buildData
+			this.buildData,
 		);
 	};
 }

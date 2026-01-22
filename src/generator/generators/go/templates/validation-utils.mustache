@@ -50,18 +50,102 @@ func ArePresent(operand []interface{}) bool {
 	return NoneIn(operand, []interface{}{"null", "undefined"}) && len(strs) > 0
 }
 
+// Lookup interface for abstraction
+type lookup interface {
+	contains(string) bool
+	isEmpty() bool
+}
+
+// Map-based lookup (O(1))
+type mapLookup struct {
+	items map[string]bool
+}
+
+func (m *mapLookup) contains(item string) bool {
+	return m.items[item]
+}
+
+func (m *mapLookup) isEmpty() bool {
+	return len(m.items) == 0
+}
+
+// Slice-based lookup (O(n))
+type sliceLookup struct {
+	items []string
+}
+
+func (s *sliceLookup) contains(item string) bool {
+	for _, v := range s.items {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *sliceLookup) isEmpty() bool {
+	return len(s.items) == 0
+}
+
+// Smart lookup creation - auto-detects and optimizes
+func createLookup(right []interface{}) (lookup, bool) {
+	// Case 1: Check if right contains a single map
+	if len(right) == 1 {
+		switch m := right[0].(type) {
+		case map[string]interface{}:
+			result := make(map[string]bool, len(m))
+			for k := range m {
+				result[k] = true
+			}
+			return &mapLookup{items: result}, true
+		case map[string]bool:
+			return &mapLookup{items: m}, true
+		case map[string]string:
+			result := make(map[string]bool, len(m))
+			for k := range m {
+				result[k] = true
+			}
+			return &mapLookup{items: result}, true
+		}
+	}
+
+	// Case 2: Convert slice to string slice
+	rightStrs, ok := toStringSlice(right)
+	if !ok {
+		return nil, false
+	}
+
+	// Optimization: Convert large slices to maps for better performance
+	const threshold = 10
+	if len(rightStrs) > threshold {
+		m := make(map[string]bool, len(rightStrs))
+		for _, v := range rightStrs {
+			m[v] = true
+		}
+		return &mapLookup{items: m}, true
+	}
+
+	return &sliceLookup{items: rightStrs}, true
+}
+
+// Updated comparison functions
 func AllIn(left []interface{}, right []interface{}) bool {
 	leftStrs, ok1 := toStringSlice(left)
-	rightStrs, ok2 := toStringSlice(right)
-	if !ok1 || !ok2 {
+	if !ok1 {
 		return false
 	}
-	
-	if len(leftStrs) == 0 && len(rightStrs) != 0 {
+
+	rightLookup, ok2 := createLookup(right)
+	if !ok2 {
 		return false
 	}
+
+	if len(leftStrs) == 0 && !rightLookup.isEmpty() {
+		return false
+	}
+
 	for _, v := range leftStrs {
-		if !contains(rightStrs, v) {
+		if !rightLookup.contains(v) {
 			return false
 		}
 	}
@@ -70,16 +154,21 @@ func AllIn(left []interface{}, right []interface{}) bool {
 
 func AnyIn(left []interface{}, right []interface{}) bool {
 	leftStrs, ok1 := toStringSlice(left)
-	rightStrs, ok2 := toStringSlice(right)
-	if !ok1 || !ok2 {
+	if !ok1 {
 		return false
 	}
-	
-	if len(leftStrs) == 0 && len(rightStrs) != 0 {
+
+	rightLookup, ok2 := createLookup(right)
+	if !ok2 {
 		return false
 	}
+
+	if len(leftStrs) == 0 && !rightLookup.isEmpty() {
+		return false
+	}
+
 	for _, v := range leftStrs {
-		if contains(rightStrs, v) {
+		if rightLookup.contains(v) {
 			return true
 		}
 	}
@@ -88,19 +177,22 @@ func AnyIn(left []interface{}, right []interface{}) bool {
 
 func NoneIn(left []interface{}, right []interface{}) bool {
 	leftStrs, ok1 := toStringSlice(left)
-	rightStrs, ok2 := toStringSlice(right)
-	if !ok1 || !ok2 {
+	if !ok1 {
 		return false
 	}
-	
+
+	rightLookup, ok2 := createLookup(right)
+	if !ok2 {
+		return false
+	}
+
 	for _, v := range leftStrs {
-		if contains(rightStrs, v) {
+		if rightLookup.contains(v) {
 			return false
 		}
 	}
 	return true
 }
-
 func EqualTo(left []interface{}, right []interface{}) bool {
 	leftStrs, ok1 := toStringSlice(left)
 	rightStrs, ok2 := toStringSlice(right)
@@ -297,15 +389,6 @@ func isISO8601(str string) bool {
 
 	_, err = time.Parse(time.RFC3339, str)
 	return err == nil
-}
-
-func contains(slice []string, item string) bool {
-	for _, v := range slice {
-		if v == item {
-			return true
-		}
-	}
-	return false
 }
 
 // StringSliceToInterface converts []string to []interface{}

@@ -85,18 +85,22 @@ export class GoGenerator extends CodeGenerator {
 			const loadData = relevantSessionData[action] || {};
 			const saveData = sessionData[action] || {};
 			const saveCode = Mustache.render(saveActionTemplate, {
-				storeActions: Object.keys(saveData).map((key) => {
-					return {
-						key: key,
-						value: saveData[key],
-					};
-				}),
-				loadActions: Object.keys(loadData).map((key) => {
-					console.log(loadData[key]);
-					return {
-						key: loadData[key],
-					};
-				}),
+				storeActions: Object.keys(saveData)
+					.filter((f) => f !== "_SELF")
+					.map((key) => {
+						return {
+							key: key,
+							value: saveData[key],
+						};
+					}),
+				loadActions: Object.keys(loadData)
+					.filter((f) => f !== "_SELF")
+					.map((key) => {
+						console.log(loadData[key]);
+						return {
+							key: loadData[key],
+						};
+					}),
 				action: action,
 			});
 			await writeAndFormatCode(
@@ -278,7 +282,7 @@ export class GoGenerator extends CodeGenerator {
                 normalizedPayload := validationutils.NormalizeKeys(payload)
 
                 // Set _SELF
-	            externalData.Self = normalizedPayload
+	            externalData["_SELF"] = normalizedPayload
 
                 // Load stateful data if needed
                 if completeConfig.StateFullValidations {
@@ -376,13 +380,14 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 
 	private getExternalKeys() {
 		const apis = Object.keys(this.validationConfig[ConfigSyntax.SessionData]);
-		let result: { name: string }[] = [];
+		let result: { name: string; keyName: string }[] = [];
 		for (const api of apis) {
 			const keys = Object.keys(
 				this.validationConfig[ConfigSyntax.SessionData][api],
 			);
 			for (const key of keys) {
-				result.push({ name: key });
+				const goVarName = key;
+				result.push({ name: key, keyName: goVarName });
 			}
 		}
 		result = result.filter((v) => v.name !== "_SELF");
@@ -444,7 +449,9 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 			}
 			let final = "";
 			if (value.includes("_EXTERNAL")) {
-				final = `validationutils.GetJsonPath(input, "${value}",true)`;
+				// $._EXTERNAL.some.path -> $.some.path
+				const converted = (value as string).replace("$._EXTERNAL", "$");
+				final = `validationutils.GetJsonPath(input.ExternalData, "${converted}",true)`;
 			} else {
 				final =
 					typeof value === "string"

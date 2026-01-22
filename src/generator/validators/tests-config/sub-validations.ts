@@ -239,6 +239,17 @@ export class VariableValidator extends TestObjectValidator {
 				`${externalData} is not defined in ${ConfigSyntax.SessionData} data at path ${this.validationPath}`,
 			);
 		}
+
+		if (!path.includes("_SELF")) {
+			if (
+				this.targetObject[TestObjectSyntax.Description] === undefined ||
+				this.targetObject[TestObjectSyntax.Description] === ""
+			) {
+				throw new Error(
+					`Variable with path: ${path} is using external data but ${TestObjectSyntax.Description} is not provided at path ${this.validationPath}`,
+				);
+			}
+		}
 	}
 }
 

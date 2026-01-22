@@ -20,7 +20,7 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 	constructor(
 		testObject: TestObject,
 		path: string,
-		dependencies: TestsValidatorDependencies
+		dependencies: TestsValidatorDependencies,
 	) {
 		super(testObject, path);
 		this.dependencies = dependencies;
@@ -28,7 +28,7 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 	validate = async () => {
 		await new RequiredFieldsValidator(
 			this.targetObject,
-			this.validationPath
+			this.validationPath,
 		).validate();
 		await new NameValidator(this.targetObject, this.validationPath).validate();
 
@@ -37,7 +37,7 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 				this.targetObject,
 				this.validationPath,
 				this.dependencies.stringJsonPaths,
-				this.dependencies.minimal
+				this.dependencies.minimal,
 			).validate();
 		}
 
@@ -46,7 +46,7 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 				this.targetObject,
 				this.validationPath,
 				this.dependencies.errorDefinitions,
-				this.dependencies.minimal
+				this.dependencies.minimal,
 			).validate();
 		}
 
@@ -55,18 +55,18 @@ export class CompleteTestObjectValidator extends TestObjectValidator {
 			this.validationPath,
 			this.dependencies.stringJsonPaths,
 			this.dependencies.externalVariables,
-			this.dependencies.minimal
+			this.dependencies.minimal,
 		).validate();
 		if (this.targetObject[TestObjectSyntax.Continue]) {
 			await new ContinueValidator(
 				this.targetObject,
-				this.validationPath
+				this.validationPath,
 			).validate();
 		}
 		await new ReturnValidator(
 			this.targetObject,
 			this.validationPath,
-			this.dependencies
+			this.dependencies,
 		).validate();
 	};
 }

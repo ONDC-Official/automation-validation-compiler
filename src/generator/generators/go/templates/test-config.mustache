@@ -43,13 +43,22 @@ type DebugInfo struct {
 	FedConfig interface{} `json:"fedConfig"`
 }
 
-// ExternalData holds external data references for validation
-type ExternalData struct {
-	Self interface{} `json:"_SELF,omitempty"`
-    {{#externalData}}
-    {{name}} []string `json:"{{name}},omitempty"`
-    {{/externalData}}
-}
+// ExternalData holds external data references for validation as a map structure.
+//
+// Expected keys:
+//   - "_SELF": (interface{}) The current validation context object
+{{#externalData}}
+//   - "{{name}}": (any) {{keyName}} data reference
+{{/externalData}}
+//
+// Example usage:
+//   data := ExternalData{
+//       "_SELF": currentObject,
+{{#externalData}}
+//       "{{name}}": {{keyName}}Value,
+{{/externalData}}
+//   }
+type ExternalData = map[string]interface{}
 
 // ValidationInput represents the input data for validation functions
 type ValidationInput struct {

@@ -287,3 +287,34 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 	"_RETURN_": "attr are present"
 }
 ```
+
+```json
+{
+	"_TESTS_": {
+		"search": [
+			{
+				"_NAME_": "sample_testing",
+				"ids": "$._EXTERNAL.full_ids",
+				"var1": "$.context.domain",
+				"_RETURN_": "var1 all in ids"
+			}
+		]
+	},
+	"_SESSION_DATA_": {
+		"search": {
+			"full_ids": null
+		}
+	}
+}
+```
+
+```go
+
+results, runErr := PerformL1_validations(action, payload, cfg, validationutils.ExternalData{
+					"full_ids" : map[string]bool{
+						"test": true,
+						"test2": false,
+					},
+				})
+
+```

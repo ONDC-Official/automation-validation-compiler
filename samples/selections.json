@@ -3,7 +3,7 @@
 		"search": [
 			{
 				"_NAME_": "first_search_request",
-				"mockType": "$._EXTERNAL.mock_type",
+				"mockType": "$._EXTERNAL.full_ids[*]",
 				"forType": ["BAP"],
 				"_RETURN_": "(mockType equal to forType)",
 				"_SUCCESS_CODE_": 100
@@ -182,6 +182,7 @@
 	},
 	"_SESSION_DATA_": {
 		"search": {
+			"full_ids": null,
 			"transaction_id": null,
 			"message_id": null,
 			"last_action": null,

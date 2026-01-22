@@ -35,8 +35,6 @@ export class TypescriptGenerator extends CodeGenerator {
 
 		const relevantSessionData: Record<string, Record<string, string>> = {};
 		collectLoadData(tests, relevantSessionData);
-		console.log("Relevant Session Data for Loading:", relevantSessionData);
-		const actions = Object.keys(sessionData);
 		const sessionDataUtilsTemplate = readFileSync(
 			path.resolve(
 				__dirname,

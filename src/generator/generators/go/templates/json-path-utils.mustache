@@ -73,7 +73,7 @@ func resolveJSONPathData(path string, data interface{}) (string, interface{}, er
     if input, ok := data.(ValidationInput); ok {
         if strings.HasPrefix(path, "$._EXTERNAL._SELF") {
             resolvedPath := strings.Replace(path, "$._EXTERNAL._SELF", "$", 1)
-            return resolvedPath, input.ExternalData.Self, nil
+            return resolvedPath, input.ExternalData["_SELF"], nil
         }else if( strings.HasPrefix(path, "$._EXTERNAL")){
 			resolvedPath := strings.Replace(path, "$._EXTERNAL", "$", 1)
 			return resolvedPath, input.ExternalData, nil

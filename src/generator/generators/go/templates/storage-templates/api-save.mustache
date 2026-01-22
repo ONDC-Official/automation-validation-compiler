@@ -35,7 +35,7 @@ func LoadFor_{{action}}(
 	if err != nil {
 		return result, fmt.Errorf("failed to load key {{{key}}}: %w", err)
 	}
-	result.{{{key}}} = {{{key}}}_value
+	result["{{{key}}}"] = {{{key}}}_value
 	{{/loadActions}}
 	
 	fmt.Printf("Loaded external data for action {{action}}: %+v\n", result)

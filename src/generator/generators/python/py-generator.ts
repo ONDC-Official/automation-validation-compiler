@@ -39,7 +39,6 @@ export class PythonGenerator extends CodeGenerator {
 
 		const relevantSessionData: Record<string, Record<string, string>> = {};
 		collectLoadData(tests, relevantSessionData);
-		console.log("Relevant Session Data for Loading:", relevantSessionData);
 
 		const sessionDataUtilsTemplate = readFileSync(
 			path.resolve(
