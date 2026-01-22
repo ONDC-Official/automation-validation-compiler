@@ -13,7 +13,6 @@ var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.V
     configureDebugInfo := ""
     for _, testObjMap := range scope {
         validationutils.UnusedFunction(testObjMap)
-        // testObjMap["_EXTERNAL"] = validationutils.DeepCloneJSON(input.ExternalData)
         
         {{#variables}}
         {{name}} := {{{value}}}
@@ -28,8 +27,6 @@ var {{name}} = func (input validationutils.ValidationInput) ([]validationutils.V
         {{/hasContinue}}
 
         {{{validationCode}}}
-
-        // delete(testObjMap, "_EXTERNAL")
     }
     
     result := validationutils.ValidationOutput{

@@ -1,4 +1,8 @@
-import { ConfigSyntax, TestObjectSyntax } from "../../constants/syntax.js";
+import {
+	ConfigSyntax,
+	ExternalDataSyntax,
+	TestObjectSyntax,
+} from "../../constants/syntax.js";
 import {
 	ConfigVariable,
 	TestObject,
@@ -11,7 +15,7 @@ import {
 } from "../general-utils/test-object-utils.js";
 
 export function duplicateVariablesInChildren(
-	valConfig: ValidationConfig
+	valConfig: ValidationConfig,
 ): ValidationConfig {
 	const tests = valConfig[ConfigSyntax.Tests];
 	for (const key in tests) {
@@ -22,9 +26,9 @@ export function duplicateVariablesInChildren(
 		}
 	}
 	// console.log(JSON.stringify(valConfig, null, 2));
-	if(valConfig[ConfigSyntax.SessionData]["search"]){
+	if (valConfig[ConfigSyntax.SessionData]["search"]) {
 		valConfig[ConfigSyntax.SessionData]["search"]._SELF = null;
-	}else{
+	} else {
 		valConfig[ConfigSyntax.SessionData]["search"] = {
 			_SELF: null,
 		};
@@ -34,7 +38,7 @@ export function duplicateVariablesInChildren(
 
 function duplicateVariables(
 	test: TestObject,
-	parentVariables: Record<string, ConfigVariable>
+	parentVariables: Record<string, ConfigVariable>,
 ) {
 	const variables = getVariablesFromTest(test);
 	let extractedVariables: Record<string, ConfigVariable> = {};
@@ -63,11 +67,11 @@ function duplicateVariables(
 	}
 }
 
-function convertToDuplicatePaths(current : Record<string,ConfigVariable> ){
-	for(const key in current){
-		if(typeof current[key] === "string"){
+function convertToDuplicatePaths(current: Record<string, ConfigVariable>) {
+	for (const key in current) {
+		if (typeof current[key] === "string") {
 			const value = current[key].slice(2);
-			current[key] = `$._EXTERNAL._SELF.${value}`
+			current[key] = `$.${ExternalDataSyntax}._SELF.${value}`;
 		}
 	}
 	return current;

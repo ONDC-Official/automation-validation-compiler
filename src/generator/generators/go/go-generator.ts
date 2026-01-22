@@ -448,9 +448,12 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
 				continue;
 			}
 			let final = "";
-			if (value.includes("_EXTERNAL")) {
+			if (value.includes(ExternalDataSyntax)) {
 				// $._EXTERNAL.some.path -> $.some.path
-				const converted = (value as string).replace("$._EXTERNAL", "$");
+				const converted = (value as string).replace(
+					`$.${ExternalDataSyntax}`,
+					"$",
+				);
 				final = `validationutils.GetJsonPath(input.ExternalData, "${converted}",true)`;
 			} else {
 				final =
