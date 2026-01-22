@@ -316,7 +316,7 @@ export class ReturnValidator extends TestObjectValidator {
 				`${TestObjectSyntax.Return} should be a string or arrays`,
 			);
 		} catch (err: any) {
-			throw new Error(err.message + " at path " + this.validationPath);
+			throw err;
 		}
 	};
 }

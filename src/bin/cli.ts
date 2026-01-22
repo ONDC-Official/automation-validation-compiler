@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { program } from "commander";
 import { ConfigCompiler, SupportedLanguages } from "../index.js";
 import Cli from "./cli-tool.js";
+import { writeFileSync } from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,12 +27,12 @@ program
 	.option("-c, --config <path>", "Path to build.yaml file")
 	.option(
 		"-f, --function-name <name>",
-		"Name of the validation function to generate"
+		"Name of the validation function to generate",
 	)
 	.option("-o, --output <directory>", "Output directory for generated code")
 	.option(
 		"-l, --lang <language>",
-		"Target programming language (typescript, python, javascript, go)"
+		"Target programming language (typescript, python, javascript, go)",
 	)
 	.description("Generate validation code")
 	.action(async (options) => {
@@ -40,31 +41,38 @@ program
 		if (!config || !output || !lang) {
 			console.log(
 				Cli.description.error(
-					"Please provide all required options: --config, --output, --lang"
-				)
+					"Please provide all required options: --config, --output, --lang",
+				),
 			);
 			process.exit(1);
 		}
 		try {
 			console.log(
-				Cli.description.info(`Generating validation code for language: ${lang}`)
+				Cli.description.info(
+					`Generating validation code for language: ${lang}`,
+				),
 			);
 			const functionName = options.functionName || "L1validations";
 			const language = getSupportedLanguage(lang);
 			const compiler = new ConfigCompiler(language);
 			const buildPath = path.resolve(process.cwd(), config);
 			console.log(
-				Cli.description.info(`Reading build file from ${buildPath}...`)
+				Cli.description.info(`Reading build file from ${buildPath}...`),
 			);
 			const buildYaml = await fs.readFile(buildPath, "utf-8");
 			console.log(Cli.description.info("Initializing compiler..."));
 			await compiler.initialize(buildYaml);
+			const validPaths = await compiler.generateValidPaths();
+			writeFileSync(
+				path.resolve(output, "validPaths.json"),
+				JSON.stringify(validPaths, null, 2),
+			);
 			console.log(Cli.description.info("Generating validation code..."));
 			await compiler.generateValidationFromBuild(functionName, output, true);
 			console.log(
 				Cli.description.success(
-					`Validation code generated successfully in ${output} for language ${lang}`
-				)
+					`Validation code generated successfully in ${output} for language ${lang}`,
+				),
 			);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
@@ -87,15 +95,15 @@ program
 			if (!config || !output || !format) {
 				console.log(
 					Cli.description.error(
-						"Please provide all required options: --config, --output, --format"
-					)
+						"Please provide all required options: --config, --output, --format",
+					),
 				);
 				process.exit(1);
 			}
 			console.log(Cli.description.info(`Generating L0 schema...`));
 			const buildPath = path.resolve(process.cwd(), config);
 			console.log(
-				Cli.description.info(`Reading build file from ${buildPath}...`)
+				Cli.description.info(`Reading build file from ${buildPath}...`),
 			);
 			const buildYaml = await fs.readFile(buildPath, "utf-8");
 			const compiler = new ConfigCompiler(SupportedLanguages.Typescript);
@@ -122,15 +130,15 @@ program
 			if (!config || !output) {
 				console.log(
 					Cli.description.error(
-						"Please provide all required options: --config, --output"
-					)
+						"Please provide all required options: --config, --output",
+					),
 				);
 				process.exit(1);
 			}
 			console.log(Cli.description.info(`Extracting sample payloads...`));
 			const buildPath = path.resolve(process.cwd(), config);
 			console.log(
-				Cli.description.info(`Reading build file from ${buildPath}...`)
+				Cli.description.info(`Reading build file from ${buildPath}...`),
 			);
 			const buildYaml = await fs.readFile(buildPath, "utf-8");
 			const compiler = new ConfigCompiler(SupportedLanguages.Typescript);
@@ -157,7 +165,7 @@ function getSupportedLanguage(lang: string): SupportedLanguages {
 			return SupportedLanguages.Golang;
 		default:
 			throw new Error(
-				`Unsupported language: ${lang}. Supported languages are: ${getValidLanguageOptions()}`
+				`Unsupported language: ${lang}. Supported languages are: ${getValidLanguageOptions()}`,
 			);
 	}
 }
@@ -172,7 +180,7 @@ function getSchemaFormat(format: string): "json" | "typescript" {
 			throw new Error("YAML format is not yet supported");
 		default:
 			throw new Error(
-				`Unsupported format: ${format}. Supported formats are: json, typescript`
+				`Unsupported format: ${format}. Supported formats are: json, typescript`,
 			);
 	}
 }

@@ -24,7 +24,7 @@ export class ConfigValidator implements IValidator {
 		errorDefinitions: ErrorDefinition[],
 		settings?: {
 			minimal: boolean;
-		}
+		},
 	) {
 		this.validationPath = validationPath;
 		this.config = config;
@@ -49,7 +49,7 @@ export class ConfigValidator implements IValidator {
 
 		const sessionDataValidator = new SessionDataValidator(
 			`${this.validationPath}/${ConfigSyntax.SessionData}`,
-			sessionData
+			sessionData,
 		);
 
 		await sessionDataValidator.validate();
@@ -69,12 +69,18 @@ export class ConfigValidator implements IValidator {
 		for (const api in tests) {
 			const testList = tests[api];
 			const path = `${this.validationPath}/${ConfigSyntax.Tests}/${api}`;
+
+			if (!this.stringJsonPaths[api]) {
+				throw new Error(`No JSON paths found for API: ${api}`);
+			}
+
 			const dependencies: TestsValidatorDependencies = {
 				stringJsonPaths: this.stringJsonPaths[api],
 				errorDefinitions: this.errorDefinitions,
 				externalVariables: externalVariables,
 				minimal: this.validatorSettings.minimal,
 			};
+
 			await new TestsValidator(testList, path, dependencies).validate();
 		}
 	};

@@ -7,7 +7,7 @@ export class ExtractionService {
 	extractSchemas = async (
 		data: BUILD_TYPE,
 		removeRequired: boolean,
-		removeEnums: boolean
+		removeEnums: boolean,
 	) => {
 		const paths = data.paths;
 		const apis = Object.keys(paths).map((key) => {
@@ -21,7 +21,7 @@ export class ExtractionService {
 			const filtteredSchema = removeRequiredAndEnum(
 				existingSchema,
 				removeEnums,
-				removeRequired
+				removeRequired,
 			);
 			output[targetApi] = filtteredSchema;
 		}
@@ -35,9 +35,12 @@ export class ExtractionService {
 				p
 					.replace(
 						/\.([\w-]+\/[\w-]+)(?![\w\]])/g,
-						(_, match) => `['${match}']`
+						(_, match) => `['${match}']`,
 					)
-					.replace(/\.(@[\w-\/]+)/g, (_, match) => `['@${match.substring(1)}']`)
+					.replace(
+						/\.(@[\w-\/]+)/g,
+						(_, match) => `['@${match.substring(1)}']`,
+					),
 			);
 		}
 		return paths;
