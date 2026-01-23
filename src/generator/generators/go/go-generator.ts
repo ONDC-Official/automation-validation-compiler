@@ -21,6 +21,7 @@ import {
 	removeAllSpecialCharacters,
 } from "../../../utils/general-utils/string-utils.js";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
+import { MarkdownDocGenerator } from "../documentation/md-generator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -234,6 +235,11 @@ export class GoGenerator extends CodeGenerator {
 		);
 		await this.generateSessionDataCode();
 		await this.generateUnitTestingCode();
+		await new MarkdownDocGenerator(
+			this.validationConfig,
+			this.errorCodes,
+			this.rootPath,
+		).generateCode();
 	};
 
 	private generateIndexFile(

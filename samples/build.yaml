@@ -53,7 +53,7 @@ paths:
                     $ref: "#/components/schemas/Error"
                 required:
                   - context
-  /item:
+  /items:
     post:
       tags:
         - ONDC Buyer App
@@ -64,12 +64,7 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              type: object
-              properties:
-                items:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Item"
+              $ref: "#/components/schemas/Item"
               required:
                 - items
 components:
@@ -7033,263 +7028,293 @@ x-validations:
                 _CONTINUE_: "!(attr are present)"
                 _RETURN_: attr all in var_enum
     items:
-      # - _NAME_: ITEMS
-      #   _RETURN_:
-      - _NAME_: ITEMS_ID
-        attr: "$.id"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_NON_CUSTOMIZATION_TIME_LABEL
-        item_type: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-        customization: ["customization"]
-        _CONTINUE_: "item_type all in customization"
-        time_label: "$.time.label"
-        var_enum: ["enable", "disable"]
-        _RETURN_: time_label all in var_enum
-      - _NAME_: ITEMS_NON_CUSTOMIZATION_TIME_TIMESTAMP
-        item_type: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-        customization: ["customization"]
-        _CONTINUE_: "item_type all in customization"
-        time_timestamp: "$.time.timestamp"
-        _RETURN_: time_timestamp are present
-      - _NAME_: ITEMS_DESCRIPTOR_NAME
-        attr: "$.descriptor.name"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_DESCRIPTOR_SYMBOL
-        attr: "$.descriptor.symbol"
-        reg:
-          - "^(http|https)://.*$"
-        value: "$.tags[?(@.code=='type')].list[*].value"
-        customization: ["customization"]
-        _CONTINUE_: value all in customization
-        _RETURN_: attr are present && attr follow regex reg
-      - _NAME_: ITEMS_DESCRIPTOR_SHORT_DESC
-        attr: "$.descriptor.short_desc"
-        value: "$.tags[?(@.code=='type')].list[*].value"
-        customization: ["customization"]
-        _CONTINUE_: value all in customization
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_DESCRIPTOR_LONG_DESC
-        attr: "$.descriptor.long_desc"
-        value: "$.tags[?(@.code=='type')].list[*].value"
-        customization: ["customization"]
-        _CONTINUE_: value all in customization
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_DESCRIPTOR_IMAGES
-        attr: "$.descriptor.images[*]"
-        reg:
-          - "^(http|https)://.*$"
-        _RETURN_: attr are present && attr follow regex reg
-      - _NAME_: ITEMS_QUANTITY_UNITIZED_MEASURE_UNIT
-        attr: "$.quantity.unitized.measure.unit"
-        var_enum:
-          ["unit", "dozen", "gram", "kilogram", "tonne", "litre", "millilitre"]
-        _RETURN_: attr all in var_enum
-      - _NAME_: ITEMS_QUANTITY_UNITIZED_MEASURE_VALUE
-        attr: "$.quantity.unitized.measure.value"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_QUANTITY_AVAILABLE_COUNT
-        attr: "$.quantity.available.count"
-        var_enum: ["99", "0"]
-        _RETURN_: attr all in var_enum
-      - _NAME_: ITEMS_QUANTITY_MAXIMUM_COUNT
-        attr: "$.quantity.maximum.count"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_PRICE_CURRENCY
-        attr: "$.price.currency"
-        var_enum: ["INR"]
-        _RETURN_: attr all in var_enum
-      - _NAME_: ITEMS_PRICE_VALUE
-        attr: "$.price.value"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_PRICE_MAXIMUM_VALUE
-        attr: "$.price.maximum_value"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_PRICE_TAGS
+      - _NAME_: ITEMS
+        #   _SCOPE_: "$.items"
         _RETURN_:
-          - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE
-            _RETURN_:
-              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE_LOWER
-                _CONTINUE_: "!(attr are present)"
-                attr: "$.price.tags[?(@.code=='range')].list[?(@.code=='lower')].value"
-                _RETURN_: attr are present
-              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE_UPPER
-                _CONTINUE_: "!(attr are present)"
-                attr: "$.price.tags[?(@.code=='range')].list[?(@.code=='upper')].value"
-                _RETURN_: attr are present
-          - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION
-            _RETURN_:
-              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION_VALUE
-                _CONTINUE_: "!(attr are present)"
-                attr: "$.price.tags[?(@.code=='default_selection')].list[?(@.code=='value')].value"
-                _RETURN_: attr are present
-              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION_MAXIMUM_VALUE
-                _CONTINUE_: "!(attr are present)"
-                attr: "$.price.tags[?(@.code=='default_selection')].list[?(@.code=='maximum_value')].value"
-                _RETURN_: attr are present
-      - _NAME_: ITEMS_CATEGORY_ID
-        attr: "$.category_id"
-        var_enum: ["F&B"]
-        _RETURN_: attr all in var_enum
-      - _NAME_: ITEMS_CATEGORY_IDS
-        attr: "$.category_ids[*]"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_FULFILLMENT_ID_PRESENT
-        value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-        customization: ["customization"]
-        _CONTINUE_: value all in customization
-        fulfillment_id: "$.fulfillment_id"
-        _RETURN_: fulfillment_id are present
-      - _NAME_: ITEM_FULFILLMENT_CHECK
-        typeCode: "$.tags[?(@.code=='type')].list[*].code"
-        typeValue: "$.tags[?(@.code=='type')].list[*].value"
-        validCode: ["type"]
-        valueValue: ["customization"]
-        fulfillment: "$.fulfillment_id"
-        all_fulfillment: "$._EXTERNAL.fulfillment_ids"
-        _CONTINUE_: validCode all in typeCode && valueValue all in typeValue
-        _RETURN_: fulfillment all in all_fulfillment
-      - _NAME_: ITEMS_LOCATION_ID
-        attr: "$.location_id"
-        value: "$.tags[?(@.code=='type')].list[*].value"
-        customization: ["customization"]
-        _CONTINUE_: value all in customization
-        _RETURN_: attr are present
-      - _NAME_: ITEM_LOCATION_CHECK
-        typeCode: "$.tags[?(@.code=='type')].list[*].code"
-        typeValue: "$.tags[?(@.code=='type')].list[*].value"
-        validCode: ["type"]
-        valueValue: ["customization"]
-        location: "$.location_id"
-        all_location: "$._EXTERNAL.location_ids"
-        _CONTINUE_: validCode all in typeCode && valueValue all in typeValue
-        _RETURN_: location all in all_location
-      - _NAME_: ITEMS_RELATED
-        attr: "$.related"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_RECOMMENDED
-        attr: "$.recommended"
-        _RETURN_: attr are present
-      # - _NAME_: ITEMS_RETURNABLE
-      #   attr: "$['@ondc/org/returnable']"
-      #   value: "$.tags[?(@.code=='type')].list[*].value"
-      #   customization: ["customization"]
-      #   _CONTINUE_: value all in customization
-      #   _RETURN_: attr are present
-      # - _NAME_: ITEMS_CANCELLABLE
-      #   attr: "$['@ondc/org/cancellable']"
-      #   value: "$.tags[?(@.code=='type')].list[*].value"
-      #   customization: ["customization"]
-      #   _CONTINUE_: value all in customization
-      #   _RETURN_: attr are present
-      # - _NAME_: ITEMS_SELLER_PICKUP_RETURN
-      #   attr: "$['@ondc/org/seller_pickup_return']"
-      #   _RETURN_: attr are present
-      # - _NAME_: ITEMS_TIME_TO_SHIP
-      #   attr: "$['@ondc/org/time_to_ship']"
-      #   _RETURN_: attr are present
-      # - _NAME_: ITEMS_AVAILABLE_ON_COD
-      #   attr: "$['@ondc/org/available_on_cod']"
-      #   _RETURN_: attr are present
-      # - _NAME_: ITEMS_CONTACT_DETAILS_CONSUMER_CARE
-      #   attr: "$['@ondc/org/contact_details_consumer_care']"
-      #   _RETURN_: attr are present
-      - _NAME_: ITEMS_TAGS
-        _RETURN_:
-          - _NAME_: ITEMS_TAGS_TYPE
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-            var_enum: ["item", "dynamic_item", "customization"]
+          - _NAME_: ITEMS_ID
+            attr: "$.id"
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_NON_CUSTOMIZATION_TIME_LABEL
+            item_type: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+            customization: ["customization"]
+            _CONTINUE_: "item_type all in customization"
+            time_label: "$.time.label"
+            var_enum: ["enable", "disable"]
+            _RETURN_: time_label all in var_enum
+          - _NAME_: ITEMS_NON_CUSTOMIZATION_TIME_TIMESTAMP
+            item_type: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+            customization: ["customization"]
+            _CONTINUE_: "item_type all in customization"
+            time_timestamp: "$.time.timestamp"
+            _RETURN_: time_timestamp are present
+          - _NAME_: ITEMS_DESCRIPTOR_NAME
+            attr: "$.descriptor.name"
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_DESCRIPTOR_SYMBOL
+            attr: "$.descriptor.symbol"
+            reg:
+              - "^(http|https)://.*$"
+            value: "$.tags[?(@.code=='type')].list[*].value"
+            customization: ["customization"]
+            _CONTINUE_: value all in customization
+            _RETURN_: attr are present && attr follow regex reg
+          - _NAME_: ITEMS_DESCRIPTOR_SHORT_DESC
+            attr: "$.descriptor.short_desc"
+            value: "$.tags[?(@.code=='type')].list[*].value"
+            customization: ["customization"]
+            _CONTINUE_: value all in customization
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_DESCRIPTOR_LONG_DESC
+            attr: "$.descriptor.long_desc"
+            value: "$.tags[?(@.code=='type')].list[*].value"
+            customization: ["customization"]
+            _CONTINUE_: value all in customization
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_DESCRIPTOR_IMAGES
+            attr: "$.descriptor.images[*]"
+            reg:
+              - "^(http|https)://.*$"
+            _RETURN_: attr are present && attr follow regex reg
+          - _NAME_: ITEMS_QUANTITY_UNITIZED_MEASURE_UNIT
+            attr: "$.quantity.unitized.measure.unit"
+            var_enum:
+              [
+                "unit",
+                "dozen",
+                "gram",
+                "kilogram",
+                "tonne",
+                "litre",
+                "millilitre",
+              ]
             _RETURN_: attr all in var_enum
-      - _NAME_: TAGS_CUSTOM_GROUP
-        _CONTINUE_: "!(attr are present)"
-        attr: "$.tags[?(@.code=='custom_group')].list[?(@.code=='id')].value"
-        _RETURN_: attr are present
-      - _NAME_: TAGS_CONFIG
-        _RETURN_:
-          - _NAME_: TAGS_CONFIG_ID
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='config')].list[?(@.code=='id')].value"
+          - _NAME_: ITEMS_QUANTITY_UNITIZED_MEASURE_VALUE
+            attr: "$.quantity.unitized.measure.value"
             _RETURN_: attr are present
-          - _NAME_: TAGS_CONFIG_MIN
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='config')].list[?(@.code=='min')].value"
+          - _NAME_: ITEMS_QUANTITY_AVAILABLE_COUNT
+            attr: "$.quantity.available.count"
+            var_enum: ["99", "0"]
+            _RETURN_: attr all in var_enum
+          - _NAME_: ITEMS_QUANTITY_MAXIMUM_COUNT
+            attr: "$.quantity.maximum.count"
             _RETURN_: attr are present
-          - _NAME_: TAGS_CONFIG_MAX
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='config')].list[?(@.code=='max')].value"
+          - _NAME_: ITEMS_PRICE_CURRENCY
+            attr: "$.price.currency"
+            var_enum: ["INR"]
+            _RETURN_: attr all in var_enum
+          - _NAME_: ITEMS_PRICE_VALUE
+            attr: "$.price.value"
             _RETURN_: attr are present
-          - _NAME_: TAGS_CONFIG_SEQ
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='config')].list[?(@.code=='seq')].value"
+          - _NAME_: ITEMS_PRICE_MAXIMUM_VALUE
+            attr: "$.price.maximum_value"
             _RETURN_: attr are present
-      - _NAME_: TAGS_TIMING
-        _RETURN_:
-          - _NAME_: TAGS_TIMING_DAY_FROM
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='timing')].list[?(@.code=='day_from')].value"
-            _RETURN_: attr are present
-          - _NAME_: TAGS_TIMING_DAY_TO
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='timing')].list[?(@.code=='day_to')].value"
-            _RETURN_: attr are present
-          - _NAME_: TAGS_TIMING_TIME_FROM
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='timing')].list[?(@.code=='time_from')].value"
-            _RETURN_: attr are present
-          - _NAME_: TAGS_TIMING_TIME_TO
-            _CONTINUE_: "!(attr are present)"
-            attr: "$.tags[?(@.code=='timing')].list[?(@.code=='time_to')].value"
-            _RETURN_: attr are present
-          - _NAME_: TAGS_VEG_NONVEG_PER_ITEM
-            attr: "$.tags[?(@.code=='veg_nonveg')].code"
-            _RETURN_: attr are present
-          - _NAME_: TAGS_VEG_NONVEG_VALIDATION
+          - _NAME_: ITEMS_PRICE_TAGS
             _RETURN_:
-              - _NAME_: TAGS_VEG_NONVEG_CODES
-                attr: "$.tags[?(@.code=='veg_nonveg')].list[*].code"
-                var_enum: ["veg", "non_veg", "egg"]
+              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE
+                _RETURN_:
+                  - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE_LOWER
+                    _CONTINUE_: "!(attr are present)"
+                    attr: "$.price.tags[?(@.code=='range')].list[?(@.code=='lower')].value"
+                    _RETURN_: attr are present
+                  - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_RANGE_UPPER
+                    _CONTINUE_: "!(attr are present)"
+                    attr: "$.price.tags[?(@.code=='range')].list[?(@.code=='upper')].value"
+                    _RETURN_: attr are present
+              - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION
+                _RETURN_:
+                  - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION_VALUE
+                    _CONTINUE_: "!(attr are present)"
+                    attr: "$.price.tags[?(@.code=='default_selection')].list[?(@.code=='value')].value"
+                    _RETURN_: attr are present
+                  - _NAME_: TAGS_PROVIDERS_ITEMS_PRICE_DEFAULT_SELECTION_MAXIMUM_VALUE
+                    _CONTINUE_: "!(attr are present)"
+                    attr: "$.price.tags[?(@.code=='default_selection')].list[?(@.code=='maximum_value')].value"
+                    _RETURN_: attr are present
+          - _NAME_: ITEMS_CATEGORY_ID
+            attr: "$.category_id"
+            var_enum: ["F&B"]
+            _RETURN_: attr all in var_enum
+          - _NAME_: ITEMS_CATEGORY_IDS
+            attr: "$.category_ids[*]"
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_FULFILLMENT_ID_PRESENT
+            value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+            customization: ["customization"]
+            _CONTINUE_: value all in customization
+            fulfillment_id: "$.fulfillment_id"
+            _RETURN_: fulfillment_id are present
+          - _NAME_: ITEM_FULFILLMENT_CHECK
+            _DESCRIPTION_: >
+              Validates that when an item is marked with tag code 'type'
+              having value 'customization', the referenced 'fulfillment_id'
+              must be present in the externally provided list of valid
+              fulfillment IDs. The check is applied only if both the expected
+              tag code and value are present.
+            typeCode: "$.tags[?(@.code=='type')].list[*].code"
+            typeValue: "$.tags[?(@.code=='type')].list[*].value"
+            validCode: ["type"]
+            valueValue: ["customization"]
+            fulfillment: "$.fulfillment_id"
+            all_fulfillment: "$._EXTERNAL.fulfillment_ids"
+            _CONTINUE_: validCode all in typeCode && valueValue all in typeValue
+            _RETURN_: fulfillment all in all_fulfillment
+          - _NAME_: ITEMS_LOCATION_ID
+            attr: "$.location_id"
+            value: "$.tags[?(@.code=='type')].list[*].value"
+            customization: ["customization"]
+            _CONTINUE_: value all in customization
+            _RETURN_: attr are present
+          - _NAME_: ITEM_LOCATION_CHECK
+            typeCode: "$.tags[?(@.code=='type')].list[*].code"
+            typeValue: "$.tags[?(@.code=='type')].list[*].value"
+            _DESCRIPTION_: >
+              Validates that when an item is marked with tag code 'type'
+              having value 'customization', the referenced 'location_id'
+              must be present in the externally provided list of valid
+              location IDs. The check is applied only if both the expected
+              tag code and value are present.
+            validCode: ["type"]
+            valueValue: ["customization"]
+            location: "$.location_id"
+            all_location: "$._EXTERNAL.location_ids"
+            _CONTINUE_: validCode all in typeCode && valueValue all in typeValue
+            _RETURN_: location all in all_location
+          - _NAME_: ITEMS_RELATED
+            attr: "$.related"
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_RECOMMENDED
+            attr: "$.recommended"
+            _RETURN_: attr are present
+          # - _NAME_: ITEMS_RETURNABLE
+          #   attr: "$['@ondc/org/returnable']"
+          #   value: "$.tags[?(@.code=='type')].list[*].value"
+          #   customization: ["customization"]
+          #   _CONTINUE_: value all in customization
+          #   _RETURN_: attr are present
+          # - _NAME_: ITEMS_CANCELLABLE
+          #   attr: "$['@ondc/org/cancellable']"
+          #   value: "$.tags[?(@.code=='type')].list[*].value"
+          #   customization: ["customization"]
+          #   _CONTINUE_: value all in customization
+          #   _RETURN_: attr are present
+          # - _NAME_: ITEMS_SELLER_PICKUP_RETURN
+          #   attr: "$['@ondc/org/seller_pickup_return']"
+          #   _RETURN_: attr are present
+          # - _NAME_: ITEMS_TIME_TO_SHIP
+          #   attr: "$['@ondc/org/time_to_ship']"
+          #   _RETURN_: attr are present
+          # - _NAME_: ITEMS_AVAILABLE_ON_COD
+          #   attr: "$['@ondc/org/available_on_cod']"
+          #   _RETURN_: attr are present
+          # - _NAME_: ITEMS_CONTACT_DETAILS_CONSUMER_CARE
+          #   attr: "$['@ondc/org/contact_details_consumer_care']"
+          #   _RETURN_: attr are present
+          - _NAME_: ITEMS_TAGS
+            _RETURN_:
+              - _NAME_: ITEMS_TAGS_TYPE
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+                var_enum: ["item", "dynamic_item", "customization"]
                 _RETURN_: attr all in var_enum
-              - _NAME_: TAGS_VEG_NONVEG_VALUES
-                attr: "$.tags[?(@.code=='veg_nonveg')].list[*].value"
-                var_enum: ["yes", "no"]
-                _RETURN_: attr all in var_enum
-      - _NAME_: ITEMS_CUSTOMIZATION_PARENT_CHECK
-        value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-        customization: ["customization"]
-        _CONTINUE_: "!(value all in customization)"
-        attr: "$.tags[?(@.code=='parent')].list[?(@.code=='id')].value"
-        _RETURN_: attr are present
-      - _NAME_: ITEMS_CUSTOMIZATION_PARENT_DEFAULT_CHECK
-        value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
-        customization: ["customization"]
-        _CONTINUE_: "!(value all in customization)"
-        default_value: "$.tags[?(@.code=='parent')].list[?(@.code=='default')].value"
-        var_enum: ["yes", "no"]
-        _RETURN_: default_value all in var_enum
-      - _NAME_: ITEMS_CUSTOM_GROUP_ID_IN_CATEGORIES
-        attr: "$.tags[?(@.code=='custom_group')].list[?(@.code=='id')].value"
-        _CONTINUE_: "!(attr are present)"
-        value: "$_EXTERNAL.category_ids"
-        _RETURN_: attr all in value
-      - _NAME_: ITEMS_PARENT_ID_IN_CATEGORIES
-        attr: "$.tags[?(@.code=='parent')].list[?(@.code=='id')].value"
-        _CONTINUE_: "!(attr are present)"
-        value: "$_EXTERNAL.category_ids"
-        _RETURN_: attr all in value
-      - _NAME_: ITEMS_CHILD_ID_IN_CATEGORIES
-        attr: "$.tags[?(@.code=='child')].list[?(@.code=='id')].value"
-        _CONTINUE_: "!(attr are present)"
-        value: "$_EXTERNAL.category_ids"
-        _RETURN_: attr all in value
+          - _NAME_: TAGS_CUSTOM_GROUP
+            _CONTINUE_: "!(attr are present)"
+            attr: "$.tags[?(@.code=='custom_group')].list[?(@.code=='id')].value"
+            _RETURN_: attr are present
+          - _NAME_: TAGS_CONFIG
+            _RETURN_:
+              - _NAME_: TAGS_CONFIG_ID
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='config')].list[?(@.code=='id')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_CONFIG_MIN
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='config')].list[?(@.code=='min')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_CONFIG_MAX
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='config')].list[?(@.code=='max')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_CONFIG_SEQ
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='config')].list[?(@.code=='seq')].value"
+                _RETURN_: attr are present
+          - _NAME_: TAGS_TIMING
+            _RETURN_:
+              - _NAME_: TAGS_TIMING_DAY_FROM
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='timing')].list[?(@.code=='day_from')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_TIMING_DAY_TO
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='timing')].list[?(@.code=='day_to')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_TIMING_TIME_FROM
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='timing')].list[?(@.code=='time_from')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_TIMING_TIME_TO
+                _CONTINUE_: "!(attr are present)"
+                attr: "$.tags[?(@.code=='timing')].list[?(@.code=='time_to')].value"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_VEG_NONVEG_PER_ITEM
+                attr: "$.tags[?(@.code=='veg_nonveg')].code"
+                _RETURN_: attr are present
+              - _NAME_: TAGS_VEG_NONVEG_VALIDATION
+                _RETURN_:
+                  - _NAME_: TAGS_VEG_NONVEG_CODES
+                    attr: "$.tags[?(@.code=='veg_nonveg')].list[*].code"
+                    var_enum: ["veg", "non_veg", "egg"]
+                    _RETURN_: attr all in var_enum
+                  - _NAME_: TAGS_VEG_NONVEG_VALUES
+                    attr: "$.tags[?(@.code=='veg_nonveg')].list[*].value"
+                    var_enum: ["yes", "no"]
+                    _RETURN_: attr all in var_enum
+          - _NAME_: ITEMS_CUSTOMIZATION_PARENT_CHECK
+            value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+            customization: ["customization"]
+            _CONTINUE_: "!(value all in customization)"
+            attr: "$.tags[?(@.code=='parent')].list[?(@.code=='id')].value"
+            _RETURN_: attr are present
+          - _NAME_: ITEMS_CUSTOMIZATION_PARENT_DEFAULT_CHECK
+            value: "$.tags[?(@.code=='type')].list[?(@.code=='type')].value"
+            customization: ["customization"]
+            _CONTINUE_: "!(value all in customization)"
+            default_value: "$.tags[?(@.code=='parent')].list[?(@.code=='default')].value"
+            var_enum: ["yes", "no"]
+            _RETURN_: default_value all in var_enum
+          - _NAME_: ITEMS_CUSTOM_GROUP_ID_IN_CATEGORIES
+            attr: "$.tags[?(@.code=='custom_group')].list[?(@.code=='id')].value"
+            _CONTINUE_: "!(attr are present)"
+            _DESCRIPTION_: >
+              Ensures that if a 'custom_group' tag with code 'id' is present
+              on an item, its value must belong to the externally provided
+              list of valid category IDs. If no such 'custom_group' id is
+              present, the check is skipped.
+            value: "$._EXTERNAL.category_ids"
+            _RETURN_: attr all in value
+          - _NAME_: ITEMS_PARENT_ID_IN_CATEGORIES
+            _DESCRIPTION_: >
+              Ensures that if a 'parent' tag with code 'id' is present on an
+              item, its value must belong to the externally provided list of
+              valid category IDs. If no such 'parent' id is present, the
+              check is skipped.
+            attr: "$.tags[?(@.code=='parent')].list[?(@.code=='id')].value"
+            _CONTINUE_: "!(attr are present)"
+            value: "$._EXTERNAL.category_ids"
+            _RETURN_: attr all in value
+          - _NAME_: ITEMS_CHILD_ID_IN_CATEGORIES
+            _DESCRIPTION_: >
+              Ensures that if a 'child' tag with code 'id' is present on an
+              item, its value must belong to the externally provided list of
+              valid category IDs. If no such 'child' id is present, the
+              check is skipped.
+            attr: "$.tags[?(@.code=='child')].list[?(@.code=='id')].value"
+            _CONTINUE_: "!(attr are present)"
+            value: "$._EXTERNAL.category_ids"
+            _RETURN_: attr all in value
 
-  _SESSION_DATA_:
-    items:
-      category_ids: null
-      fulfillment_ids: null
-      location_ids: null
-
-  # "_SESSION_DATA_":
-  #   {
-  #     "items":
-  #       { "category_ids": null, "fulfillment_ids": null, "location_ids": null },
-  #   }
+  "_SESSION_DATA_":
+    {
+      "items":
+        { "category_ids": null, "fulfillment_ids": null, "location_ids": null },
+    }
