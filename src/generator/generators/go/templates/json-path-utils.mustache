@@ -5,9 +5,84 @@ package validationutils
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/AsaiYusuke/jsonpath"
 )
+
+// Global cache for parsed JSONPath functions
+var (
+	pathParserCache = make(map[string]func(interface{}) ([]interface{}, error))
+	parserCacheMu   sync.RWMutex
+	cacheHits       uint64
+	cacheMisses     uint64
+	statsMu         sync.Mutex
+)
+
+// getOrParseJSONPath retrieves a cached parser or parses and caches a new one
+func getOrParseJSONPath(path string) (func(interface{}) ([]interface{}, error), error) {
+	// Try to get from cache first (read lock for fast concurrent reads)
+	parserCacheMu.RLock()
+	parser, exists := pathParserCache[path]
+	parserCacheMu.RUnlock()
+
+	if exists {
+		// Cache hit - use existing parser
+		statsMu.Lock()
+		cacheHits++
+		statsMu.Unlock()
+		return parser, nil
+	}
+
+	// Cache miss - need to parse
+	statsMu.Lock()
+	cacheMisses++
+	statsMu.Unlock()
+
+	// Acquire write lock to add to cache
+	parserCacheMu.Lock()
+	defer parserCacheMu.Unlock()
+
+	// Double-check after acquiring write lock (another goroutine might have added it)
+	if parser, exists := pathParserCache[path]; exists {
+		return parser, nil
+	}
+
+	// Parse the JSONPath expression
+	parser, err := jsonpath.Parse(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JSONPath %s: %w", path, err)
+	}
+
+	// Cache it for future use
+	pathParserCache[path] = parser
+	return parser, nil
+}
+
+// GetParserCacheStats returns cache statistics
+func GetParserCacheStats() (hits, misses uint64, size int) {
+	statsMu.Lock()
+	h, m := cacheHits, cacheMisses
+	statsMu.Unlock()
+
+	parserCacheMu.RLock()
+	s := len(pathParserCache)
+	parserCacheMu.RUnlock()
+
+	return h, m, s
+}
+
+// ClearParserCache clears the cache (useful for testing)
+func ClearParserCache() {
+	parserCacheMu.Lock()
+	pathParserCache = make(map[string]func(interface{}) ([]interface{}, error))
+	parserCacheMu.Unlock()
+
+	statsMu.Lock()
+	cacheHits = 0
+	cacheMisses = 0
+	statsMu.Unlock()
+}
 
 // isListOfStringsOrNull checks if the variable is a slice containing only strings or nil values
 func isListOfStringsOrNull(variable interface{}) bool {
@@ -29,10 +104,30 @@ func isListOfStringsOrNull(variable interface{}) bool {
 
 // GetJsonPath queries a payload using JSONPath and returns the results
 func GetJsonPath(payload interface{}, path string, flattenResult bool) []interface{} {
-    resolvedPath, resolvedData, err := resolveJSONPathData(path, payload)
-	output, err := jsonpath.Retrieve(resolvedPath, resolvedData)
+	resolvedPath, resolvedData, err := resolveJSONPathData(path, payload)
 	if err != nil {
-		fmt.Printf("Error retrieving JSONPath %s: %v\n", path, err)
+		// fmt.Printf("Error resolving JSONPath %s: %v\n", path, err)
+		return []interface{}{}
+	}
+
+	// Get or parse the JSONPath - uses cache if available
+	parser, err := getOrParseJSONPath(resolvedPath)
+	if err != nil {
+		// fmt.Printf("Error parsing JSONPath %s: %v\n", resolvedPath, err)
+		return []interface{}{}
+	}
+
+	// Execute the parsed JSONPath function
+	result, err := parser(resolvedData)
+	if err != nil {
+		// fmt.Printf("Error retrieving JSONPath %s: %v\n", resolvedPath, err)
+		return []interface{}{}
+	}
+
+	// Result is already []interface{}
+	output := result
+
+	if len(output) == 0 {
 		return []interface{}{}
 	}
 
@@ -48,9 +143,6 @@ func GetJsonPath(payload interface{}, path string, flattenResult bool) []interfa
 		output = flattenSlice(output)
 	}
 
-	if len(output) == 0 {
-		return []interface{}{}
-	}
 	return output
 }
 
@@ -67,17 +159,15 @@ func flattenSlice(slice []interface{}) []interface{} {
 	return result
 }
 
-
-
 func resolveJSONPathData(path string, data interface{}) (string, interface{}, error) {
-    if input, ok := data.(ValidationInput); ok {
-        if strings.HasPrefix(path, "$._EXTERNAL._SELF") {
-            resolvedPath := strings.Replace(path, "$._EXTERNAL._SELF", "$", 1)
-            return resolvedPath, input.ExternalData["_SELF"], nil
-        }else if( strings.HasPrefix(path, "$._EXTERNAL")){
+	if input, ok := data.(ValidationInput); ok {
+		if strings.HasPrefix(path, "$._EXTERNAL._SELF") {
+			resolvedPath := strings.Replace(path, "$._EXTERNAL._SELF", "$", 1)
+			return resolvedPath, input.ExternalData["_SELF"], nil
+		} else if strings.HasPrefix(path, "$._EXTERNAL") {
 			resolvedPath := strings.Replace(path, "$._EXTERNAL", "$", 1)
 			return resolvedPath, input.ExternalData, nil
 		}
-    }
-    return path, data, nil
+	}
+	return path, data, nil
 }
