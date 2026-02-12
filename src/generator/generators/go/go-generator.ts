@@ -1,15 +1,15 @@
 import { readFileSync } from "fs";
 import {
-	CodeGenerator,
-	CodeGeneratorProps,
+    CodeGenerator,
+    CodeGeneratorProps,
 } from "../classes/abstract-generator.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import Mustache from "mustache";
 import {
-	ConfigSyntax,
-	ExternalDataSyntax,
-	TestObjectSyntax,
+    ConfigSyntax,
+    ExternalDataSyntax,
+    TestObjectSyntax,
 } from "../../../constants/syntax.js";
 import { writeAndFormatCode } from "../../../utils/fs-utils.js";
 import { collectLoadData } from "../../../utils/config-utils/load-variables.js";
@@ -17,8 +17,8 @@ import { ConfigVariable, TestObject } from "../../../types/config-types.js";
 import { compileInputToGo } from "./go-ast.js";
 import { getVariablesFromTest } from "../../../utils/general-utils/test-object-utils.js";
 import {
-	ConvertArrayToStringGoStyle,
-	removeAllSpecialCharacters,
+    ConvertArrayToStringGoStyle,
+    removeAllSpecialCharacters,
 } from "../../../utils/general-utils/string-utils.js";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
 import { MarkdownDocGenerator } from "../documentation/md-generator.js";
@@ -29,237 +29,252 @@ const __dirname = path.dirname(__filename);
 const packageName = "validationpkg";
 
 export class GoGenerator extends CodeGenerator {
-	codeConfig: CodeGeneratorProps | undefined;
-	async generateSessionDataCode() {
-		if (!this.codeConfig) {
-			throw new Error("Code config is not set");
-		}
-		const sessionData = this.validationConfig[ConfigSyntax.SessionData];
-		const tests = this.validationConfig[ConfigSyntax.Tests];
+    codeConfig: CodeGeneratorProps | undefined;
+    async generateSessionDataCode() {
+        if (!this.codeConfig) {
+            throw new Error("Code config is not set");
+        }
+        const sessionData = this.validationConfig[ConfigSyntax.SessionData];
+        const tests = this.validationConfig[ConfigSyntax.Tests];
 
-		const relevantSessionData: Record<string, Record<string, string>> = {};
-		collectLoadData(tests, relevantSessionData);
+        const relevantSessionData: Record<string, Record<string, string>> = {};
+        collectLoadData(tests, relevantSessionData);
 
-		const sessionDataUtilsTemplate = readFileSync(
-			path.resolve(
-				__dirname,
-				"./templates/storage-templates/save-utils.mustache",
-			),
-			"utf-8",
-		);
-		const storageInterfaceTemplate = readFileSync(
-			path.resolve(
-				__dirname,
-				"./templates/storage-templates/storage-interface.mustache",
-			),
-			"utf-8",
-		);
+        const sessionDataUtilsTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/storage-templates/save-utils.mustache",
+            ),
+            "utf-8",
+        );
+        const storageInterfaceTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/storage-templates/storage-interface.mustache",
+            ),
+            "utf-8",
+        );
 
-		const indexTemplate = readFileSync(
-			path.resolve(__dirname, "./templates/storage-templates/index.mustache"),
-			"utf-8",
-		);
-		const saveActionTemplate = readFileSync(
-			path.resolve(
-				__dirname,
-				"./templates/storage-templates/api-save.mustache",
-			),
-			"utf-8",
-		);
-		const saveActionUtilsTemplate = readFileSync(
-			path.resolve(
-				__dirname,
-				"./templates/storage-templates/api-save-utils.mustache",
-			),
-			"utf-8",
-		);
+        const indexTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/storage-templates/index.mustache",
+            ),
+            "utf-8",
+        );
+        const saveActionTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/storage-templates/api-save.mustache",
+            ),
+            "utf-8",
+        );
+        const saveActionUtilsTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/storage-templates/api-save-utils.mustache",
+            ),
+            "utf-8",
+        );
 
-		const allActions = Object.keys(tests);
-		const indexCode = Mustache.render(indexTemplate, {
-			actions: Array.from(allActions).map((action) => {
-				return { action: action };
-			}),
-			functionName: this.codeConfig.codeName.replace(/[^a-zA-Z0-9_]/g, ""),
-		});
+        const allActions = Object.keys(tests);
+        const indexCode = Mustache.render(indexTemplate, {
+            actions: Array.from(allActions).map((action) => {
+                return { action: action };
+            }),
+            functionName: this.codeConfig.codeName.replace(
+                /[^a-zA-Z0-9_]/g,
+                "",
+            ),
+        });
 
-		for (const action of allActions) {
-			const loadData = relevantSessionData[action] || {};
-			const saveData = sessionData[action] || {};
-			const saveCode = Mustache.render(saveActionTemplate, {
-				storeActions: Object.keys(saveData)
-					.filter((f) => f !== "_SELF")
-					.map((key) => {
-						return {
-							key: key,
-							value: saveData[key],
-						};
-					}),
-				loadActions: Object.keys(loadData)
-					.filter((f) => f !== "_SELF")
-					.map((key) => {
-						console.log(loadData[key]);
-						return {
-							key: loadData[key],
-						};
-					}),
-				action: action,
-			});
-			await writeAndFormatCode(
-				this.rootPath,
-				`./${packageName}/storageutils/${action}.go`,
-				saveCode,
-				"go",
-			);
-		}
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/storageutils/save_utils.go`,
-			sessionDataUtilsTemplate,
-			"go",
-		);
+        for (const action of allActions) {
+            const loadData = relevantSessionData[action] || {};
+            console.log("Load data for action", action, loadData);
+            const saveData = sessionData[action] || {};
+            const saveCode = Mustache.render(saveActionTemplate, {
+                storeActions: [
+                    ...new Set(
+                        Object.keys(saveData)
+                            .filter((f) => f !== "_SELF")
+                            .map((key) => saveData[key]),
+                    ),
+                ].map((value) => ({
+                    key: Object.keys(saveData).find(
+                        (k) => saveData[k] === value,
+                    ), // original key
+                    value: value,
+                })),
 
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/validationutils/storage-interface.go`,
-			storageInterfaceTemplate,
-			"go",
-		);
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/storageutils/index.go`,
-			indexCode,
-			"go",
-		);
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/storageutils/api_save_utils.go`,
-			saveActionUtilsTemplate,
-			"go",
-		);
-	}
-	async generateValidationCode() {
-		const testConfig = this.validationConfig[ConfigSyntax.Tests];
-		for (const key in testConfig) {
-			const testObjects = testConfig[key];
-			const betaConfig = {
-				[TestObjectSyntax.Name]: key + "Validations",
-				[TestObjectSyntax.Return]: testObjects,
-			};
+                loadActions: [
+                    ...new Set(
+                        Object.keys(loadData)
+                            .filter((f) => f !== "_SELF")
+                            .map((key) => loadData[key]),
+                    ),
+                ].map((value) => ({
+                    key: value,
+                })),
 
-			const testFunction = await this.generateTestFunction(betaConfig);
-			const apiTestTemplate = readFileSync(
-				path.resolve(__dirname, "./templates/api-tests.mustache"),
-				"utf-8",
-			);
-			const finalCode = Mustache.render(apiTestTemplate, {
-				functionCode: testFunction.code,
-				apiName: stringToCaps(key),
-			});
-			await writeAndFormatCode(
-				this.rootPath,
-				`./${packageName}/jsonvalidations/${key}.go`,
-				finalCode,
-				"go",
-			);
-		}
-	}
-	generateCode = async (codeConfig: CodeGeneratorProps) => {
-		this.codeConfig = codeConfig;
-		const jsonPathUtilsCode = readFileSync(
-			path.resolve(__dirname, "./templates/json-path-utils.mustache"),
-			"utf-8",
-		);
+                action: action,
+            });
 
-		const validationUtils = readFileSync(
-			path.resolve(__dirname, "./templates/validation-utils.mustache"),
-			"utf-8",
-		);
-		const typesTemplate = readFileSync(
-			path.resolve(__dirname, "./templates/test-config.mustache"),
-			"utf-8",
-		);
-		const normalizerTemplate = readFileSync(
-			path.resolve(__dirname, "./templates/json-normalizer.mustache"),
-			"utf-8",
-		);
+            await writeAndFormatCode(
+                this.rootPath,
+                `./${packageName}/storageutils/${action}.go`,
+                saveCode,
+                "go",
+            );
+        }
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/storageutils/save_utils.go`,
+            sessionDataUtilsTemplate,
+            "go",
+        );
 
-		const goMod = readFileSync(
-			path.resolve(__dirname, "./templates/go-mod.mustache"),
-			"utf-8",
-		);
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/validationutils/storage-interface.go`,
+            storageInterfaceTemplate,
+            "go",
+        );
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/storageutils/index.go`,
+            indexCode,
+            "go",
+        );
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/storageutils/api_save_utils.go`,
+            saveActionUtilsTemplate,
+            "go",
+        );
+    }
+    async generateValidationCode() {
+        const testConfig = this.validationConfig[ConfigSyntax.Tests];
+        for (const key in testConfig) {
+            const testObjects = testConfig[key];
+            const betaConfig = {
+                [TestObjectSyntax.Name]: key + "Validations",
+                [TestObjectSyntax.Return]: testObjects,
+            };
 
-		const typesCode = Mustache.render(typesTemplate, {
-			externalData: this.getExternalKeys(),
-		});
+            const testFunction = await this.generateTestFunction(betaConfig);
+            const apiTestTemplate = readFileSync(
+                path.resolve(__dirname, "./templates/api-tests.mustache"),
+                "utf-8",
+            );
+            const finalCode = Mustache.render(apiTestTemplate, {
+                functionCode: testFunction.code,
+                apiName: stringToCaps(key),
+            });
+            await writeAndFormatCode(
+                this.rootPath,
+                `./${packageName}/jsonvalidations/${key}.go`,
+                finalCode,
+                "go",
+            );
+        }
+    }
+    generateCode = async (codeConfig: CodeGeneratorProps) => {
+        this.codeConfig = codeConfig;
+        const jsonPathUtilsCode = readFileSync(
+            path.resolve(__dirname, "./templates/json-path-utils.mustache"),
+            "utf-8",
+        );
 
-		writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/validationutils/json_path_utils.go`,
-			jsonPathUtilsCode,
-			"go",
-		);
-		writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/validationutils/validation_utils.go`,
-			validationUtils,
-			"go",
-		);
-		writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/validationutils/test-config.go`,
-			typesCode,
-			"go",
-		);
-		writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/validationutils/json_normalizer.go`,
-			normalizerTemplate,
-			"go",
-		);
-		await this.generateValidationCode();
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/main-validator.go`,
-			this.generateIndexFile(
-				Object.keys(this.validationConfig[ConfigSyntax.Tests]),
-				codeConfig.codeName,
-			),
-			"go",
-		);
+        const validationUtils = readFileSync(
+            path.resolve(__dirname, "./templates/validation-utils.mustache"),
+            "utf-8",
+        );
+        const typesTemplate = readFileSync(
+            path.resolve(__dirname, "./templates/test-config.mustache"),
+            "utf-8",
+        );
+        const normalizerTemplate = readFileSync(
+            path.resolve(__dirname, "./templates/json-normalizer.mustache"),
+            "utf-8",
+        );
 
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/go.mod`,
-			goMod,
-			"text",
-		);
-		await this.generateSessionDataCode();
-		await this.generateUnitTestingCode();
-		await new MarkdownDocGenerator(
-			this.validationConfig,
-			this.errorCodes,
-			this.rootPath,
-		).generateCode();
-	};
+        const goMod = readFileSync(
+            path.resolve(__dirname, "./templates/go-mod.mustache"),
+            "utf-8",
+        );
 
-	private generateIndexFile(
-		apis: string[],
-		functionName: string = "L1Validations",
-	): string {
-		functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
-		let importList = [
-			`"validationpkg/validationutils"`,
-			`"validationpkg/jsonvalidations"`,
-			`"fmt"`,
-			`"encoding/json"`,
-			`"validationpkg/storageutils"`,
-		];
-		const masterTemplate = readFileSync(
-			path.resolve(__dirname, "./templates/index.mustache"),
-			"utf-8",
-		);
+        const typesCode = Mustache.render(typesTemplate, {
+            externalData: this.getExternalKeys(),
+        });
 
-		const masterFunction = `func Perform${functionName}(
+        writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/validationutils/json_path_utils.go`,
+            jsonPathUtilsCode,
+            "go",
+        );
+        writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/validationutils/validation_utils.go`,
+            validationUtils,
+            "go",
+        );
+        writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/validationutils/test-config.go`,
+            typesCode,
+            "go",
+        );
+        writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/validationutils/json_normalizer.go`,
+            normalizerTemplate,
+            "go",
+        );
+        await this.generateValidationCode();
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/main-validator.go`,
+            this.generateIndexFile(
+                Object.keys(this.validationConfig[ConfigSyntax.Tests]),
+                codeConfig.codeName,
+            ),
+            "go",
+        );
+
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/go.mod`,
+            goMod,
+            "text",
+        );
+        await this.generateSessionDataCode();
+        await this.generateUnitTestingCode();
+        await new MarkdownDocGenerator(
+            this.validationConfig,
+            this.errorCodes,
+            this.rootPath,
+        ).generateCode();
+    };
+
+    private generateIndexFile(
+        apis: string[],
+        functionName: string = "L1Validations",
+    ): string {
+        functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
+        let importList = [
+            `"validationpkg/validationutils"`,
+            `"validationpkg/jsonvalidations"`,
+            `"fmt"`,
+            `"encoding/json"`,
+            `"validationpkg/storageutils"`,
+        ];
+        const masterTemplate = readFileSync(
+            path.resolve(__dirname, "./templates/index.mustache"),
+            "utf-8",
+        );
+
+        const masterFunction = `func Perform${functionName}(
             action string,
 	        payload interface{},
 	        config *validationutils.ValidationConfig,
@@ -310,13 +325,13 @@ export class GoGenerator extends CodeGenerator {
                 // Route to action-specific validation
                 switch action {
                 ${apis
-									.map(
-										(api) => `
+                    .map(
+                        (api) => `
                 case "${api}":
                     return jsonvalidations.${stringToCaps(api)}_Tests(input)
                 `,
-									)
-									.join("\n")}
+                    )
+                    .join("\n")}
                 default:
                     return nil, fmt.Errorf("action not found: %s", action)
                 }
@@ -374,212 +389,218 @@ var Perform${functionName}Load = storageutils.Perform${functionName}Load
 var Perform${functionName}Save = storageutils.Perform${functionName}Save
             `;
 
-		const importCode = `import (
+        const importCode = `import (
 ${importList.map((imp) => `\t${imp}`).join("\n")}
             )`;
 
-		return Mustache.render(masterTemplate, {
-			importCode: importCode,
-			masterFunction: masterFunction,
-		});
-	}
+        return Mustache.render(masterTemplate, {
+            importCode: importCode,
+            masterFunction: masterFunction,
+        });
+    }
 
-	private getExternalKeys() {
-		const apis = Object.keys(this.validationConfig[ConfigSyntax.SessionData]);
-		let result: { name: string; keyName: string }[] = [];
-		for (const api of apis) {
-			const keys = Object.keys(
-				this.validationConfig[ConfigSyntax.SessionData][api],
-			);
-			for (const key of keys) {
-				const goVarName = key;
-				result.push({ name: key, keyName: goVarName });
-			}
-		}
-		result = result.filter((v) => v.name !== "_SELF");
-		return result;
-	}
+    private getExternalKeys() {
+        const apis = Object.keys(
+            this.validationConfig[ConfigSyntax.SessionData],
+        );
+        let result: { name: string; keyName: string }[] = [];
+        for (const api of apis) {
+            const keys = Object.keys(
+                this.validationConfig[ConfigSyntax.SessionData][api],
+            );
+            for (const key of keys) {
+                const goVarName = key;
+                result.push({ name: key, keyName: goVarName });
+            }
+        }
+        result = result.filter((v) => v.name !== "_SELF");
+        return result;
+    }
 
-	private generateTestFunction = async (testObject: TestObject) => {
-		const template = readFileSync(
-			path.resolve(__dirname, "./templates/test-object.mustache"),
-			"utf-8",
-		);
+    private generateTestFunction = async (testObject: TestObject) => {
+        const template = readFileSync(
+            path.resolve(__dirname, "./templates/test-object.mustache"),
+            "utf-8",
+        );
 
-		const view: mustachRequirements = {
-			name: stringToCaps(testObject[TestObjectSyntax.Name]),
-			scopePath: testObject[TestObjectSyntax.Scope] ?? "$",
-			variables: this.createVariablesCode(testObject),
-			hasContinue: testObject[TestObjectSyntax.Continue] ? true : false,
-			skipCheckStatement: testObject[TestObjectSyntax.Continue]
-				? compileInputToGo(testObject[TestObjectSyntax.Continue])
-				: undefined,
-			validationCode: await this.createValidationLogicCode(testObject),
-			successCode: testObject[TestObjectSyntax.SuccessCode] ?? 200,
-			errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
-			testName: stringToCaps(testObject[TestObjectSyntax.Name]),
-			TEST_OBJECT: `${JSON.stringify(testObject)}`,
-		};
-		return {
-			funcName: stringToCaps(testObject[TestObjectSyntax.Name]),
-			code: Mustache.render(template, view),
-		};
-	};
+        const view: mustachRequirements = {
+            name: stringToCaps(testObject[TestObjectSyntax.Name]),
+            scopePath: testObject[TestObjectSyntax.Scope] ?? "$",
+            variables: this.createVariablesCode(testObject),
+            hasContinue: testObject[TestObjectSyntax.Continue] ? true : false,
+            skipCheckStatement: testObject[TestObjectSyntax.Continue]
+                ? compileInputToGo(testObject[TestObjectSyntax.Continue])
+                : undefined,
+            validationCode: await this.createValidationLogicCode(testObject),
+            successCode: testObject[TestObjectSyntax.SuccessCode] ?? 200,
+            errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
+            testName: stringToCaps(testObject[TestObjectSyntax.Name]),
+            TEST_OBJECT: `${JSON.stringify(testObject)}`,
+        };
+        return {
+            funcName: stringToCaps(testObject[TestObjectSyntax.Name]),
+            code: Mustache.render(template, view),
+        };
+    };
 
-	private createVariablesCode(testObject: TestObject) {
-		const variables: { name: string; value: string }[] = [];
-		const varNames = getVariablesFromTest(testObject);
+    private createVariablesCode(testObject: TestObject) {
+        const variables: { name: string; value: string }[] = [];
+        const varNames = getVariablesFromTest(testObject);
 
-		const returnStatement = testObject[TestObjectSyntax.Return];
-		const continueStatement = testObject[TestObjectSyntax.Continue];
-		let elementsList: string[] = [];
+        const returnStatement = testObject[TestObjectSyntax.Return];
+        const continueStatement = testObject[TestObjectSyntax.Continue];
+        let elementsList: string[] = [];
 
-		// REPLACE ALL special WITH empty AND SPLIT
-		if (typeof returnStatement === "string") {
-			elementsList = removeAllSpecialCharacters(returnStatement).split(" ");
-		}
-		if (continueStatement) {
-			const contElements =
-				removeAllSpecialCharacters(continueStatement).split(" ");
-			for (const elem of contElements) {
-				if (!elementsList.includes(elem)) {
-					elementsList.push(elem);
-				}
-			}
-		}
+        // REPLACE ALL special WITH empty AND SPLIT
+        if (typeof returnStatement === "string") {
+            elementsList =
+                removeAllSpecialCharacters(returnStatement).split(" ");
+        }
+        if (continueStatement) {
+            const contElements =
+                removeAllSpecialCharacters(continueStatement).split(" ");
+            for (const elem of contElements) {
+                if (!elementsList.includes(elem)) {
+                    elementsList.push(elem);
+                }
+            }
+        }
 
-		for (const name of varNames) {
-			const value = testObject[name] as ConfigVariable;
-			if (!elementsList.includes(name)) {
-				continue;
-			}
-			let final = "";
-			if (value.includes(ExternalDataSyntax)) {
-				// $._EXTERNAL.some.path -> $.some.path
-				const converted = (value as string).replace(
-					`$.${ExternalDataSyntax}`,
-					"$",
-				);
-				final = `validationutils.GetJsonPath(input.ExternalData, "${converted}",true)`;
-			} else {
-				final =
-					typeof value === "string"
-						? `validationutils.GetJsonPath(testObjMap, "${value}",true)`
-						: ConvertArrayToStringGoStyle(value);
-			}
+        for (const name of varNames) {
+            const value = testObject[name] as ConfigVariable;
+            if (!elementsList.includes(name)) {
+                continue;
+            }
+            let final = "";
+            if (value.includes(ExternalDataSyntax)) {
+                // $._EXTERNAL.some.path -> $.some.path
+                const converted = (value as string).replace(
+                    `$.${ExternalDataSyntax}`,
+                    "$",
+                );
+                final = `validationutils.GetJsonPath(input.ExternalData, "${converted}",true)`;
+            } else {
+                final =
+                    typeof value === "string"
+                        ? `validationutils.GetJsonPath(testObjMap, "${value}",true)`
+                        : ConvertArrayToStringGoStyle(value);
+            }
 
-			variables.push({
-				name: name,
-				value: final,
-			});
-		}
-		return variables;
-	}
+            variables.push({
+                name: name,
+                value: final,
+            });
+        }
+        return variables;
+    }
 
-	private async createValidationLogicCode(testObject: TestObject) {
-		const template = readFileSync(
-			path.resolve(__dirname, "./templates/validation-code.mustache"),
-			"utf-8",
-		);
-		const skip = testObject[TestObjectSyntax.Continue];
-		const skipList = skip ? [skip] : undefined;
-		if (typeof testObject[TestObjectSyntax.Return] === "string") {
-			const returnStatement = compileInputToGo(
-				testObject[TestObjectSyntax.Return],
-			);
-			let isStateFull = false;
-			for (const k in testObject) {
-				const value = testObject[k];
-				if (typeof value === "string") {
-					if (
-						value.includes(`${ExternalDataSyntax}.`) &&
-						!value.includes("_SELF")
-					) {
-						isStateFull = true;
-						break;
-					}
-				}
-			}
-			return Mustache.render(template, {
-				isNested: false,
-				isStateFull: isStateFull,
-				returnStatement: returnStatement,
-				errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
-				errorDescription: this.CreateErrorMarkdown(testObject, skipList),
-				testName: testObject[TestObjectSyntax.Name],
-				TEST_OBJECT: `${JSON.stringify(testObject)}`,
-			});
-		} else {
-			const subObjects = testObject[TestObjectSyntax.Return];
-			const functionCodes: {
-				funcName: string;
-				code: string;
-			}[] = [];
-			for (const subObject of subObjects) {
-				const func = await this.generateTestFunction(subObject);
-				functionCodes.push(func);
-			}
-			const names = functionCodes.map((f) => {
-				return { name: f.funcName };
-			});
-			return Mustache.render(template, {
-				isNested: true,
-				nestedFunctions: functionCodes.map((f) => f.code).join("\n"),
-				names: names,
-				testName: testObject[TestObjectSyntax.Name],
-				TEST_OBJECT: `${JSON.stringify(testObject)}`,
-			});
-		}
-	}
+    private async createValidationLogicCode(testObject: TestObject) {
+        const template = readFileSync(
+            path.resolve(__dirname, "./templates/validation-code.mustache"),
+            "utf-8",
+        );
+        const skip = testObject[TestObjectSyntax.Continue];
+        const skipList = skip ? [skip] : undefined;
+        if (typeof testObject[TestObjectSyntax.Return] === "string") {
+            const returnStatement = compileInputToGo(
+                testObject[TestObjectSyntax.Return],
+            );
+            let isStateFull = false;
+            for (const k in testObject) {
+                const value = testObject[k];
+                if (typeof value === "string") {
+                    if (
+                        value.includes(`${ExternalDataSyntax}.`) &&
+                        !value.includes("_SELF")
+                    ) {
+                        isStateFull = true;
+                        break;
+                    }
+                }
+            }
+            return Mustache.render(template, {
+                isNested: false,
+                isStateFull: isStateFull,
+                returnStatement: returnStatement,
+                errorCode: testObject[TestObjectSyntax.ErrorCode] ?? 30000,
+                errorDescription: this.CreateErrorMarkdown(
+                    testObject,
+                    skipList,
+                ),
+                testName: testObject[TestObjectSyntax.Name],
+                TEST_OBJECT: `${JSON.stringify(testObject)}`,
+            });
+        } else {
+            const subObjects = testObject[TestObjectSyntax.Return];
+            const functionCodes: {
+                funcName: string;
+                code: string;
+            }[] = [];
+            for (const subObject of subObjects) {
+                const func = await this.generateTestFunction(subObject);
+                functionCodes.push(func);
+            }
+            const names = functionCodes.map((f) => {
+                return { name: f.funcName };
+            });
+            return Mustache.render(template, {
+                isNested: true,
+                nestedFunctions: functionCodes.map((f) => f.code).join("\n"),
+                names: names,
+                testName: testObject[TestObjectSyntax.Name],
+                TEST_OBJECT: `${JSON.stringify(testObject)}`,
+            });
+        }
+    }
 
-	private CreateErrorMarkdown(
-		testObject: TestObject,
-		skipList: string[] | undefined,
-	) {
-		return markdownMessageGenerator(
-			testObject[TestObjectSyntax.Return] as string,
-			testObject,
-			testObject[TestObjectSyntax.Name],
-			skipList,
-		);
-	}
+    private CreateErrorMarkdown(
+        testObject: TestObject,
+        skipList: string[] | undefined,
+    ) {
+        return markdownMessageGenerator(
+            testObject[TestObjectSyntax.Return] as string,
+            testObject,
+            testObject[TestObjectSyntax.Name],
+            skipList,
+        );
+    }
 
-	public async generateUnitTestingCode() {
-		const testTemplate = readFileSync(
-			path.resolve(
-				__dirname,
-				"./templates/test-templates/validator-test.mustache",
-			),
-			"utf-8",
-		);
-		const finalTestCode = Mustache.render(testTemplate, {
-			functionName: this.codeConfig?.codeName ?? "L1Validations",
-		});
-		await writeAndFormatCode(
-			this.rootPath,
-			`./${packageName}/main-validator_test.go`,
-			finalTestCode,
-			"go",
-		);
-	}
+    public async generateUnitTestingCode() {
+        const testTemplate = readFileSync(
+            path.resolve(
+                __dirname,
+                "./templates/test-templates/validator-test.mustache",
+            ),
+            "utf-8",
+        );
+        const finalTestCode = Mustache.render(testTemplate, {
+            functionName: this.codeConfig?.codeName ?? "L1Validations",
+        });
+        await writeAndFormatCode(
+            this.rootPath,
+            `./${packageName}/main-validator_test.go`,
+            finalTestCode,
+            "go",
+        );
+    }
 }
 
 function stringToCaps(str: string): string {
-	return str.charAt(0).toUpperCase() + str.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 interface mustachRequirements {
-	name: string;
-	scopePath: string;
-	variables: {
-		name: string;
-		value: string;
-	}[];
-	hasContinue: boolean;
-	skipCheckStatement?: string;
-	validationCode: string;
-	successCode: number;
-	errorCode: number;
-	testName: string;
-	TEST_OBJECT: string;
+    name: string;
+    scopePath: string;
+    variables: {
+        name: string;
+        value: string;
+    }[];
+    hasContinue: boolean;
+    skipCheckStatement?: string;
+    validationCode: string;
+    successCode: number;
+    errorCode: number;
+    testName: string;
+    TEST_OBJECT: string;
 }

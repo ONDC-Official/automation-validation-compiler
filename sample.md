@@ -312,8 +312,7 @@ This document outlines best practices for writing effective JVAL (JSON Validatio
 
 results, runErr := PerformL1_validations(action, payload, cfg, validationutils.ExternalData{
 					"full_ids" : map[string]bool{
-						"test": true,
-						"test2": false,
+						"10102": true,
 					},
 				})
 

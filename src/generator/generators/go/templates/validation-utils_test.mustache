@@ -1,0 +1,132 @@
+package validationutils
+
+import "testing"
+
+func TestToStringSlice(t *testing.T) {
+	got, ok := toStringSlice([]interface{}{"a", 10, true, nil})
+	if !ok {
+		t.Fatalf("expected conversion to succeed")
+	}
+	want := []string{"a", "10", "true", "null"}
+	if len(got) != len(want) {
+		t.Fatalf("length mismatch: got=%d want=%d", len(got), len(want))
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("unexpected value at %d: got=%q want=%q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestAreUniqueAndPresent(t *testing.T) {
+	if !AreUnique([]interface{}{"x", "y"}) {
+		t.Fatalf("expected unique slice to pass")
+	}
+	if AreUnique([]interface{}{"x", "x"}) {
+		t.Fatalf("expected duplicate slice to fail")
+	}
+	if !ArePresent([]interface{}{"value"}) {
+		t.Fatalf("expected non-empty non-null values to be present")
+	}
+	if ArePresent([]interface{}{}) || ArePresent([]interface{}{"null"}) || ArePresent([]interface{}{"undefined"}) {
+		t.Fatalf("expected empty/null/undefined slices to fail presence")
+	}
+}
+
+func TestSetComparators(t *testing.T) {
+	tests := []struct {
+		name string
+		fn   func([]interface{}, []interface{}) bool
+		left []interface{}
+		right []interface{}
+		want bool
+	}{
+		{"allin true", AllIn, []interface{}{"a", "b"}, []interface{}{"a", "b", "c"}, true},
+		{"allin false", AllIn, []interface{}{"a", "z"}, []interface{}{"a", "b", "c"}, false},
+		{"anyin true", AnyIn, []interface{}{"x", "b"}, []interface{}{"a", "b", "c"}, true},
+		{"anyin false", AnyIn, []interface{}{"x", "y"}, []interface{}{"a", "b", "c"}, false},
+		{"nonein true", NoneIn, []interface{}{"x", "y"}, []interface{}{"a", "b", "c"}, true},
+		{"nonein false", NoneIn, []interface{}{"x", "b"}, []interface{}{"a", "b", "c"}, false},
+		{"regression empty-left allin false", AllIn, []interface{}{}, []interface{}{"a"}, false},
+		{"regression empty-left anyin false", AnyIn, []interface{}{}, []interface{}{"a"}, false},
+		{"empty-left nonein true", NoneIn, []interface{}{}, []interface{}{"a"}, true},
+		{"map lookup", AllIn, []interface{}{"k1", "k2"}, []interface{}{map[string]interface{}{"k1": 1, "k2": 2}}, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.fn(tt.left, tt.right); got != tt.want {
+				t.Fatalf("unexpected result: got=%v want=%v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEqualTo(t *testing.T) {
+	if !EqualTo([]interface{}{"1", "2"}, []interface{}{"1", "2"}) {
+		t.Fatalf("expected equal slices to match")
+	}
+	if EqualTo([]interface{}{"1", "2"}, []interface{}{"2", "1"}) {
+		t.Fatalf("expected different-order slices to fail")
+	}
+	if EqualTo([]interface{}{"1"}, []interface{}{"1", "2"}) {
+		t.Fatalf("expected different-length slices to fail")
+	}
+}
+
+func TestGreaterThanAndLessThan(t *testing.T) {
+	if !GreaterThan([]interface{}{"10", "20"}, []interface{}{"1", "2"}) {
+		t.Fatalf("expected numeric greater-than to pass")
+	}
+	if GreaterThan([]interface{}{"1"}, []interface{}{"2"}) {
+		t.Fatalf("expected numeric greater-than to fail")
+	}
+	if !LessThan([]interface{}{"1", "2"}, []interface{}{"10", "20"}) {
+		t.Fatalf("expected numeric less-than to pass")
+	}
+	if LessThan([]interface{}{"2"}, []interface{}{"1"}) {
+		t.Fatalf("expected numeric less-than to fail")
+	}
+
+	leftDates := []interface{}{"2025-01-02T00:00:00Z", "2025-01-03T00:00:00Z"}
+	rightDates := []interface{}{"2025-01-01T00:00:00Z", "2025-01-02T00:00:00Z"}
+	if !GreaterThan(leftDates, rightDates) {
+		t.Fatalf("expected date greater-than to pass")
+	}
+
+	leftOlderDates := []interface{}{"2025-01-01T00:00:00Z", "2025-01-02T00:00:00Z"}
+	rightNewerDates := []interface{}{"2025-01-02T00:00:00Z", "2025-01-03T00:00:00Z"}
+	if !LessThan(leftOlderDates, rightNewerDates) {
+		t.Fatalf("expected date less-than to pass")
+	}
+
+	if GreaterThan([]interface{}{"abc"}, []interface{}{"1"}) || LessThan([]interface{}{"abc"}, []interface{}{"1"}) {
+		t.Fatalf("expected non-comparable values to fail")
+	}
+}
+
+func TestRegexAndISOHelpers(t *testing.T) {
+	if !FollowRegex([]interface{}{"123", "456"}, []interface{}{`^\d+$`}) {
+		t.Fatalf("expected all values to match regex")
+	}
+	if FollowRegex([]interface{}{"123", "abc"}, []interface{}{`^\d+$`}) {
+		t.Fatalf("expected mixed values to fail regex check")
+	}
+	if FollowRegex([]interface{}{"123"}, []interface{}{`[`}) {
+		t.Fatalf("expected invalid regex to fail")
+	}
+
+	if !isISO8601("2025-01-02T03:04:05Z") {
+		t.Fatalf("expected valid RFC3339 timestamp")
+	}
+	if isISO8601("2025-01-02") {
+		t.Fatalf("expected date-only string to fail")
+	}
+}
+
+func TestStringSliceToInterface(t *testing.T) {
+	got := StringSliceToInterface([]string{"a", "b"})
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
+		t.Fatalf("unexpected conversion result: %#v", got)
+	}
+}

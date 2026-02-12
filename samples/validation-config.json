@@ -1,12 +1,10 @@
 {
-	"_TESTS_": {
-		"provider": [
-			{
-				"_NAME_": "CONTEXT_REQUIRED_DOMAIN",
-				"attr": "$.context.domain",
-				"_RETURN_": "attr are present"
-			}
-		]
-	},
-	"_SESSION_DATA_": {}
+  "_TESTS_": {
+    "on_confirm": [
+      {
+        "_NAME_": "PAYMENT_TRANSACTION_ID"
+      }
+    ]
+  },
+  "_SESSION_DATA_": {}
 }

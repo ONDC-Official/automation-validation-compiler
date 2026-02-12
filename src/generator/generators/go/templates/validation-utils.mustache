@@ -5,6 +5,8 @@ package validationutils
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/dlclark/regexp2"
@@ -34,7 +36,7 @@ func AreUnique(operand []interface{}) bool {
 	if !ok {
 		return false
 	}
-	
+
 	valuesSet := make(map[string]struct{})
 	for _, v := range strs {
 		valuesSet[v] = struct{}{}
@@ -199,7 +201,7 @@ func EqualTo(left []interface{}, right []interface{}) bool {
 	if !ok1 || !ok2 {
 		return false
 	}
-	
+
 	if len(leftStrs) != len(rightStrs) {
 		return false
 	}
@@ -217,7 +219,7 @@ func GreaterThan(left []interface{}, right []interface{}) bool {
 	if !ok1 || !ok2 {
 		return false
 	}
-	
+
 	areAllISO := func(arr []string) bool {
 		for _, v := range arr {
 			if !isISO8601(v) {
@@ -287,7 +289,7 @@ func LessThan(left []interface{}, right []interface{}) bool {
 	if !ok1 || !ok2 {
 		return false
 	}
-	
+
 	areAllISO := func(arr []string) bool {
 		for _, v := range arr {
 			if !isISO8601(v) {
@@ -351,21 +353,36 @@ func LessThan(left []interface{}, right []interface{}) bool {
 	return false
 }
 
+var regexCache sync.Map // cache compiled regexes
+
 func FollowRegex(left []interface{}, regexArray []interface{}) bool {
 	leftStrs, ok1 := toStringSlice(left)
 	regexStrs, ok2 := toStringSlice(regexArray)
 	if !ok1 || !ok2 {
 		return false
 	}
-	
+
 	if len(leftStrs) == 0 && len(regexStrs) != 0 {
 		return false
 	}
+
 	for _, regexStr := range regexStrs {
-		re, err := regexp2.Compile(regexStr, 0)
-		if err != nil {
-			return false
+		var re *regexp2.Regexp
+		regexStr = sanitizeRegex(regexStr)
+		fmt.Printf("Using regex: %s\n", regexStr)
+		// Check cache first
+		if cached, ok := regexCache.Load(regexStr); ok {
+			re = cached.(*regexp2.Regexp)
+		} else {
+			compiled, err := regexp2.Compile(regexStr, 0)
+			if err != nil {
+				fmt.Printf("Invalid regex '%s': %v\n", regexStr, err)
+				return false
+			}
+			regexCache.Store(regexStr, compiled)
+			re = compiled
 		}
+
 		for _, v := range leftStrs {
 			match, err := re.MatchString(v)
 			if err != nil || !match {
@@ -373,7 +390,15 @@ func FollowRegex(left []interface{}, regexArray []interface{}) bool {
 			}
 		}
 	}
+
 	return true
+}
+
+// Only fixes escapes that are invalid in regexp2
+func sanitizeRegex(regex string) string {
+    regex = strings.ReplaceAll(regex, `\_`, `_`) // escaped underscore → literal
+    regex = strings.ReplaceAll(regex, `\-`, `-`) // escaped hyphen → literal
+    return regex
 }
 
 func isISO8601(str string) bool {
@@ -381,7 +406,7 @@ func isISO8601(str string) bool {
 	if err != nil {
 		return false
 	}
-	
+
 	match, err := iso8601Regex.MatchString(str)
 	if err != nil || !match {
 		return false
