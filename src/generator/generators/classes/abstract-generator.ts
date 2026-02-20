@@ -11,24 +11,25 @@ import { ErrorDefinition } from "../../../types/error-codes";
         2. combine all the tests
 */
 export type CodeGeneratorProps = {
-	codeName: string;
+    codeName: string;
+    goPkgName?: string;
 };
 
 export abstract class CodeGenerator {
-	validationConfig: ValidationConfig;
-	rootPath: string;
-	errorCodes: ErrorDefinition[];
-	constructor(
-		validationConfig: ValidationConfig,
-		errorCodes: ErrorDefinition[],
-		rootPath = "./"
-	) {
-		this.validationConfig = validationConfig;
-		this.rootPath = rootPath;
-		this.errorCodes = errorCodes;
-	}
-	abstract generateSessionDataCode(): Promise<void>;
-	abstract generateValidationCode(): Promise<void>;
-	abstract generateCode(codeConfig: CodeGeneratorProps): Promise<void>;
-	abstract generateUnitTestingCode(): Promise<void>;
+    validationConfig: ValidationConfig;
+    rootPath: string;
+    errorCodes: ErrorDefinition[];
+    constructor(
+        validationConfig: ValidationConfig,
+        errorCodes: ErrorDefinition[],
+        rootPath = "./",
+    ) {
+        this.validationConfig = validationConfig;
+        this.rootPath = rootPath;
+        this.errorCodes = errorCodes;
+    }
+    abstract generateSessionDataCode(): Promise<void>;
+    abstract generateValidationCode(): Promise<void>;
+    abstract generateCode(codeConfig: CodeGeneratorProps): Promise<void>;
+    abstract generateUnitTestingCode(): Promise<void>;
 }

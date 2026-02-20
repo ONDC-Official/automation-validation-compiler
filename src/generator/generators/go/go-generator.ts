@@ -26,7 +26,7 @@ import { MarkdownDocGenerator } from "../documentation/md-generator.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const packageName = "validationpkg";
+const defaultPkgName = "validationpkg";
 
 export class GoGenerator extends CodeGenerator {
     codeConfig: CodeGeneratorProps | undefined;
@@ -47,6 +47,10 @@ export class GoGenerator extends CodeGenerator {
             ),
             "utf-8",
         );
+        const sessionDataUtilsCode = Mustache.render(sessionDataUtilsTemplate, {
+            pkgName: this.codeConfig.goPkgName,
+        });
+
         const storageInterfaceTemplate = readFileSync(
             path.resolve(
                 __dirname,
@@ -69,6 +73,7 @@ export class GoGenerator extends CodeGenerator {
             ),
             "utf-8",
         );
+
         const saveActionUtilsTemplate = readFileSync(
             path.resolve(
                 __dirname,
@@ -76,6 +81,9 @@ export class GoGenerator extends CodeGenerator {
             ),
             "utf-8",
         );
+        const saveActionUtilsCode = Mustache.render(saveActionUtilsTemplate, {
+            pkgName: this.codeConfig.goPkgName,
+        });
 
         const allActions = Object.keys(tests);
         const indexCode = Mustache.render(indexTemplate, {
@@ -86,6 +94,7 @@ export class GoGenerator extends CodeGenerator {
                 /[^a-zA-Z0-9_]/g,
                 "",
             ),
+            pkgName: this.codeConfig.goPkgName,
         });
 
         for (const action of allActions) {
@@ -117,38 +126,39 @@ export class GoGenerator extends CodeGenerator {
                 })),
 
                 action: action,
+                pkgName: this.codeConfig.goPkgName,
             });
 
             await writeAndFormatCode(
                 this.rootPath,
-                `./${packageName}/storageutils/${action}.go`,
+                `./${this.codeConfig.goPkgName}/storageutils/${action}.go`,
                 saveCode,
                 "go",
             );
         }
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/storageutils/save_utils.go`,
-            sessionDataUtilsTemplate,
+            `./${this.codeConfig.goPkgName}/storageutils/save_utils.go`,
+            sessionDataUtilsCode,
             "go",
         );
 
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/validationutils/storage-interface.go`,
+            `./${this.codeConfig.goPkgName}/validationutils/storage-interface.go`,
             storageInterfaceTemplate,
             "go",
         );
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/storageutils/index.go`,
+            `./${this.codeConfig.goPkgName}/storageutils/index.go`,
             indexCode,
             "go",
         );
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/storageutils/api_save_utils.go`,
-            saveActionUtilsTemplate,
+            `./${this.codeConfig.goPkgName}/storageutils/api_save_utils.go`,
+            saveActionUtilsCode,
             "go",
         );
     }
@@ -169,10 +179,11 @@ export class GoGenerator extends CodeGenerator {
             const finalCode = Mustache.render(apiTestTemplate, {
                 functionCode: testFunction.code,
                 apiName: stringToCaps(key),
+                pkgName: this.codeConfig?.goPkgName,
             });
             await writeAndFormatCode(
                 this.rootPath,
-                `./${packageName}/jsonvalidations/${key}.go`,
+                `./${this.codeConfig?.goPkgName}/jsonvalidations/${key}.go`,
                 finalCode,
                 "go",
             );
@@ -180,6 +191,9 @@ export class GoGenerator extends CodeGenerator {
     }
     generateCode = async (codeConfig: CodeGeneratorProps) => {
         this.codeConfig = codeConfig;
+        if (!this.codeConfig.goPkgName) {
+            this.codeConfig.goPkgName = defaultPkgName;
+        }
         const jsonPathUtilsCode = readFileSync(
             path.resolve(__dirname, "./templates/json-path-utils.mustache"),
             "utf-8",
@@ -202,6 +216,9 @@ export class GoGenerator extends CodeGenerator {
             path.resolve(__dirname, "./templates/go-mod.mustache"),
             "utf-8",
         );
+        const goModCode = Mustache.render(goMod, {
+            pkgName: codeConfig.goPkgName,
+        });
 
         const typesCode = Mustache.render(typesTemplate, {
             externalData: this.getExternalKeys(),
@@ -209,32 +226,32 @@ export class GoGenerator extends CodeGenerator {
 
         writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/validationutils/json_path_utils.go`,
+            `./${this.codeConfig.goPkgName}/validationutils/json_path_utils.go`,
             jsonPathUtilsCode,
             "go",
         );
         writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/validationutils/validation_utils.go`,
+            `./${this.codeConfig.goPkgName}/validationutils/validation_utils.go`,
             validationUtils,
             "go",
         );
         writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/validationutils/test-config.go`,
+            `./${this.codeConfig.goPkgName}/validationutils/test-config.go`,
             typesCode,
             "go",
         );
         writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/validationutils/json_normalizer.go`,
+            `./${this.codeConfig.goPkgName}/validationutils/json_normalizer.go`,
             normalizerTemplate,
             "go",
         );
         await this.generateValidationCode();
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/main-validator.go`,
+            `./${this.codeConfig.goPkgName}/main-validator.go`,
             this.generateIndexFile(
                 Object.keys(this.validationConfig[ConfigSyntax.Tests]),
                 codeConfig.codeName,
@@ -244,8 +261,8 @@ export class GoGenerator extends CodeGenerator {
 
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/go.mod`,
-            goMod,
+            `./${this.codeConfig.goPkgName}/go.mod`,
+            goModCode,
             "text",
         );
         await this.generateSessionDataCode();
@@ -263,11 +280,11 @@ export class GoGenerator extends CodeGenerator {
     ): string {
         functionName = functionName.replace(/[^a-zA-Z0-9_]/g, "");
         let importList = [
-            `"validationpkg/validationutils"`,
-            `"validationpkg/jsonvalidations"`,
+            `"${this.codeConfig?.goPkgName}/validationutils"`,
+            `"${this.codeConfig?.goPkgName}/jsonvalidations"`,
             `"fmt"`,
             `"encoding/json"`,
-            `"validationpkg/storageutils"`,
+            `"${this.codeConfig?.goPkgName}/storageutils"`,
         ];
         const masterTemplate = readFileSync(
             path.resolve(__dirname, "./templates/index.mustache"),
@@ -396,6 +413,7 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
         return Mustache.render(masterTemplate, {
             importCode: importCode,
             masterFunction: masterFunction,
+            pkgName: this.codeConfig?.goPkgName,
         });
     }
 
@@ -575,10 +593,11 @@ ${importList.map((imp) => `\t${imp}`).join("\n")}
         );
         const finalTestCode = Mustache.render(testTemplate, {
             functionName: this.codeConfig?.codeName ?? "L1Validations",
+            pkgName: this.codeConfig?.goPkgName ?? defaultPkgName,
         });
         await writeAndFormatCode(
             this.rootPath,
-            `./${packageName}/main-validator_test.go`,
+            `./${this.codeConfig?.goPkgName ?? defaultPkgName}/main-validator_test.go`,
             finalTestCode,
             "go",
         );
