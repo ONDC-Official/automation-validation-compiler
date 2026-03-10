@@ -30,7 +30,7 @@ export class MarkdownDocGenerator extends CodeGenerator {
     generateUnitTestingCode(): Promise<void> {
         throw new Error("Method not implemented.");
     }
-
+    codeConfig: CodeGeneratorProps | undefined;
     generateValidationCode = async () => {
         const testConfig = this.validationConfig[ConfigSyntax.Tests];
 
@@ -48,6 +48,7 @@ export class MarkdownDocGenerator extends CodeGenerator {
                 action,
                 action, // use action name as codeName heading inside the doc
                 testConfig[action],
+                this.codeConfig as CodeGeneratorProps,
             );
             finalMarkdown += `\n\n${section}`;
         }
@@ -73,7 +74,8 @@ export class MarkdownDocGenerator extends CodeGenerator {
         writeFileWithFsExtra(this.rootPath, "./page/style.css", cssData);
     };
 
-    generateCode = async (_codeConfig?: CodeGeneratorProps) => {
+    generateCode = async (codeConfig: CodeGeneratorProps) => {
+        this.codeConfig = codeConfig; // store for use in generateValidationCode
         await this.generateValidationCode();
     };
 }

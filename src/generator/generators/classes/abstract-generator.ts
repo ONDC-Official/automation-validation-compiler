@@ -13,6 +13,8 @@ import { ErrorDefinition } from "../../../types/error-codes";
 export type CodeGeneratorProps = {
     codeName: string;
     goPkgName?: string;
+    domain?: string | string[];
+    version?: string;
 };
 
 export abstract class CodeGenerator {

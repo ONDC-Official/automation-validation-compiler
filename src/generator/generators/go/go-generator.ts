@@ -271,7 +271,7 @@ export class GoGenerator extends CodeGenerator {
             this.validationConfig,
             this.errorCodes,
             this.rootPath,
-        ).generateCode();
+        ).generateCode(codeConfig);
     };
 
     private generateIndexFile(

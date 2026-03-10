@@ -43,6 +43,8 @@ export class ConfigCompiler {
     errorDefinitions: ErrorDefinition[] | undefined;
     generatorConfig: CodeGeneratorConfig | undefined;
     language: SupportedLanguages;
+    domain?: string | string[];
+    version?: string;
     private SchemaExtractionService: SchemaExtractionService;
     constructor(language: SupportedLanguages) {
         this.language = language;
@@ -66,10 +68,11 @@ export class ConfigCompiler {
 
         const errors = this.buildData["x-errorcodes"];
         this.errorDefinitions = errors.code;
+        this.domain = this.buildData.info?.domain;
+        this.version = this.buildData.info?.version;
     };
 
     performValidations = async (valConfig: ValidationConfig) => {
-        // try {
         if (!this.buildData) throw new Error("Build data not initialized");
         if (!this.jsonSchemas) throw new Error("Schemas not initialized");
         if (!this.possibleJsonPaths)
@@ -83,31 +86,34 @@ export class ConfigCompiler {
             this.possibleJsonPaths,
             this.errorDefinitions,
         ).validate();
-        // } catch (e) {
-        // 	logger.error(e);
-        // 	throw new Error(e as any);
-        // }
     };
 
     withMinimalValidations = async (valConfig: ValidationConfig) => {
-        // try {
         await new ConfigValidator("", valConfig, {}, [], {
             minimal: true,
         }).validate();
-        // } catch (e) {
-        // logger.error(e);
-        // throw new Error("validation failed");
     };
-    // };
 
     generateCode = async (
         valConfig: ValidationConfig,
-        codeName: string = "L1-Validations",
-        minimal: boolean = false,
-        outputPath: string = "./",
-        absolutePath: boolean = false,
-        goPackageName: string = "validationpkg",
+        codeGenConfig: CodeGenConfig | string = "L1-Validations",
     ) => {
+        // Accept either the new CodeGenConfig object or the legacy positional
+        // string (codeName) so existing call-sites continue to work.
+        const config: CodeGenConfig =
+            typeof codeGenConfig === "string"
+                ? { codeName: codeGenConfig }
+                : codeGenConfig;
+
+        const {
+            codeName = "L1-Validations",
+            goPkgName = "validationpkg",
+            minimal = false,
+            outputPath = "./",
+            absolutePath = false,
+            domain = this.domain,
+            version = this.version,
+        } = config;
         try {
             console.log("[ CODE GENERATION ] Starting code generation...");
             valConfig = JSON.parse(JSON.stringify(valConfig));
@@ -132,6 +138,8 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 case SupportedLanguages.Python:
@@ -141,6 +149,8 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 case SupportedLanguages.Javascript:
@@ -150,6 +160,8 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 case SupportedLanguages.Golang:
@@ -159,7 +171,9 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
-                        goPkgName: goPackageName,
+                        goPkgName: goPkgName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 case SupportedLanguages.Markdown:
@@ -167,7 +181,11 @@ export class ConfigCompiler {
                         valConfig,
                         this.errorDefinitions ?? [],
                         targetPath,
-                    ).generateCode();
+                    ).generateCode({
+                        codeName: codeName,
+                        domain: domain,
+                        version: version,
+                    });
                     break;
                 case SupportedLanguages.RAG:
                     await new RagGenerator(
@@ -176,6 +194,8 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 case SupportedLanguages.RAG_TABLE:
@@ -185,6 +205,8 @@ export class ConfigCompiler {
                         targetPath,
                     ).generateCode({
                         codeName: codeName,
+                        domain: domain,
+                        version: version,
                     });
                     break;
                 default:
@@ -253,31 +275,41 @@ export class ConfigCompiler {
     generateValidPaths = async () => {
         if (!this.possibleJsonPaths)
             throw new Error("Possible paths not initialized");
-        // writeFileSync(
-        // 	"./validPaths.json",
-        // 	JSON.stringify(this.possibleJsonPaths, null, 2)
-        // );
         return this.possibleJsonPaths;
     };
 
     generateValidationFromBuild = async (
-        codeName: string,
-        outputPath: string,
-        absolutePath: boolean = false,
-        goPackageName: string = "validationpkg",
+        codeGenConfig: CodeGenConfig | string,
+        outputPath?: string,
+        absolutePath?: boolean,
+        goPackageName?: string,
     ) => {
         if (!this.buildData) throw new Error("Build data not initialized");
         const valConfig = this.buildData["x-validations"];
         if (!valConfig)
             throw new Error("No validation config found in build data");
-        await this.generateCode(
-            valConfig,
-            codeName,
-            false,
-            outputPath,
-            absolutePath,
-            goPackageName,
-        );
+
+        // Support legacy positional call: (codeName, outputPath, absolutePath, goPkgName)
+        const config: CodeGenConfig =
+            typeof codeGenConfig === "string"
+                ? {
+                      codeName: codeGenConfig,
+                      outputPath: outputPath ?? "./",
+                      absolutePath: absolutePath ?? false,
+                      goPkgName: goPackageName ?? "validationpkg",
+                      domain: this.buildData.info?.domain,
+                      version: this.buildData.info?.version,
+                  }
+                : {
+                      ...codeGenConfig,
+                      domain:
+                          codeGenConfig.domain ?? this.buildData?.info?.domain,
+                      version:
+                          codeGenConfig.version ??
+                          this.buildData?.info?.version,
+                  };
+
+        await this.generateCode(valConfig, config);
     };
 
     extractPayloadsFromBuild = async (outputPath: string) => {
@@ -287,3 +319,16 @@ export class ConfigCompiler {
         );
     };
 }
+
+export type CodeGenConfig = {
+    codeName: string;
+    goPkgName?: string;
+    domain?: string | string[];
+    version?: string;
+    /** Skip full path/enum validations and run minimal checks only. Default: false */
+    minimal?: boolean;
+    /** Base output directory. Default: "./" */
+    outputPath?: string;
+    /** Treat outputPath as absolute (skip prepending "generated/<codeName>"). Default: false */
+    absolutePath?: boolean;
+};

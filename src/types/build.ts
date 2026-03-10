@@ -2,53 +2,57 @@ import { ValidationConfig } from "./config-types";
 import { ErrorDefinition } from "./error-codes";
 
 export interface Xattributes {
-	[key: string]: AttributeSet;
+    [key: string]: AttributeSet;
 }
 export interface AttributeSet {
-	attribute_set: AttributeSection;
+    attribute_set: AttributeSection;
 }
 export interface Attribute {
-	required?: string;
-	usage?: any;
-	description?: string;
-	owner?: string;
-	type?: string;
+    required?: string;
+    usage?: any;
+    description?: string;
+    owner?: string;
+    type?: string;
 }
 export interface AttributeSection {
-	[key: string]: Attribute | AttributeSection;
+    [key: string]: Attribute | AttributeSection;
 }
 
 export type BuildPath = {
-	[key: string]: {
-		post: {
-			description: string;
-			requestBody: {
-				content: {
-					"application/json": {
-						schema: any;
-					};
-				};
-			};
-			responses: {
-				default: {
-					content: {
-						"application/json": {
-							schema: any;
-						};
-					};
-				};
-			};
-		};
-	};
+    [key: string]: {
+        post: {
+            description: string;
+            requestBody: {
+                content: {
+                    "application/json": {
+                        schema: any;
+                    };
+                };
+            };
+            responses: {
+                default: {
+                    content: {
+                        "application/json": {
+                            schema: any;
+                        };
+                    };
+                };
+            };
+        };
+    };
 };
 
 export interface BUILD_TYPE {
-	paths: BuildPath;
-	"x-enum": any;
-	"x-attributes": Xattributes;
-	"x-errorcodes": {
-		code: ErrorDefinition[];
-	};
-	"x-validations"?: ValidationConfig;
-	"x-examples"?: any;
+    paths: BuildPath;
+    info: {
+        domain?: string | string[];
+        version?: string;
+    };
+    "x-enum": any;
+    "x-attributes": Xattributes;
+    "x-errorcodes": {
+        code: ErrorDefinition[];
+    };
+    "x-validations"?: ValidationConfig;
+    "x-examples"?: any;
 }

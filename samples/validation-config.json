@@ -1,10 +1,12 @@
 {
-  "_TESTS_": {
-    "on_confirm": [
-      {
-        "_NAME_": "PAYMENT_TRANSACTION_ID"
-      }
-    ]
-  },
-  "_SESSION_DATA_": {}
+    "_TESTS_": {
+        "on_confirm": [
+            {
+                "_NAME_": "PAYMENT_TRANSACTION_ID",
+                "val1": ["TEST"],
+                "_RETURN_": "val1 all in val1"
+            }
+        ]
+    },
+    "_SESSION_DATA_": {}
 }

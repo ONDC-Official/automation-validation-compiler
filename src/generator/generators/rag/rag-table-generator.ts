@@ -76,7 +76,12 @@ export class RagTableGenerator extends CodeGenerator {
 
         for (const action of Object.keys(testConfig)) {
             const testArray = testConfig[action];
-            const md = this.buildActionMarkdown(action, codeName, testArray);
+            const md = this.buildActionMarkdown(
+                action,
+                codeName,
+                testArray,
+                codeConfig,
+            );
             writeFileWithFsExtra(
                 this.rootPath,
                 `./rag-table-docs/${action}.md`,
@@ -119,6 +124,7 @@ export class RagTableGenerator extends CodeGenerator {
         action: string,
         codeName: string,
         testArray: TestObject[],
+        codeConfig: CodeGeneratorProps,
     ): string {
         const rows: TableRow[] = [];
         this.collectRows(testArray, rows, "");
@@ -128,12 +134,18 @@ export class RagTableGenerator extends CodeGenerator {
 
         const dateStr = new Date().toISOString().split("T")[0];
 
+        const domainText = Array.isArray(codeConfig.domain)
+            ? codeConfig.domain.join(", ")
+            : (codeConfig.domain ?? "-");
+
         const frontmatter = [
             "---",
             `action: ${action}`,
             `codeName: ${codeName}`,
             `numTests: ${rows.length}`,
             `generated: ${dateStr}`,
+            `domain: ${domainText}`,
+            `version: ${codeConfig.version ?? "-"}`,
             "---",
         ].join("\n");
 
@@ -142,6 +154,7 @@ export class RagTableGenerator extends CodeGenerator {
             `# ${codeName} — \`${action}\` Validations (Table View)`,
             "",
             `**${leafCount}** leaf validation rule(s) applied to \`${action}\` in the **${codeName}** flow.`,
+            `Domain: \`${domainText}\`, Version: \`${codeConfig.version ?? "-"}\``,
             `Group rows (GRP) list their immediate sub-tests. Leaf rows (LF) show the actual validation logic.`,
             "",
             "---",
