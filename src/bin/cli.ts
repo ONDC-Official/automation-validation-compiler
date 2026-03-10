@@ -180,6 +180,8 @@ function getSupportedLanguage(lang: string): SupportedLanguages {
             return SupportedLanguages.Javascript;
         case "go":
             return SupportedLanguages.Golang;
+        case "md":
+            return SupportedLanguages.Markdown;
         default:
             throw new Error(
                 `Unsupported language: ${lang}. Supported languages are: ${getValidLanguageOptions()}`,

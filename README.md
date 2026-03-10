@@ -194,5 +194,5 @@ await comp.generateCode(x_validations, "L1-validations"); // pass the validation
 ## scripts:
 
 ```
-node ./dist/bin/cli.js xval -c "./samples/build.yaml" -o "./alpha/" -l "go"
+node ./dist/bin/cli.js xval -c "./samples/build.yaml" -o "./alpha/" -l "go" -p "validationpkg"
 ```

@@ -19,6 +19,7 @@ import { PythonGenerator } from "./generators/python/py-generator.js";
 import { JavascriptGenerator } from "./generators/javascript/js-generator.js";
 import { GoGenerator } from "./generators/go/go-generator.js";
 import logger from "../utils/logger.js";
+import { MarkdownDocGenerator } from "./generators/documentation/md-generator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -159,6 +160,13 @@ export class ConfigCompiler {
                         codeName: codeName,
                         goPkgName: goPackageName,
                     });
+                    break;
+                case SupportedLanguages.Markdown:
+                    await new MarkdownDocGenerator(
+                        valConfig,
+                        this.errorDefinitions ?? [],
+                        targetPath,
+                    ).generateCode();
                     break;
                 default:
                     throw new Error("Language not supported");
