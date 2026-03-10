@@ -18,8 +18,9 @@ import { duplicateVariablesInChildren } from "../utils/config-utils/duplicateVar
 import { PythonGenerator } from "./generators/python/py-generator.js";
 import { JavascriptGenerator } from "./generators/javascript/js-generator.js";
 import { GoGenerator } from "./generators/go/go-generator.js";
-import logger from "../utils/logger.js";
 import { MarkdownDocGenerator } from "./generators/documentation/md-generator.js";
+import { RagGenerator } from "./generators/rag/rag-generator.js";
+import { RagTableGenerator } from "./generators/rag/rag-table-generator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -167,6 +168,24 @@ export class ConfigCompiler {
                         this.errorDefinitions ?? [],
                         targetPath,
                     ).generateCode();
+                    break;
+                case SupportedLanguages.RAG:
+                    await new RagGenerator(
+                        valConfig,
+                        this.errorDefinitions ?? [],
+                        targetPath,
+                    ).generateCode({
+                        codeName: codeName,
+                    });
+                    break;
+                case SupportedLanguages.RAG_TABLE:
+                    await new RagTableGenerator(
+                        valConfig,
+                        this.errorDefinitions ?? [],
+                        targetPath,
+                    ).generateCode({
+                        codeName: codeName,
+                    });
                     break;
                 default:
                     throw new Error("Language not supported");

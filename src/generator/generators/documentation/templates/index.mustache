@@ -1,36 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API SERVICE VALIDATIONS</title>
-    <!-- Link to the CSS file -->
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Validations</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div id="content">
-        <h2>List of validations of api</h2>
-        {{{content}}}
+
+<header class="top-bar">
+  <span class="logo">&#9724; ONDC Validations</span>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <input id="search" type="text" placeholder="Search tests, descriptions, error codes&hellip;" autocomplete="off">
+      <button id="clear-search" class="clear-btn hidden">&times;</button>
     </div>
-</body>
+    <div class="filter-group" id="type-filter">
+      <button class="pill active" data-type="all">All</button>
+      <button class="pill" data-type="group">GRP - Groups</button>
+      <button class="pill" data-type="leaf">LF - Tests</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav id="sidebar">
+    <p class="nav-heading">Actions</p>
+    <!-- populated by JS -->
+  </nav>
+
+  <main id="content">
+    {{{content}}}
+  </main>
+</div>
+
+<div id="match-count" class="hidden"></div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Select all list items that have a nested <ul> (collapsible items)
-        const collapsibleItems = document.querySelectorAll('li > ul');
+(function () {
 
-        collapsibleItems.forEach(function(nestedList) {
-            const parentLi = nestedList.parentElement;
-            parentLi.classList.add('collapsible', 'collapsed');
+  /* ── 1. Strip YAML front-matter bleed-through ─────────────────────────
+     marked renders --- as <hr> and the key:value block as <h2>           */
+  document.querySelectorAll('#content hr').forEach(hr => {
+    const sib = hr.nextElementSibling;
+    if (sib && sib.tagName === 'H2' &&
+        /action:|codeName:|numTests:|generated:/.test(sib.textContent)) {
+      const trailingHr = sib.nextElementSibling;
+      if (trailingHr && trailingHr.tagName === 'HR') trailingHr.remove();
+      sib.remove();
+      hr.remove();
+    }
+  });
 
-            // Add click event listener to the <p> inside the list item
-            const clickableArea = parentLi.querySelector('p');
-            clickableArea.addEventListener('click', function(e) {
-                // Prevent click events on links inside the <p>
-                if (e.target.tagName !== 'A') {
-                    parentLi.classList.toggle('collapsed');
-                }
-            });
-        });
+  /* ── 2. Build sidebar nav from h1 headings ────────────────────────── */
+  const nav = document.getElementById('sidebar');
+  document.querySelectorAll('#content h1').forEach((h1, i) => {
+    const id = 'section-' + i;
+    h1.id = id;
+    const link = document.createElement('a');
+    link.href = '#' + id;
+    const match = h1.textContent.match(/`([^`]+)`/);
+    link.textContent = match ? match[1] : h1.textContent.slice(0, 28);
+    link.addEventListener('click', () => {
+      nav.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
     });
+    nav.appendChild(link);
+  });
+
+  /* ── 3. Tag every table body row with data attributes ─────────────── */
+  document.querySelectorAll('table tbody tr').forEach(row => {
+    const typeCell = row.cells[1];
+    if (!typeCell) return;
+    row.dataset.rowtype = typeCell.textContent.includes('GRP') ? 'group' : 'leaf';
+    row.dataset.text = row.textContent.toLowerCase();
+    /* cache original inner HTML of each cell for highlight restore */
+    Array.from(row.cells).forEach(td => { td.dataset.raw = td.innerHTML; });
+  });
+
+  /* ── 4. Shared filter function ────────────────────────────────────── */
+  const searchInput = document.getElementById('search');
+  const clearBtn    = document.getElementById('clear-search');
+  const countEl     = document.getElementById('match-count');
+  let activeType = 'all';
+
+  function escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    clearBtn.classList.toggle('hidden', q === '');
+    let visible = 0, total = 0;
+
+    document.querySelectorAll('table tbody tr').forEach(row => {
+      const typeOk = activeType === 'all' || row.dataset.rowtype === activeType;
+      const textOk = q === '' || (row.dataset.text || '').includes(q);
+      const show   = typeOk && textOk;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+      total++;
+
+      /* inline search highlight */
+      Array.from(row.cells).forEach(td => {
+        if (!td.dataset.raw) return;
+        if (q === '') {
+          td.innerHTML = td.dataset.raw;
+        } else {
+          td.innerHTML = td.dataset.raw.replace(
+            new RegExp('(' + escapeRe(q) + ')', 'gi'),
+            '<mark>$1</mark>'
+          );
+        }
+      });
+    });
+
+    const filtered = q !== '' || activeType !== 'all';
+    countEl.textContent = filtered ? visible + ' / ' + total + ' rows shown' : '';
+    countEl.classList.toggle('hidden', !filtered);
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    applyFilters();
+    searchInput.focus();
+  });
+
+  /* ── 5. Type filter pills ─────────────────────────────────────────── */
+  document.querySelectorAll('#type-filter .pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#type-filter .pill')
+              .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeType = btn.dataset.type;
+      applyFilters();
+    });
+  });
+
+  /* ── 6. Keyboard shortcut: / to focus search ─────────────────────── */
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== searchInput) {
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if (e.key === 'Escape') {
+      searchInput.value = '';
+      applyFilters();
+      searchInput.blur();
+    }
+  });
+
+  /* ── 7. Highlight active section on scroll ────────────────────────── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        nav.querySelectorAll('a').forEach(a =>
+          a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('#content h1').forEach(h => observer.observe(h));
+
+})();
 </script>
+</body>
 </html>

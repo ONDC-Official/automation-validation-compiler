@@ -182,6 +182,10 @@ function getSupportedLanguage(lang: string): SupportedLanguages {
             return SupportedLanguages.Golang;
         case "md":
             return SupportedLanguages.Markdown;
+        case "rag":
+            return SupportedLanguages.RAG;
+        case "rag_table":
+            return SupportedLanguages.RAG_TABLE;
         default:
             throw new Error(
                 `Unsupported language: ${lang}. Supported languages are: ${getValidLanguageOptions()}`,
