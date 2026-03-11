@@ -6,6 +6,10 @@ import {
 } from "../classes/abstract-generator.js";
 import { writeFileWithFsExtra } from "../../../utils/fs-utils.js";
 import { markdownMessageGenerator } from "../documentation/markdown-message-generator.js";
+import { buildAstFromInput } from "../../../services/return-complier/combined.js";
+import { CompileToMarkdownForSkip } from "../../../services/return-complier/ast-functions/compile-to-markdown.js";
+import { ConvertArrayToStringsInTestObject } from "../../../utils/general-utils/string-utils.js";
+import Mustache from "mustache";
 
 /**
  * A single row in the output table.
@@ -208,14 +212,7 @@ export class RagTableGenerator extends CodeGenerator {
                 let skipText = "";
                 if (ownSkip) {
                     try {
-                        skipText = markdownMessageGenerator(
-                            ownSkip,
-                            test,
-                            name,
-                            undefined,
-                        )
-                            .replace(/^#{1,6}\s+\*\*[^*]+\*\*\s*\n\n?/, "")
-                            .trim();
+                        skipText = this.compileSkipToText(ownSkip, test);
                     } catch {
                         skipText = ownSkip;
                     }
@@ -242,14 +239,7 @@ export class RagTableGenerator extends CodeGenerator {
                 let skipText = "";
                 if (ownSkip) {
                     try {
-                        skipText = markdownMessageGenerator(
-                            ownSkip,
-                            test,
-                            name,
-                            undefined,
-                        )
-                            .replace(/^#{1,6}\s+\*\*[^*]+\*\*\s*\n\n?/, "")
-                            .trim();
+                        skipText = this.compileSkipToText(ownSkip, test);
                     } catch {
                         skipText = ownSkip;
                     }
@@ -361,6 +351,20 @@ export class RagTableGenerator extends CodeGenerator {
         );
 
         return [headerRow, sepRow, ...dataRows].join("\n");
+    }
+
+    /**
+     * Compiles a JVAL skip expression to plain text suitable for a table cell.
+     * Uses CompileToMarkdownForSkip (not CompileToMarkdown) so the output
+     * correctly renders conditional/negation skip logic.
+     */
+    private compileSkipToText(skipExpr: string, test: TestObject): string {
+        const skAst = buildAstFromInput(skipExpr);
+        const skBlock = CompileToMarkdownForSkip(skAst, false, 2, false);
+        return Mustache.render(
+            skBlock,
+            ConvertArrayToStringsInTestObject(test),
+        );
     }
 
     /**
