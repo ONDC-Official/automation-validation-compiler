@@ -2,7 +2,6 @@
 
 package validationutils
 
-
 // NormalizeKeys normalizes JSON structures so that:
 //   - All objects with the same property name share the union of keys seen anywhere
 //   - All objects inside the same array share the union of keys at that array level
@@ -70,10 +69,11 @@ func applyTemplates(node interface{}, templates map[string]map[string]struct{}) 
 					next[k] = val
 				}
 
-				// Add missing keys from array union
+				// Add missing keys from array union, rebuilding the templated
+				// sub-structure (not just a bare nil) so deep paths stay aligned.
 				for key := range arrayUnion {
 					if _, exists := next[key]; !exists {
-						next[key] = nil
+						next[key] = instantiateTemplate(key, templates, map[string]struct{}{})
 					}
 				}
 
@@ -124,18 +124,47 @@ func fillFromTemplate(propName string, obj map[string]interface{}, templates map
 		return base // No known template keys for this prop
 	}
 
-	// Fill missing keys with nil
+	// Fill missing keys, rebuilding the templated sub-structure for each
+	// missing key (instead of a bare nil) so that nested paths under a
+	// missing object still resolve to aligned (nil) leaves.
 	filled := make(map[string]interface{})
 	for k, v := range base {
 		filled[k] = v
 	}
 	for key := range template {
 		if _, exists := filled[key]; !exists {
-			filled[key] = nil
+			filled[key] = instantiateTemplate(key, templates, map[string]struct{}{})
 		}
 	}
 
 	return filled
+}
+
+// instantiateTemplate builds a skeleton value for a missing property using the
+// collected per-property-name templates. If the property name has a known
+// object template, it returns a new object whose keys are recursively
+// instantiated (leaves become nil). If there is no template (the property was
+// only ever a primitive/array, or is unknown), it returns nil.
+//
+// visiting guards against cycles in recursive structures (a property name that
+// transitively contains itself) by stopping expansion once a name is already on
+// the current path.
+func instantiateTemplate(propName string, templates map[string]map[string]struct{}, visiting map[string]struct{}) interface{} {
+	template, hasTemplate := templates[propName]
+	if !hasTemplate {
+		return nil
+	}
+	if _, onPath := visiting[propName]; onPath {
+		return nil
+	}
+	visiting[propName] = struct{}{}
+	defer delete(visiting, propName)
+
+	obj := make(map[string]interface{}, len(template))
+	for key := range template {
+		obj[key] = instantiateTemplate(key, templates, visiting)
+	}
+	return obj
 }
 
 // DeepCloneJSON creates a deep clone of a JSON-serializable structure using sonic
